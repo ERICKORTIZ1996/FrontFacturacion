@@ -1,27 +1,20 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+.barra::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: #182a3b;
+    border-radius: 5px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.barra::-webkit-scrollbar-thumb {
+    background-color: #478bb3;
+    border-radius: 4px;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.fondo {
+    background-image: url("/images/fondo-modal.svg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
