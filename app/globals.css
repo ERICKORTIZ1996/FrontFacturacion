@@ -18,3 +18,21 @@
     background-size: cover;
     background-position: center;
 }
+
+.fondo_card {
+    background-image: url("/images/fondo_card.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.fondo_card2 {
+    background-image: url("/images/fondo_card2.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.fondo_card3 {
+    background-image: url("/images/fondo_card3.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+}

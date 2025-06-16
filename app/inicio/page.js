@@ -78,66 +78,36 @@ export default function Inicio() {
                     <h2 className="font-semibold text-gray-100 text-lg mb-5">Últimas facturas</h2>
 
                     <div className="overflow-x-auto whitespace-nowrap barra p-2 mb-5">
-                        <div className="inline-block px-4 py-2 bg-gradient-to-t from-[#1572ab] to-[#158eab] mr-2 w-52 h-52 rounded-3xl border-b-8 border-b-[#11353e]">
-                            <div className="relative w-full h-full flex flex-col justify-center items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-44 absolute text-[#000000] opacity-20">
+                        <div className="inline-block px-4 py-2 mr-2 w-52 h-52 rounded-3xl fondo_card">
+                            <div className="relative w-full h-full flex flex-col justify-end items-center pb-5">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-32 absolute -top-5">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                 </svg>
-                                <p className="text-3xl font-semibold">$ 50.25</p>
-                                <h2>Ganacias del día</h2>
-
-
+                                <p className="text-3xl font-bold text-[#102940]">$ 50.25</p>
+                                <h2 className="text-gray-200">Ganacias del día</h2>
                             </div>
                         </div>
-                        <div className="inline-block px-4 py-2 bg-gradient-to-t from-[#229c5b] to-[#229c4f]  mr-2 w-52 h-52 rounded-3xl border-b-8 border-b-[#0f4020]">
-                            <div className="relative w-full h-full flex flex-col justify-center items-center">
-                                <p className="text-3xl font-semibold">$ 50.25</p>
-                                <h2>Ganacias del mes</h2>
 
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-44 absolute text-[#000000] opacity-20">
+                        <div className="inline-block px-4 py-2 mr-2 w-52 h-52 rounded-3xl fondo_card2">
+                            <div className="relative w-full h-full flex flex-col justify-end items-center pb-5">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-32 absolute -top-5">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
                                 </svg>
+
+                                <p className="text-3xl font-bold text-[#102940]">$ 50.25</p>
+                                <h2 className="text-gray-200">Ganacias del</h2>
                             </div>
                         </div>
-                        <div className="inline-block px-4 py-2 bg-gradient-to-t from-[#db5c19] to-[#db5019] mr-2 w-52 h-52 rounded-3xl border-b-8 border-b-[#3b2012]">
-                            <div className="relative w-full h-full flex flex-col justify-center items-center">
-                                <p className="text-3xl font-semibold">$ 50.25</p>
-                                <h2>Ganacias del mes pasado</h2>
 
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-44 absolute text-[#000000] opacity-20">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z" />
+                        <div className="inline-block px-4 py-2 mr-2 w-52 h-52 rounded-3xl fondo_card3">
+                            <div className="relative w-full h-full flex flex-col justify-end items-center pb-5">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-32 absolute -top-5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
                                 </svg>
-                            </div>
-                        </div>
-                        <div className="inline-block px-4 py-2 bg-gradient-to-t from-[#1572ab] to-[#158eab] mr-2 w-52 h-52 rounded-3xl border-b-8 border-b-[#11353e]">
-                            <div className="relative w-full h-full flex flex-col justify-center items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-44 absolute text-[#000000] opacity-20">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                </svg>
-                                <p className="text-3xl font-semibold">$ 50.25</p>
-                                <h2>Ganacias del día</h2>
 
-
-                            </div>
-                        </div>
-                        <div className="inline-block px-4 py-2 bg-gradient-to-t from-[#229c5b] to-[#229c4f]  mr-2 w-52 h-52 rounded-3xl border-b-8 border-b-[#0f4020]">
-                            <div className="relative w-full h-full flex flex-col justify-center items-center">
-                                <p className="text-3xl font-semibold">$ 50.25</p>
-                                <h2>Ganacias del mes</h2>
-
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-44 absolute text-[#000000] opacity-20">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
-                                </svg>
-                            </div>
-                        </div>
-                        <div className="inline-block px-4 py-2 bg-gradient-to-t from-[#db5c19] to-[#db5019] mr-2 w-52 h-52 rounded-3xl border-b-8 border-b-[#3b2012]">
-                            <div className="relative w-full h-full flex flex-col justify-center items-center">
-                                <p className="text-3xl font-semibold">$ 50.25</p>
-                                <h2>Ganacias del mes pasado</h2>
-
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-44 absolute text-[#000000] opacity-20">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z" />
-                                </svg>
+                                <p className="text-3xl font-bold text-[#102940]">$ 50.25</p>
+                                <h2 className="text-gray-200">Ganacias del día</h2>
                             </div>
                         </div>
                     </div>
@@ -174,7 +144,7 @@ export default function Inicio() {
                             </div>
 
                             <Link
-                                href={'/'}
+                                href={'/emitir-facturas'}
                                 className="hover:bg-[#2e556b] rounded-full p-1 transition-colors"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">

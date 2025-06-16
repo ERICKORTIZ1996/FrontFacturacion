@@ -15,7 +15,7 @@ export default function EmitirFacturas() {
                 <p>Emitir Facturas</p>
             </div>
 
-            <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Maxime quod odit nobis.</p>
+            <p className="mt-3">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Maxime quod odit nobis.</p>
 
 
             <div className="mt-10 flex items-center justify-between bg-gradient-to-t from-[#102940] to-[#182a3b] rounded-2xl p-3">

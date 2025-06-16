@@ -7,7 +7,7 @@ export default function MainLayout({ children }) {
             <NavBar />
 
             <main
-                className="w-full h-full overflow-auto py-6 pr-7 pl-32"
+                className="w-full h-full overflow-auto py-6 pr-7 pl-32 barra"
             >
                 {children}
             </main>

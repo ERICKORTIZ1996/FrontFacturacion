@@ -6,11 +6,21 @@ import { Description, Dialog, DialogPanel, DialogTitle, Button } from '@headless
 import { useMainStore } from '@/store/mainStore'
 import { facturaSchema } from '@/schema'
 import { toast } from 'react-toastify';
+import { AgregarProducto } from '../emitir_facturas_componentes/AgregarProducto'
 
 export default function ModalEmitirFactura() {
 
     const modalCrearNotificacion = useMainStore((state) => state.modalCrearNotificacion)
     const changeModalCrearNotificacion = useMainStore((state) => state.changeModalCrearNotificacion)
+    const formulariosFactura = useMainStore((state) => state.formulariosFactura)
+    const crearFormProducto = useMainStore((state) => state.crearFormProducto)
+
+    const [botonMas, setBotonMas] = useState(true)
+
+    const mostrarFormProducto = () => {
+        crearFormProducto({})
+        setBotonMas(false)
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -30,8 +40,6 @@ export default function ModalEmitirFactura() {
             })
             return
         }
-
-
     };
 
     return (
@@ -39,9 +47,9 @@ export default function ModalEmitirFactura() {
             <Dialog open={modalCrearNotificacion} onClose={() => { }} className="relative z-50">
                 <div className="fixed inset-0 flex w-screen items-center justify-center p-4 bg-gray-800/70">
 
-                    <DialogPanel className="w-[100%] md:w-[90%] h-[90%] space-y-4 px-8 py-6 rounded-3xl shadow-lg fondo overflow-y-auto">
+                    <DialogPanel className="w-[100%] md:w-[90%] h-[90%] space-y-4 px-8 py-6 rounded-3xl shadow-lg fondo">
 
-                        <form onSubmit={handleSubmit}>
+                        <form onSubmit={handleSubmit} className='overflow-y-auto h-full barra pr-8'>
                             <div
                                 className='flex justify-between items-center gap-5 border-b border-b-[#486b8f] pb-5'
                             >
@@ -49,7 +57,17 @@ export default function ModalEmitirFactura() {
 
                             </div>
 
-                            <h2 className='my-5 text-xl'>CABECERA</h2>
+
+                            <h2 className='my-5 text-xl flex gap-2 items-center'>
+
+                                <span className='bg-gray-200 rounded-full p-1 text-gray-800'>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 bg-gray-200 text-gray-800">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+                                    </svg>
+                                </span>
+
+                                Cabecera
+                            </h2>
 
                             <div className='flex gap-5'>
                                 <div className='flex flex-col'>
@@ -98,7 +116,16 @@ export default function ModalEmitirFactura() {
                                 </div>
                             </div>
 
-                            <h2 className='my-5 text-xl'>DATOS DEL CLIENTE</h2>
+                            <h2 className='my-5 text-xl flex gap-2 items-center'>
+
+                                <span className='bg-gray-200 rounded-full p-1 text-gray-800'>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                                    </svg>
+                                </span>
+
+                                Datos del Cliente
+                            </h2>
 
                             <div className='grid grid-cols-3 gap-20'>
 
@@ -175,82 +202,44 @@ export default function ModalEmitirFactura() {
                                 <div></div>
                             </div>
 
-                            <h2 className='my-5 text-xl'>PRODUCTOS / ARTÍCULOS</h2>
+                            <h2 className='my-5 text-xl flex gap-2 items-center'>
 
-                            <div className='flex gap-3'>
-                                <div className='flex flex-col'>
-                                    <label htmlFor="nombres-producto" className='mb-1'>Nombre</label>
-                                    <input
-                                        id='nombres-producto'
-                                        type="text"
-                                        name='nombres-producto'
-                                        className='outline-none bg-[#102940] rounded-lg px-3 py-1'
-                                        placeholder='Ej: Pantalones'
-                                    />
-                                </div>
+                                <span className='bg-gray-200 rounded-full p-1 text-gray-800'>
 
-                                <div className='flex flex-col'>
-                                    <label htmlFor="canatidad-producto" className='mb-1'>Cantidad</label>
-                                    <input
-                                        id='canatidad-producto'
-                                        type="text"
-                                        name='canatidad-producto'
-                                        className='outline-none bg-[#102940] rounded-lg px-3 py-1'
-                                        placeholder='Ej: 2'
-                                    />
-                                </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                    </svg>
+                                </span>
 
-                                <div className='flex flex-col'>
-                                    <label htmlFor="precio-unitario" className='mb-1'>Precio Unitario</label>
-                                    <input
-                                        id='precio-unitario'
-                                        type="text"
-                                        name='precio-unitario'
-                                        className='outline-none bg-[#102940] rounded-lg px-3 py-1'
-                                        placeholder='Ej: 22.50'
-                                    />
-                                </div>
+                                Artículos
 
-                                <div className='flex flex-col'>
-                                    <label htmlFor="descuento" className='mb-1'>Descuento</label>
-                                    <input
-                                        id='descuento'
-                                        type="text"
-                                        name='descuento'
-                                        className='outline-none bg-[#102940] rounded-lg px-3 py-1'
-                                        placeholder='Ej: 5%'
-                                    />
-                                </div>
+                            </h2>
 
-                                <div className='flex flex-col'>
-                                    <label htmlFor="total" className='mb-1'>Total</label>
-                                    <input
-                                        id='total'
-                                        type="text"
-                                        name='total'
-                                        className='outline-none bg-[#102940] rounded-lg px-3 py-1'
-                                        placeholder='Ej: 23.00'
-                                    />
-                                </div>
-                            </div>
+                            {botonMas &&
+                                <button
+                                    type="button"
+                                    className="bg-white text-gray-800 hover:bg-green-500 border border-gray-200 px-2 rounded-full cursor-pointer p-2 hover:border-green-500 hover:text-gray-200 transition-colors"
+                                    onClick={mostrarFormProducto}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                </button>
+                            }
 
-
+                            {formulariosFactura.map(id => (
+                                <AgregarProducto
+                                    key={id}
+                                    id={id}
+                                />
+                            ))}
 
                             <div className='flex justify-between gap-5 items-center mt-10'>
 
 
-                                <p className='font-semibold text-2xl'>Total a Pagar: $ 23.00</p>
+                                <p className='font-semibold text-xl'>Total a Pagar: $ 23.00</p>
 
                                 <div className='flex gap-3 items-center'>
-                                    <Button
-                                        className="bg-[#102940] rounded-full p-1 cursor-pointer hover:bg-[#d76161] transition-colors flex items-center gap-1 px-3 py-1"
-                                        type='submit'
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                        </svg>
-                                        Ingresar Factura
-                                    </Button>
 
                                     <Button
                                         className="bg-[#d24148] rounded-full p-2 cursor-pointer hover:bg-[#d76161] transition-colors flex items-center gap-1 px-3 py-1"
@@ -260,6 +249,16 @@ export default function ModalEmitirFactura() {
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                                         </svg>
                                         Cancelar
+                                    </Button>
+
+                                    <Button
+                                        className="bg-[#102940] rounded-full p-1 cursor-pointer hover:bg-[#3a546e] transition-colors flex items-center gap-1 px-3 py-1"
+                                        type='submit'
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                        </svg>
+                                        Ingresar Factura
                                     </Button>
                                 </div>
                             </div>
