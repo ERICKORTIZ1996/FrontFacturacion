@@ -179,7 +179,7 @@ export const AgregarProducto = ({ id }) => {
                         id='nombre-producto'
                         type="text"
                         name='nombre-producto'
-                        className='outline-none bg-[#102940] rounded-lg px-3 py-1'
+                        className='outline-none bg-[#2e4760] rounded-lg px-3 py-1'
                         placeholder='Ej: Pantalones'
                         onChange={(e) => setFirst(e.target.value)}
                     />
@@ -191,7 +191,7 @@ export const AgregarProducto = ({ id }) => {
                         id='canatidad-producto'
                         type="text"
                         name='canatidad-producto'
-                        className='outline-none bg-[#102940] rounded-lg px-3 py-1'
+                        className='outline-none bg-[#2e4760] rounded-lg px-3 py-1'
                         placeholder='Ej: 2'
                     />
                 </div>
@@ -202,7 +202,7 @@ export const AgregarProducto = ({ id }) => {
                         id='precio-unitario'
                         type="text"
                         name='precio-unitario'
-                        className='outline-none bg-[#102940] rounded-lg px-3 py-1'
+                        className='outline-none bg-[#2e4760] rounded-lg px-3 py-1'
                         placeholder='Ej: 22.50'
                     />
                 </div>
@@ -213,7 +213,7 @@ export const AgregarProducto = ({ id }) => {
                         id='descuento'
                         type="text"
                         name='descuento'
-                        className='outline-none bg-[#102940] rounded-lg px-3 py-1'
+                        className='outline-none bg-[#2e4760] rounded-lg px-3 py-1'
                         placeholder='Ej: 5%'
                     />
                 </div>
@@ -224,7 +224,7 @@ export const AgregarProducto = ({ id }) => {
                         id='total'
                         type="text"
                         name='total'
-                        className='outline-none bg-[#102940] rounded-lg px-3 py-1'
+                        className='outline-none bg-[#2e4760] rounded-lg px-3 py-1'
                         placeholder='Ej: 23.00'
                     />
                 </div>

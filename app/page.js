@@ -2,91 +2,110 @@
 
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { loginSchema } from "@/schema";
+import { toast } from "react-toastify";
 
 export default function Home() {
 
   const router = useRouter();
 
   const handleSubmitIniciarSesion = (formData) => {
+
     router.push('/inicio')
+    return
+
+    const data = {
+      user: formData.get('user'),
+      pass: formData.get('pass')
+    }
+
+
+    const result = loginSchema.safeParse(data)
+
+    if (!result.success) {
+      result.error.issues.forEach(issue => {
+        toast.error(issue.message)
+      })
+    }
+
+
   }
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden  bg-gradient-to-r from-[#293c6b] via-[#2e556b] to-[#293c6b]">
+    <div className="relative w-screen h-screen overflow-hidden fondo-login">
 
-      <div className="flex justify-center items-center h-full shadow-md">
-
-        <div className="relative w-52 h-[70%] rounded-l-3xl overflow-hidden bg-[#293c6b] z-10">
-          <Image
-            src="/images/bienvenida.avif"
-            alt="logo-bienvenida"
-            width={20}
-            height={20}
-            className="absolute bottom-0 z-20"
-          />
-        </div>
+      <div className="relative flex justify-start gap-10 items-center h-full">
 
         <form
           action={handleSubmitIniciarSesion}
-          className="px-10 py-16 rounded-r-3xl h-[70%] fondo w-[25%] shadow-md z-10"
+          className="px-10 py-16 rounded-3xl h-[90%] ml-10 bg-gradient-to-t from-[#102940]/20 to-[#182a3b]/60 shadow shadow-gray-800 flex items-center"
         >
 
-          <p className="font-semibold text-3xl">BIENVENIDO!</p>
-          <p className="mb-10">Inicia sesión para poder administrar tu negocio.</p>
+          <div>
+            <p className="font-semibold text-3xl text-center">BIENVENIDO</p>
+            <p className="mb-10 text-center">Inicia sesión para poder gestionar tus tareas</p>
 
-          <p className="font-semibold mb-2">Correo Electrónico</p>
+            <p className="mb-2">Correo Electrónico</p>
 
-          <div className="relative mb-2">
+            <div className="relative mb-2">
+              <input
+                type="text"
+                placeholder="Ingresa tu correo electrónico"
+                className='outline-none bg-[#2e4760] rounded-xl px-3 py-1  focus:border-[#a4a4a4] border border-[#2e4760] w-full'
+                name="user"
+              />
+            </div>
 
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 absolute top-[10px] left-2 text-gray-400">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm0 0c0 1.657 1.007 3 2.25 3S21 13.657 21 12a9 9 0 1 0-2.636 6.364M16.5 12V8.25" />
-            </svg>
+            <p className="mb-2">Contraseña</p>
+
+            <div className="relative mb-7">
+
+              <input
+                type="text"
+                placeholder="Ingresa tu contraseña"
+                className='outline-none bg-[#2e4760] rounded-xl px-3 py-1  focus:border-[#a4a4a4] border border-[#2e4760] w-full'
+                name="pass"
+              />
+
+              <button
+                type="button"
+                className="absolute top-[2px] right-[5px] cursor-pointer hover:bg-[#102940] rounded-full transition-colors p-1"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 text-gray-400">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </svg>
+              </button>
+
+            </div>
 
             <input
-              type="text"
-              placeholder="Ingresa tu correo electrónico"
-              className='outline-none bg-[#102940] rounded-lg px-3 pl-9 py-2 pr-9 focus:border-blue-500 w-full'
+              type="submit"
+              className=" px-3 py-1 bg-[#1b58fb] rounded-xl w-full m-auto text-white font-semibold hover:bg-[#386dff] cursor-pointer"
+              value="Iniciar Sesión"
             />
           </div>
-
-          <p className="font-semibold mb-2">Contraseña</p>
-
-          <div className="relative mb-7">
-
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 absolute top-[10px] left-2 text-gray-400">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-            </svg>
-
-            <input
-              type="text"
-              placeholder="Ingresa tu contraseña"
-              className='outline-none bg-[#102940] rounded-lg px-3 pl-9 py-2 pr-9 focus:border-blue-500 w-full'
-              name="password"
-            />
-
-            <button
-              type="button"
-              className="absolute top-[10px] right-[10px]"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 text-gray-400">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-              </svg>
-            </button>
-
-          </div>
-
-          <input
-            type="submit"
-            className="py-2 bg-[#1b58fb] rounded-xl w-full text-white font-semibold hover:bg-[#386dff] cursor-pointer"
-            value="Iniciar Sesión"
-          />
         </form>
-      </div>
 
-      <div className="absolute bg-[#364f8e] w-52 h-96 rotate-[-25deg] right-[-150px] top-[30%] z-0"></div>
-      <div className="absolute bg-[#233562] w-52 h-96 rotate-[-25deg] left-[-150px] top-[-20%] z-0"></div>
-      <div className="absolute bg-[#325d76] w-52 h-96 rotate-[65deg] left-[30%] bottom-[-28%] z-0"></div>
+        <div className="flex-1 flex flex-col justify-center items-center h-full">
+
+          <div className="relative w-fit rounded-3xl p-5">
+            <p className="text-6xl bg-gradient-to-l from-[#1bfbd6] via-[#1b58fb] to-[#1bfba9] text-transparent bg-clip-text font-bold drop-shadow-sm drop-shadow-gray-700 mt-10">
+              Decisión INTELIGENTE
+            </p>
+
+            <p className='text-4xl bg-gradient-to-l from-[#1bfbd6] via-[#1b58fb] to-[#1bfba9] text-transparent bg-clip-text font-bold drop-shadow-sm drop-shadow-gray-700'>para administrar</p>
+
+            <p className='text-6xl bg-gradient-to-l from-[#1bfbd6] via-[#1b58fb] to-[#1bfba9] text-transparent bg-clip-text font-bold drop-shadow-sm drop-shadow-gray-700'>tu NEGOCIO</p>
+
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-44 absolute -top-28 -left-14 text-[#4afcbb]">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+            </svg>
+          </div>
+
+        </div>
+
+      </div>
 
     </div>
   );

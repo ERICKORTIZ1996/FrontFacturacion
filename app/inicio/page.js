@@ -1,8 +1,11 @@
 import MainLayout from "@/components/layouts/MainLayout"
 import Image from "next/image"
+import ModalNotificacionesGlobales from "@/components/modals/ModalNotificacionesGlobales"
 import Link from "next/link"
+import BotonNotificacionesGlobales from "@/components/emitir_facturas_componentes/BotonNotificacionesGlobales"
 
 export default function Inicio() {
+
     return (
         <MainLayout>
             <div className="flex justify-between items-start">
@@ -12,26 +15,14 @@ export default function Inicio() {
                     <p>Aquí esta el resumen de tu negocio</p>
                 </div>
 
-                <div className="relative flex justify-end">
-                    <button
-                        type="button"
-                        className="bg-[#102940] rounded-full p-2"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-                        </svg>
-
-                    </button>
-
-                    <span className="absolute top-0 right-0 w-3 h-3 bg-[#d24148] rounded-full"></span>
-                </div>
+                < BotonNotificacionesGlobales />
             </div>
 
 
             <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5">
                 <div className="min-w-0">
 
-                    <div className="relative bg-gradient-to-b from-[#3b46bf] to-[#3f6caf] rounded-3xl mr-5 my-5 shadow-lg flex items-center justify-between px-8 py-6">
+                    <div className="relative bg-gradient-to-b from-[#3b46bf]/50 to-[#3f6caf]/50 rounded-3xl mr-5 my-5 shadow-lg flex items-center justify-between px-8 py-6">
                         <div className="flex flex-col gap-1">
 
                             <div className="flex items-center gap-3">
@@ -63,13 +54,13 @@ export default function Inicio() {
 
                         </div>
 
-                        <div className="relative w-xl">
+                        <div className="relative w-2xl">
                             <Image
                                 src={'/images/banner_principal.png'}
                                 width={500}
                                 height={500}
                                 alt="imagen-bienvenida"
-                                className="absolute -bottom-32 -right-20 w-full"
+                                className="absolute -bottom-40 -right-24 w-full"
                                 priority
                             />
                         </div>
@@ -80,7 +71,7 @@ export default function Inicio() {
                     <div className="overflow-x-auto whitespace-nowrap barra p-2 mb-5">
                         <div className="inline-block px-4 py-2 mr-2 w-52 h-52 rounded-3xl fondo_card">
                             <div className="relative w-full h-full flex flex-col justify-end items-center pb-5">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-32 absolute -top-5">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-32 absolute -top-5 text-[#96ccff]">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                 </svg>
                                 <p className="text-3xl font-bold text-[#102940]">$ 50.25</p>
@@ -91,30 +82,31 @@ export default function Inicio() {
                         <div className="inline-block px-4 py-2 mr-2 w-52 h-52 rounded-3xl fondo_card2">
                             <div className="relative w-full h-full flex flex-col justify-end items-center pb-5">
 
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-32 absolute -top-5">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-32 absolute -top-10 text-[#96ffb7]">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
                                 </svg>
 
-                                <p className="text-3xl font-bold text-[#102940]">$ 50.25</p>
+                                <p className="text-3xl font-bold text-[#104013]">$ 50.25</p>
                                 <h2 className="text-gray-200">Ganacias del</h2>
                             </div>
                         </div>
 
                         <div className="inline-block px-4 py-2 mr-2 w-52 h-52 rounded-3xl fondo_card3">
                             <div className="relative w-full h-full flex flex-col justify-end items-center pb-5">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-32 absolute -top-5">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-32 absolute -top-5 text-[#ffad96]">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
                                 </svg>
 
-                                <p className="text-3xl font-bold text-[#102940]">$ 50.25</p>
+                                <p className="text-3xl font-bold text-[#401a10]">$ 50.25</p>
                                 <h2 className="text-gray-200">Ganacias del día</h2>
                             </div>
                         </div>
+
                     </div>
 
                     <h2 className="font-semibold text-gray-100 text-lg mb-5">Balances</h2>
 
-                    <div className="bg-gradient-to-t from-[#102940] to-[#182a3b] flex justify-between rounded-3xl px-8 py-6">
+                    <div className="bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 flex justify-between rounded-3xl px-8 py-6">
                         <div>
                             sdf
                         </div>
@@ -131,7 +123,7 @@ export default function Inicio() {
                     <h2 className="font-semibold text-gray-100 text-lg my-5">Gestionar</h2>
 
                     <div className="flex flex-col gap-3">
-                        <div className="bg-gradient-to-t from-[#102940] to-[#182a3b] shadow-lg rounded-3xl pl-3 pr-6 py-2 flex justify-between items-center gap-3">
+                        <div className="bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 shadow-lg rounded-3xl pl-3 pr-6 py-2 flex justify-between items-center gap-3">
                             <div className="flex justify-between items-center gap-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-11 bg-[#2e556b] rounded-2xl p-1">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
@@ -155,7 +147,7 @@ export default function Inicio() {
 
                         </div>
 
-                        <div className="bg-gradient-to-t from-[#102940] to-[#182a3b] bg-opacity-60 shadow-lg border-gray-400 rounded-3xl pl-3 pr-6 py-2 flex justify-between items-center gap-3">
+                        <div className="bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 bg-opacity-60 shadow-lg border-gray-400 rounded-3xl pl-3 pr-6 py-2 flex justify-between items-center gap-3">
                             <div className="flex justify-between items-center gap-4">
 
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-11 bg-[#2e556b] rounded-2xl p-1">
@@ -181,7 +173,7 @@ export default function Inicio() {
 
                         </div>
 
-                        <div className="bg-gradient-to-t from-[#102940] to-[#182a3b] bg-opacity-60 shadow-lg border-gray-400 rounded-3xl pl-3 pr-6 py-2 flex justify-between items-center gap-3">
+                        <div className="bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 bg-opacity-60 shadow-lg border-gray-400 rounded-3xl pl-3 pr-6 py-2 flex justify-between items-center gap-3">
                             <div className="flex justify-between items-center gap-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-11 bg-[#2e556b] rounded-2xl p-1">
 
@@ -211,7 +203,7 @@ export default function Inicio() {
 
                     <h2 className="font-semibold text-gray-100 text-lg my-5">Facturas</h2>
 
-                    <div className="shadow-lg border-gray-400 rounded-3xl px-8 py-6 fondo">
+                    <div className="shadow-lg border-gray-400 rounded-3xl px-8 py-6 bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50">
 
                         <div className="flex justify-center">
                             <div className="w-52 h-52 bg-[#478bb3] rounded-full mb-5"></div>
@@ -221,17 +213,17 @@ export default function Inicio() {
                         <div className="flex justify-center gap-5">
                             <div>
                                 <div className="w-10 h-10 bg-[#478bb3] rounded-full"></div>
-                                <p>lorem</p>
+                                <p>Quincenal</p>
                             </div>
 
                             <div>
                                 <div className="w-10 h-10 bg-[#478bb3] rounded-full"></div>
-                                <p>lorem</p>
+                                <p>Mensual</p>
                             </div>
 
                             <div>
                                 <div className="w-10 h-10 bg-[#478bb3] rounded-full"></div>
-                                <p>lorem</p>
+                                <p>Anual</p>
                             </div>
                         </div>
                     </div>
@@ -239,6 +231,8 @@ export default function Inicio() {
 
                 </div>
             </div>
+
+            <ModalNotificacionesGlobales />
         </MainLayout>
     )
 }

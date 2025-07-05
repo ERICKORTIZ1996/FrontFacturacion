@@ -14,7 +14,7 @@ export default function NavBar() {
         >
 
             <div
-                className="bg-gradient-to-t from-[#102940] to-[#182a3b] rounded-4xl shadow-lg shadow-[#13222f] h-full flex flex-col justify-between"
+                className="bg-gradient-to-t from-[#102940]/60 to-[#182a3b]/60 rounded-4xl shadow-lg shadow-[#13222f] h-full flex flex-col justify-between"
             >
                 <div>
                     <div className="flex justify-center">

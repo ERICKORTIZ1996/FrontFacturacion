@@ -1,4 +1,3 @@
-// components/Modal.tsx
 'use client'
 
 import { useState } from 'react'
@@ -22,34 +21,40 @@ export default function ModalEmitirFactura() {
         setBotonMas(false)
     }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmit = () => {
+        console.log('asdf');
 
-        const formData = new FormData(e.target);
 
-        const data = {
-            nombreCliente: formData.get('nombre-cliente')
-        }
+        // e.preventDefault();
 
-        const result = facturaSchema.safeParse(data)
+        // const formData = new FormData(e.target);
 
-        if (!result.success) {
+        // const data = {
+        //     nombreCliente: formData.get('nombre-cliente')
+        // }
 
-            result.error.issues.forEach((issue) => {
-                toast.error(issue.message)
-            })
-            return
-        }
+        // const result = facturaSchema.safeParse(data)
+
+        // if (!result.success) {
+
+        //     result.error.issues.forEach((issue) => {
+        //         toast.error(issue.message)
+        //     })
+        //     return
+        // }
     };
 
     return (
         <>
             <Dialog open={modalCrearNotificacion} onClose={() => { }} className="relative z-50">
-                <div className="fixed inset-0 flex w-screen items-center justify-center p-4 bg-gray-800/70">
+                <div className="fixed inset-0 flex w-screen items-center justify-center p-4 bg-gray-800/50">
 
-                    <DialogPanel className="w-[100%] md:w-[90%] h-[90%] space-y-4 px-8 py-6 rounded-3xl shadow-lg fondo">
+                    <DialogPanel className="w-[100%] md:w-[90%] h-[90%] space-y-4 px-8 py-6 rounded-3xl shadow shadow-[#245e95] bg-gradient-to-b from-[#153350] to-[#1f3850]">
 
-                        <form onSubmit={handleSubmit} className='overflow-y-auto h-full barra pr-8'>
+                        <form
+                            action={handleSubmit}
+                            className='overflow-y-auto h-full barra pr-8'
+                        >
                             <div
                                 className='flex justify-between items-center gap-5 border-b border-b-[#486b8f] pb-5'
                             >
@@ -76,7 +81,7 @@ export default function ModalEmitirFactura() {
                                         id='ruc'
                                         type="text"
                                         name='ruc'
-                                        className='outline-none bg-[#102940] rounded-lg px-3 py-1'
+                                        className='outline-none bg-[#2e4760] rounded-lg px-3 py-1'
                                         placeholder='Ej: 1750851956001'
                                     />
                                 </div>
@@ -87,7 +92,7 @@ export default function ModalEmitirFactura() {
                                         id='nombre_local'
                                         type="text"
                                         name='nombre_local'
-                                        className='outline-none bg-[#102940] rounded-lg px-3 py-1'
+                                        className='outline-none bg-[#2e4760] rounded-lg px-3 py-1'
                                         placeholder='Ej: Etafashion'
                                     />
                                 </div>
@@ -98,7 +103,7 @@ export default function ModalEmitirFactura() {
                                         id='sucursal'
                                         type="text"
                                         name='sucursal'
-                                        className='outline-none bg-[#102940] rounded-lg px-3 py-1'
+                                        className='outline-none bg-[#2e4760] rounded-lg px-3 py-1'
                                         placeholder='Ej: Quito'
                                     />
                                 </div>
@@ -110,7 +115,7 @@ export default function ModalEmitirFactura() {
                                         id='direccion'
                                         type="text"
                                         name='direccion'
-                                        className='outline-none bg-[#102940] rounded-lg px-3 py-1'
+                                        className='outline-none bg-[#2e4760] rounded-lg px-3 py-1'
                                         placeholder='Ej: Av. Rio Amazonas'
                                     />
                                 </div>
@@ -136,7 +141,7 @@ export default function ModalEmitirFactura() {
                                             id='nombres-cliente'
                                             type="text"
                                             name='nombres-cliente'
-                                            className='outline-none bg-[#102940] rounded-lg px-3 py-1'
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1'
                                             placeholder='Ej: Cristhian Lorenzo'
                                         />
                                     </div>
@@ -147,7 +152,7 @@ export default function ModalEmitirFactura() {
                                             id='apellidos-cliente'
                                             type="text"
                                             name='apellidos-cliente'
-                                            className='outline-none bg-[#102940] rounded-lg px-3 py-1'
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1'
                                             placeholder='Ej: Velez Zambrano'
                                         />
                                     </div>
@@ -158,7 +163,7 @@ export default function ModalEmitirFactura() {
                                             id='identificacion'
                                             type="text"
                                             name='identificacion'
-                                            className='outline-none bg-[#102940] rounded-lg px-3 py-1'
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1'
                                             placeholder='Ej: 1750851956'
                                         />
                                     </div>
@@ -171,7 +176,7 @@ export default function ModalEmitirFactura() {
                                             id='direccion-cliente'
                                             type="text"
                                             name='direccion-cliente'
-                                            className='outline-none bg-[#102940] rounded-lg px-3 py-1'
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1'
                                             placeholder='Ej: La Planada'
                                         />
                                     </div>
@@ -182,7 +187,7 @@ export default function ModalEmitirFactura() {
                                             id='telefono-cliente'
                                             type="text"
                                             name='telefono-cliente'
-                                            className='outline-none bg-[#102940] rounded-lg px-3 py-1'
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1'
                                             placeholder='Ej: 0989486603'
                                         />
                                     </div>
@@ -193,7 +198,7 @@ export default function ModalEmitirFactura() {
                                             id='correo-cliente'
                                             type="text"
                                             name='correo-cliente'
-                                            className='outline-none bg-[#102940] rounded-lg px-3 py-1'
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1'
                                             placeholder='Ej: cris@cris.com'
                                         />
                                     </div>
@@ -252,7 +257,7 @@ export default function ModalEmitirFactura() {
                                     </Button>
 
                                     <Button
-                                        className="bg-[#102940] rounded-full p-1 cursor-pointer hover:bg-[#3a546e] transition-colors flex items-center gap-1 px-3 py-1"
+                                        className="bg-[#2e4760] rounded-full p-1 cursor-pointer hover:bg-[#3a546e] transition-colors flex items-center gap-1 px-3 py-1"
                                         type='submit'
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">

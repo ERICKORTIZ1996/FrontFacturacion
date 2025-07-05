@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+.main-background {
+    background: linear-gradient(to left, rgba(255, 0, 0, 0), rgba(0, 0, 0, 0.6)),
+        url("/images/main-back.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+}
+
+.fondo-login {
+    background: linear-gradient(to left, rgba(255, 0, 0, 0), rgba(0, 0, 0, 0.6)),
+        url("/images/banner-login.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+}
+
 .barra::-webkit-scrollbar {
     width: 6px;
     height: 6px;

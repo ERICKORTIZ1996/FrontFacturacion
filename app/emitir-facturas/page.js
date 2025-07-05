@@ -1,8 +1,17 @@
 import MainLayout from "@/components/layouts/MainLayout"
 import BotonAgregarFactura from "@/components/emitir_facturas_componentes/BotonAgregarFactura"
 import ModalEmitirFactura from "@/components/modals/ModalEmitirFactura"
+import Paginacion from "@/components/emitir_facturas_componentes/Paginacion"
+import axios from "axios"
 
-export default function EmitirFacturas() {
+// async function getBills() {
+//     const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/devices/informationForDevice/COOPMEGA-4-11`);
+//     return data
+// }
+
+export default async function EmitirFacturas() {
+
+    // const bills = await getBills()
 
     return (
         <MainLayout>
@@ -18,7 +27,7 @@ export default function EmitirFacturas() {
             <p className="mt-3">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Maxime quod odit nobis.</p>
 
 
-            <div className="mt-10 flex items-center justify-between bg-gradient-to-t from-[#102940] to-[#182a3b] rounded-2xl p-3">
+            <div className="mt-10 flex items-center justify-between bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3">
 
                 <div className="flex items-center gap-3">
                     <button
@@ -56,7 +65,7 @@ export default function EmitirFacturas() {
 
             </div>
 
-            <div className="bg-gradient-to-b from-[#153350] to-[#1f3850] shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
+            <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
 
                 <table className="w-full">
                     <thead>
@@ -72,7 +81,7 @@ export default function EmitirFacturas() {
                     </thead>
 
                     <tbody className="odd:bg-red-600">
-                        <tr className="border-b border-[#355370] last-of-type:border-none even:bg-[#2e4760] hover:bg-[#074feb]">
+                        <tr className="border-b border-[#355370] last-of-type:border-none even:bg-[#2e4760] hover:bg-[#4d5d92]">
                             <td className="p-2">001-001-000000417</td>
                             <td className="p-2">$ 105.00</td>
                             <td className="p-2">$ 100.65</td>
@@ -93,7 +102,7 @@ export default function EmitirFacturas() {
                                 </button>
                             </td>
                         </tr>
-                        <tr className="border-b border-[#355370] last-of-type:border-none even:bg-[#2e4760] hover:bg-[#074feb]">
+                        <tr className="border-b border-[#355370] last-of-type:border-none even:bg-[#2e4760] hover:bg-[#4d5d92]">
                             <td className="p-2">001-001-000000417</td>
                             <td className="p-2">$ 105.00</td>
                             <td className="p-2">$ 100.65</td>
@@ -114,7 +123,7 @@ export default function EmitirFacturas() {
                                 </button>
                             </td>
                         </tr>
-                        <tr className="border-b border-[#355370] last-of-type:border-none even:bg-[#2e4760] hover:bg-[#074feb]">
+                        <tr className="border-b border-[#355370] last-of-type:border-none even:bg-[#2e4760] hover:bg-[#4d5d92]">
                             <td className="p-2">001-001-000000417</td>
                             <td className="p-2">$ 105.00</td>
                             <td className="p-2">$ 100.65</td>
@@ -135,7 +144,7 @@ export default function EmitirFacturas() {
                                 </button>
                             </td>
                         </tr>
-                        <tr className="border-b border-[#355370] last-of-type:border-none even:bg-[#2e4760] hover:bg-[#074feb]">
+                        <tr className="border-b border-[#355370] last-of-type:border-none even:bg-[#2e4760] hover:bg-[#4d5d92]">
                             <td className="p-2">001-001-000000417</td>
                             <td className="p-2">$ 105.00</td>
                             <td className="p-2">$ 100.65</td>
@@ -158,6 +167,10 @@ export default function EmitirFacturas() {
                         </tr>
                     </tbody>
                 </table>
+
+                <Paginacion
+                // data={bills}
+                />
 
             </div>
 

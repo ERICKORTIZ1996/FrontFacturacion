@@ -2,8 +2,8 @@ import NavBar from "./NavBar"
 
 export default function MainLayout({ children }) {
     return (
-        <div className="overflow-hidden w-screen h-screen flex bg-gradient-to-r from-[#293c6b] via-[#2e556b] to-[#293c6b]">
-
+        <div className="overflow-hidden w-screen h-screen flex main-background">
+            {/* bg-gradient-to-r from-[#293c6b] via-[#2e556b] to-[#293c6b]  */}
             <NavBar />
 
             <main
