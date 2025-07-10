@@ -52,3 +52,55 @@
     background-repeat: no-repeat;
     background-position: center;
 }
+
+/* ESTILOS PERSONALIZADOS PARA LA LIBRERIA DE SWEETALERT */
+.mi-boton-ok {
+    background-color: #1f2937;
+    padding: 0.25rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.75rem;
+}
+
+.mi-boton-ok:hover {
+    background-color: #374151;
+    transition: 150ms;
+}
+
+.mi-titulo {
+    font-size: 1rem;
+}
+
+.mi-boton-cancel {
+    background-color: white;
+    padding: 0.25rem 0.75rem;
+    font-size: 1rem;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 0.75rem;
+}
+
+.mi-boton-cancel:hover {
+    background-color: #fecaca;
+    padding: 0.25rem 0.75rem;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    transition: 150ms;
+}
+
+.mi-boton-html {
+    font-size: 16px;
+}
+
+.mi-icono {
+    margin: 0em auto 0em;
+    width: 4em;
+    height: 4em;
+}
+
+.mi-popup {
+    width: fit-content;
+    border-radius: 1.5rem;
+    padding: 2rem 4rem;
+    box-shadow: 0px 0px 5px #1c3953;
+    background: linear-gradient(to bottom, #153350, #1f3850);
+}

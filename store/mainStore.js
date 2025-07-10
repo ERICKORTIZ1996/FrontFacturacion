@@ -16,6 +16,6 @@ export const useMainStore = create((set) => ({
     crearFormProducto: (producto) => set((state) => ({
         productos: [...state.productos, producto],
         formulariosFactura: [...state.formulariosFactura, generarId()]
-    }))
-
+    })),
+    setEditar: (value) => set({ editar: value })
 })) 

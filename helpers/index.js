@@ -21,3 +21,25 @@ export const formatearFechaFactura = (fecha) => {
 
     return fechaNueva.toLocaleDateString('es-ES', opcionesFecha).replace('de', '/').replace('de', '/').toUpperCase()
 };
+
+export const consultarFechaEcuador = () => {
+
+    const ecuadorTime = new Date();
+    ecuadorTime.setHours(ecuadorTime.getHours() - 5);
+
+    return {
+        time: ecuadorTime.toISOString(),
+        timezone: 'America/Guayaquil',
+        utc_offset: '-05:00',
+        formatted_time: ecuadorTime.toLocaleString('en-US', {
+            timeZone: 'America/Guayaquil',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        })
+    }
+}
