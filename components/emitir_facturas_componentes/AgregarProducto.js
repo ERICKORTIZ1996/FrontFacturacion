@@ -1,36 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMainStore } from "@/store/mainStore";
-// import Modal from 'react-modal';
 import axios from "axios";
 import { toast } from 'react-toastify';
 import { productoSchema } from "@/schema";
 import Swal from 'sweetalert2';
-// import Decimal from 'decimal.js';
-
-// const customStyles = {
-//     overlay: {
-//         backgroundColor: 'rgba(6, 6, 6, 0.45)',
-//         height: '100vh',
-//         width: '100vw',
-//         zIndex: '21'
-//     },
-//     content: {
-//         top: '50%',
-//         left: '50%',
-//         right: 'auto',
-//         bottom: 'auto',
-//         marginRight: '-50%',
-//         transform: 'translate(-50%, -50%)',
-//         background: '#fff',
-//         padding: '0',
-//         maxWidth: '90%',
-//         maxHeight: '90%',
-//         overflow: 'hidden',
-//         overflow: 'auto',
-//     },
-// };
-
-// Modal.setAppElement('#__next');
 
 export const AgregarProducto = ({ id }) => {
 
@@ -46,6 +19,7 @@ export const AgregarProducto = ({ id }) => {
     const [alerta, setAlerta] = useState(false);
     const [agrePro, setAgrePro] = useState(false)
     const [editarPro, setEditarPro] = useState(false)
+    const isEditable = !(editar || agrePro) || editarPro;
 
     // detalle
     const [codigoPrincipal, setcodigoPrincipal] = useState('')
@@ -96,10 +70,10 @@ export const AgregarProducto = ({ id }) => {
                 id,
                 codigoPrincipal: "001",
                 descripcion: descripcionProducto,
-                cantidad: Number.parseFloat(cantidadProducto),
-                precioUnitario: Number.parseFloat(precioUnitario),
-                descuento: Number.parseFloat(descuento),
-                precioTotalSinImpuesto: Number.parseFloat(precioUnitario),
+                cantidad: cantidadProducto,
+                precioUnitario: precioUnitario,
+                descuento: descuento,
+                precioTotalSinImpuesto: precioUnitario,
                 impuestos: [{
                     codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
                     codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
@@ -151,15 +125,13 @@ export const AgregarProducto = ({ id }) => {
                     precioUnitario: precioUnitario,
                     descuento: descuento,
                     precioTotalSinImpuesto: precioUnitario,
-                    impuestos: {
-                        impuesto: {
-                            codigo: 2, // 2: IVA
-                            codigoPorcentaje: 0, // 0: 0%, 2: 12%, 3: 14%, 6: No Objeto IVA, 7: Exento IVA
-                            tarifa: 0.00,
-                            baseImponible: 10.00,
-                            valor: 0.00
-                        }
-                    }
+                    impuestos: [{
+                        codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
+                        codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
+                        tarifa: 15,
+                        baseImponible: 100.00,
+                        valor: 15.00
+                    }]
                 };
             }
             return p;
@@ -230,7 +202,7 @@ export const AgregarProducto = ({ id }) => {
                         className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-24 disabled:cursor-not-allowed'
                         placeholder='Ej: 2'
                         onChange={(e) => setCantidadProducto(e.target.value)}
-                        disabled={editar || agrePro ? !editarPro : null}
+                        disabled={!isEditable}
                     />
                 </div>
 
@@ -329,21 +301,7 @@ export const AgregarProducto = ({ id }) => {
 
                     </button>
                 }
-
-                {/* <Modal
-                    isOpen={modalStock}
-                    style={customStyles}
-                >
-                    <ModalMostrarStock
-                        BASE_URL={BASE_URL}
-                        stockFiltrado={stockFiltrado}
-                        setProductoState={setProductoState}
-                        setCantidadProductoTemp={setCantidadProductoTemp}
-                        setBusqueda={setBusqueda}
-                    />
-                </Modal> */}
             </div>
-
         </div>
     )
 }

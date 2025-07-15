@@ -7,7 +7,7 @@ export default function Paginacion({ data }) {
 
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(50);
+    const [totalPages, setTotalPages] = useState(1);
 
 
     return (

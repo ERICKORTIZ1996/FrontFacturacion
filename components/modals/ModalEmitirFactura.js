@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Description, Dialog, DialogPanel, DialogTitle, Button } from '@headlessui/react'
 import { useMainStore } from '@/store/mainStore'
 import { facturaSchema } from '@/schema'
@@ -59,6 +59,9 @@ export default function ModalEmitirFactura() {
     }
 
     const emitirFactura = async (formData) => {
+
+
+
 
 
         // 2. Extraigo el ID del CUERPO
@@ -159,16 +162,18 @@ export default function ModalEmitirFactura() {
 
             console.log(dataFactura);
             toast.success(`${dataFactura.message}`)
+            changeModalCrearNotificacion()
 
 
         } catch (e) {
             // toast.error(e.response.data.message);
+            toast.error('Error')
             console.log(e);
 
         }
-
-
     };
+
+    const totalFactura = useMemo(() => productos.reduce((total, p) => total + (Number(p?.precioUnitario) || Number(p?.precioUnitario) || 0), 0), [productos])
 
     useEffect(() => {
         setFechaEcuador(consultarFechaEcuador())
@@ -181,7 +186,7 @@ export default function ModalEmitirFactura() {
                 <div className="fixed inset-0 flex w-screen items-center justify-center p-4 bg-gray-800/40 main-background">
 
                     {/* shadow shadow-[#245e95] */}
-                    <DialogPanel className="w-[100%] md:w-[80%] h-[95%] space-y-4 px-8 py-6 rounded-3xl bg-gradient-to-b from-[#153350]/60 to-[#1f3850]/60">
+                    <DialogPanel className="w-[100%] md:w-[75%] h-[95%] space-y-4 px-8 py-6 rounded-3xl bg-gradient-to-b from-[#153350]/60 to-[#1f3850]/60">
 
                         <div className='flex h-full flex-col justify-between'>
                             <form
@@ -388,7 +393,7 @@ export default function ModalEmitirFactura() {
                                 <div className='flex justify-between gap-5 items-center mt-5'>
 
                                     <p className='font-semibold text-gray-800 text-xl bg-gray-100 rounded-xl px-3 py-1'>
-                                        Total a Pagar: $ 23.00
+                                        Total a Pagar: $ {totalFactura}
                                     </p>
 
                                     <div className='flex gap-3 items-center'>
@@ -408,7 +413,7 @@ export default function ModalEmitirFactura() {
                                         </Button>
 
                                         <Button
-                                            className="bg-gray-100 font-semibold rounded-xl px-4 py-1 border border-gray-100 text-gray-800 flex items-center"
+                                            className={`${productos.length < 2 ? 'hidden' : 'block'} bg-gray-100 font-semibold cursor-pointer rounded-xl px-4 py-1 border border-gray-100 text-gray-800 flex items-center`}
                                             type='submit'
                                             form='main-form-emitir-factura'
                                         >
