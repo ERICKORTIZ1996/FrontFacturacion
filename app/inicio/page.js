@@ -26,6 +26,7 @@ export default function Inicio() {
                     <div className="min-w-0">
 
                         <div className="relative bg-gradient-to-b from-[#3b46bf]/50 to-[#3f6caf]/50 rounded-3xl mr-5 my-5 shadow-lg flex items-center justify-between px-8 py-6">
+
                             <div className="flex flex-col gap-1">
 
                                 <div className="flex items-center gap-3">
@@ -181,7 +182,7 @@ export default function Inicio() {
                                 </div>
 
                                 <Link
-                                    href={'/'}
+                                    href={'/balances'}
                                     className="hover:bg-[#2e556b] rounded-full p-1 transition-colors"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -207,7 +208,7 @@ export default function Inicio() {
                                 </div>
 
                                 <Link
-                                    href={'/'}
+                                    href={'/autorizar-facturas'}
                                     className="hover:bg-[#2e556b] rounded-full p-1 transition-colors"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">

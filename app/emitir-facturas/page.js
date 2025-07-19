@@ -30,7 +30,7 @@ export default async function EmitirFacturas() {
                 <p className="mt-3">Gestiona y genera facturas electrónicas de forma rápida y segura. Completa la información requerida y asegura el cumplimiento tributario en cada emisión.</p>
 
 
-                <div className="mt-10 flex items-center justify-between bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3">
+                <div className="mt-5 flex items-center justify-between bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3">
 
                     <div className="flex items-center gap-3">
                         <button
@@ -70,9 +70,9 @@ export default async function EmitirFacturas() {
 
                 <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
 
-                    <table className="w-full">
-                        <thead>
-                            <tr className="border-b border-[#355370]">
+                    <table className="w-full mt-5">
+                        <thead className="bg-[#05121f]/60">
+                            <tr className="border-b-2 border-[#061727]">
                                 <th className="text-start font-semibold p-2">Número de Factura</th>
                                 <th className="text-start font-semibold p-2">Total</th>
                                 <th className="text-start font-semibold p-2">Subtotal</th>
@@ -83,7 +83,7 @@ export default async function EmitirFacturas() {
                             </tr>
                         </thead>
 
-                        <tbody className="odd:bg-red-600">
+                        <tbody>
                             <TablaEmitirFacturas />
                             <TablaEmitirFacturas />
                             <TablaEmitirFacturas />

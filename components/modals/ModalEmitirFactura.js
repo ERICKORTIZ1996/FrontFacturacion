@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { Description, Dialog, DialogPanel, DialogTitle, Button } from '@headlessui/react'
 import { useMainStore } from '@/store/mainStore'
 import { facturaSchema } from '@/schema'
@@ -21,6 +21,13 @@ export default function ModalEmitirFactura() {
 
     const [botonMas, setBotonMas] = useState(true)
     const [fechaEcuador, setFechaEcuador] = useState({})
+    const [tipoIdentificacion, setTipoIdentificacion] = useState("")
+    const [longitudIdentificacion, setLongitudIdentificacion] = useState(0)
+
+    const inputIdentificacion = useRef(null)
+    const inputNombresCliente = useRef(null)
+    const inputApellidosCliente = useRef(null)
+    const inputDireccionCliente = useRef(null)
 
     // infoTributaria
     const [ambiente, setAmbiente] = useState('')
@@ -60,31 +67,25 @@ export default function ModalEmitirFactura() {
 
     const emitirFactura = async (formData) => {
 
-
-
-
-
         // 2. Extraigo el ID del CUERPO
         const productosFormateados = productos
             .filter(producto => producto.id !== "empty")
             .map(({ id, ...prducto }) => prducto);
 
-        // return
-
         const data = {
             ambiente: "Pruebas", // Cambiado a "Pruebas" o "Produccion" según el diccionario CodigoAmbiente
             tipoEmision: "EmisionNormal", // Cambiado a un valor que coincida con las claves de TipoEmision
-            razonSocial: "ORTIZ MENDOZA ERICK ALEXANDER", // formData.get('razon-social')
+            razonSocial: formData.get('razon-social'),
             ruc: formData.get('ruc'),
             codDoc: "Factura", // Cambiado a un valor que coincida con las claves de CodigoTipoComprobante
             estab: "001",
             ptoEmi: "001",
-            // secuencial: "000000001",
             dirMatriz: formData.get('matriz'),
             dirEstablecimiento: formData.get('direccion'),
             obligadoContabilidad: "NO",
-            tipoIdentificacionComprador: "RUC", // Cambiado a un valor que coincida con las claves de TipoIdentificacion
-            razonSocialComprador: `${formData.get('nombres-cliente')} ${formData.get('apellidos-cliente')}`,
+            tipoIdentificacionComprador: formData.get('tipo-identificacion'),
+            razonSocialComprador: `${formData.get('nombres-cliente')}`,
+            razonSocialCompradorApellidos: `${formData.get('apellidos-cliente')}`,
             identificacionComprador: formData.get('identificacion-cliente'),
             direccionComprador: formData.get('direccion-comprador'),
             totalSinImpuestos: 0.00,
@@ -109,24 +110,21 @@ export default function ModalEmitirFactura() {
             detalles: productosFormateados
         }
 
-        console.log(data);
+        const result = facturaSchema.safeParse(data)
 
+        if (!result.success) {
 
-        // const result = facturaSchema.safeParse(data)
-
-        // if (!result.success) {
-
-        //     result.error.issues.forEach((issue) => {
-        //         toast.error(issue.message)
-        //     })
-        //     return
-        // }
+            result.error.issues.forEach((issue) => {
+                toast.error(issue.message)
+            })
+            return
+        }
 
         try {
             const { data: dataFactura } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/crearXML`, {
-                ambiente: "Pruebas",
+                ambiente: "Pruebas", // Cambiado a "Pruebas" o "Produccion" según el diccionario CodigoAmbiente
                 tipoEmision: "EmisionNormal", // Cambiado a un valor que coincida con las claves de TipoEmision
-                razonSocial: "ORTIZ MENDOZA ERICK ALEXANDER", // formData.get('razon-social')
+                razonSocial: formData.get('razon-social'),
                 ruc: formData.get('ruc'),
                 codDoc: "Factura", // Cambiado a un valor que coincida con las claves de CodigoTipoComprobante
                 estab: "001",
@@ -134,11 +132,11 @@ export default function ModalEmitirFactura() {
                 dirMatriz: formData.get('matriz'),
                 dirEstablecimiento: formData.get('direccion'),
                 obligadoContabilidad: "NO",
-                tipoIdentificacionComprador: "RUC", // Cambiado a un valor que coincida con las claves de TipoIdentificacion
+                tipoIdentificacionComprador: formData.get('tipo-identificacion'),
                 razonSocialComprador: `${formData.get('nombres-cliente')} ${formData.get('apellidos-cliente')}`,
                 identificacionComprador: formData.get('identificacion-cliente'),
                 direccionComprador: formData.get('direccion-comprador'),
-                totalSinImpuestos: 100.00,
+                totalSinImpuestos: 1.00, // ->
                 totalDescuento: 0.00,
                 totalConImpuestos: [
                     {
@@ -151,27 +149,88 @@ export default function ModalEmitirFactura() {
                     }
                 ],
                 propina: 0.00,
-                importeTotal: 115.00,
+                importeTotal: 1.00, // ->
                 moneda: "DOLAR",
                 pagos: [{
                     formaPago: "Efectivo", // Cambiado a un valor que coincida con las claves de FormasPago
-                    total: 115.00
+                    total: 1.00 // ->
                 }],
                 detalles: productosFormateados
             })
 
-            console.log(dataFactura);
-            toast.success(`${dataFactura.message}`)
+            setTipoIdentificacion("")
+            setLongitudIdentificacion(0)
+            setFormulariosFactura([])
+            setProductos([])
+            setBotonMas(true)
             changeModalCrearNotificacion()
+            toast.success(dataFactura.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
 
 
         } catch (e) {
-            // toast.error(e.response.data.message);
-            toast.error('Error')
+            toast.error(e.response.data.mensaje)
             console.log(e);
 
         }
     };
+
+    const controlInputIdentificacion = (value) => {
+
+        setTipoIdentificacion(value)
+
+        if (inputIdentificacion.current) {
+            inputIdentificacion.current.value = "";
+        }
+
+        switch (value) {
+            case 'RUC':
+                setLongitudIdentificacion(13)
+                reiniciarInputsCliente()
+                break;
+
+            case 'CEDULA':
+                setLongitudIdentificacion(10)
+                reiniciarInputsCliente()
+                break;
+
+            case 'PASAPORTE':
+                setLongitudIdentificacion(20)
+                reiniciarInputsCliente()
+                break;
+
+            case 'CONSUMIDOR-FINAL':
+                setLongitudIdentificacion(10)
+                inputNombresCliente.current.value = "CONSUMIDOR FINAL"
+                inputApellidosCliente.current.value = "CONSUMIDOR FINAL"
+                inputIdentificacion.current.value = "0000000000"
+                inputDireccionCliente.current.value = "CONSUMIDOR FINAL"
+                break;
+
+            case 'IDENTIFICACION-EXTERIOR':
+                setLongitudIdentificacion(30)
+                reiniciarInputsCliente()
+                break;
+
+            default:
+                setLongitudIdentificacion(0)
+                reiniciarInputsCliente()
+                break;
+        }
+    }
+
+    const reiniciarInputsCliente = () => {
+        inputNombresCliente.current.value = ""
+        inputApellidosCliente.current.value = ""
+        inputDireccionCliente.current.value = ""
+    }
+
+    const consultarCliente = async () => {
+
+    }
+
+    const consultarEmpresa = async () => {
+
+    }
 
     const totalFactura = useMemo(() => productos.reduce((total, p) => total + (Number(p?.precioUnitario) || Number(p?.precioUnitario) || 0), 0), [productos])
 
@@ -217,26 +276,38 @@ export default function ModalEmitirFactura() {
 
                                 <div className='flex gap-5'>
 
+                                    <div className='flex gap-3 items-end'>
+                                        <div className='flex flex-col'>
+                                            <label htmlFor="ruc" className='mb-1'>Ruc</label>
+                                            <input
+                                                id='ruc'
+                                                type="text"
+                                                name='ruc'
+                                                className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                                placeholder='Ej: 1750851956001'
+                                                maxLength={13}
+                                            />
+                                        </div>
+
+                                        <button
+                                            type='button'
+                                            onClick={() => consultarEmpresa()}
+                                            className='rounded-full bg-[#2e4760] w-fit p-2 cursor-pointer hover:bg-[#3a546e] transition-colors'
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
                                     <div className='flex flex-col'>
-                                        <label htmlFor="razon-social" className='mb-1'>Nombre de Empresa</label>
+                                        <label htmlFor="razon-social" className='mb-1'>Razón Social</label>
                                         <input
                                             id='razon-social'
                                             type="text"
                                             name='razon-social'
                                             className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
-                                            placeholder='Ej: Gran Akí'
-                                        />
-                                    </div>
-
-                                    <div className='flex flex-col'>
-                                        <label htmlFor="ruc" className='mb-1'>Ruc</label>
-                                        <input
-                                            id='ruc'
-                                            type="text"
-                                            name='ruc'
-                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
-                                            placeholder='Ej: 1750851956001'
-                                            maxLength={13}
+                                            placeholder='Ej: ORTIZ MENDOZA ERICK ALEXANDER'
                                         />
                                     </div>
 
@@ -277,9 +348,59 @@ export default function ModalEmitirFactura() {
                                 <div className='grid grid-cols-1 gap-20'>
 
                                     <div className='flex gap-3'>
+                                        <div className='flex flex-col gap-3'>
+
+                                            <div className='flex gap-3 items-end'>
+
+                                                <div className='flex flex-col'>
+                                                    <label htmlFor="tipo-identificacion" className='mb-1'>Tipo de Identificación</label>
+
+                                                    <select
+                                                        name="tipo-identificacion"
+                                                        id="tipo-identificacion"
+                                                        className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                                        onChange={(e) => controlInputIdentificacion(e.target.value)}
+                                                    >
+                                                        <option value="">-- Seleccionar --</option>
+                                                        <option value="RUC">RUC</option>
+                                                        <option value="CEDULA">Cédula</option>
+                                                        <option value="PASAPORTE">Pasaporte</option>
+                                                        <option value="CONSUMIDOR-FINAL">Cosumidor Final</option>
+                                                        <option value="IDENTIFICACION-EXTERIOR">Identificación del Exterior</option>
+                                                    </select>
+                                                </div>
+
+                                                <button
+                                                    type='button'
+                                                    onClick={() => consultarCliente()}
+                                                    className='rounded-full bg-[#2e4760] w-fit p-2 cursor-pointer hover:bg-[#3a546e] transition-colors'
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+
+                                            {tipoIdentificacion.length ? (
+                                                <div className='flex flex-col'>
+                                                    <label htmlFor="identificacion-cliente" className='mb-1 uppercase'>{tipoIdentificacion}</label>
+                                                    <input
+                                                        ref={inputIdentificacion}
+                                                        id='identificacion-cliente'
+                                                        type="text"
+                                                        name='identificacion-cliente'
+                                                        className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                                        maxLength={longitudIdentificacion}
+                                                    />
+                                                </div>
+                                            ) : null}
+
+                                        </div>
+
                                         <div className='flex flex-col'>
                                             <label htmlFor="nombres-cliente" className='mb-1'>Nombres</label>
                                             <input
+                                                ref={inputNombresCliente}
                                                 id='nombres-cliente'
                                                 type="text"
                                                 name='nombres-cliente'
@@ -291,6 +412,7 @@ export default function ModalEmitirFactura() {
                                         <div className='flex flex-col'>
                                             <label htmlFor="apellidos-cliente" className='mb-1'>Apellidos</label>
                                             <input
+                                                ref={inputApellidosCliente}
                                                 id='apellidos-cliente'
                                                 type="text"
                                                 name='apellidos-cliente'
@@ -300,21 +422,9 @@ export default function ModalEmitirFactura() {
                                         </div>
 
                                         <div className='flex flex-col'>
-                                            <label htmlFor="identificacion-cliente" className='mb-1'>Identificación</label>
-                                            <input
-                                                id='identificacion-cliente'
-                                                type="text"
-                                                name='identificacion-cliente'
-                                                className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
-                                                placeholder='Ej: 1750851956'
-                                                minLength={13}
-                                                maxLength={13}
-                                            />
-                                        </div>
-
-                                        <div className='flex flex-col'>
                                             <label htmlFor="direccion-comprador" className='mb-1'>Dirección</label>
                                             <input
+                                                ref={inputDireccionCliente}
                                                 id='direccion-comprador'
                                                 type="text"
                                                 name='direccion-comprador'
@@ -360,7 +470,14 @@ export default function ModalEmitirFactura() {
                                         </svg>
                                     </span>
 
-                                    Artículos
+                                    Productos / Artículos
+
+                                    <p className='text-sm flex gap-2 items-center font-semibold'>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-[#478bb3]">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5" />
+                                        </svg>
+                                        Separador de decimales: PUNTO
+                                    </p>
 
                                 </h2>
 
@@ -400,6 +517,8 @@ export default function ModalEmitirFactura() {
                                         <Button
                                             className="font-semibold text-gray-100 cursor-pointer rounded-xl transition-colors px-4 py-1 border border-gray-100 flex gap-2 items-center hover:bg-[#d24148] hover:text-gray-200 hover:border-[#d24148]"
                                             onClick={() => {
+                                                setTipoIdentificacion("")
+                                                setLongitudIdentificacion(0)
                                                 setFormulariosFactura([])
                                                 setProductos([])
                                                 setBotonMas(true)

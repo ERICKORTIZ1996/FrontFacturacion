@@ -42,10 +42,10 @@ export const AgregarProducto = ({ id }) => {
         const data = {
             codigoPrincipal: "001",
             descripcion: descripcionProducto,
-            cantidad: cantidadProducto,
-            precioUnitario: precioUnitario,
-            descuento: descuento,
-            precioTotalSinImpuesto: precioUnitario,
+            cantidad: Number(cantidadProducto),
+            precioUnitario: Number(precioUnitario),
+            descuento: Number(descuento),
+            precioTotalSinImpuesto: Number(precioUnitario),
             impuestos: [{
                 codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
                 codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
@@ -70,10 +70,10 @@ export const AgregarProducto = ({ id }) => {
                 id,
                 codigoPrincipal: "001",
                 descripcion: descripcionProducto,
-                cantidad: cantidadProducto,
-                precioUnitario: precioUnitario,
-                descuento: descuento,
-                precioTotalSinImpuesto: precioUnitario,
+                cantidad: Number(cantidadProducto),
+                precioUnitario: Number(precioUnitario),
+                descuento: Number(descuento),
+                precioTotalSinImpuesto: Number(precioUnitario),
                 impuestos: [{
                     codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
                     codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
@@ -93,10 +93,10 @@ export const AgregarProducto = ({ id }) => {
         const data = {
             codigoPrincipal: "001",
             descripcion: descripcionProducto,
-            cantidad: cantidadProducto,
-            precioUnitario: precioUnitario,
-            descuento: descuento,
-            precioTotalSinImpuesto: precioUnitario,
+            cantidad: Number(cantidadProducto),
+            precioUnitario: Number(precioUnitario),
+            descuento: Number(descuento),
+            precioTotalSinImpuesto: Number(precioUnitario),
             impuestos: [{
                 codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
                 codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
@@ -106,14 +106,14 @@ export const AgregarProducto = ({ id }) => {
             }]
         }
 
-        // const result = productoSchema.safeParse(data)
+        const result = productoSchema.safeParse(data)
 
-        // if (!result.success) {
-        //     result.error.issues.forEach(issue => {
-        //         toast.error(issue.message)
-        //     })
-        //     return
-        // }
+        if (!result.success) {
+            result.error.issues.forEach(issue => {
+                toast.error(issue.message)
+            })
+            return
+        }
 
         const nuevoPro = productos.map((p) => {
             if (p.id === id) {
@@ -121,10 +121,10 @@ export const AgregarProducto = ({ id }) => {
                     ...p,
                     codigoPrincipal: "001",
                     descripcion: descripcionProducto,
-                    cantidad: cantidadProducto,
-                    precioUnitario: precioUnitario,
-                    descuento: descuento,
-                    precioTotalSinImpuesto: precioUnitario,
+                    cantidad: Number(cantidadProducto),
+                    precioUnitario: Number(precioUnitario),
+                    descuento: Number(descuento),
+                    precioTotalSinImpuesto: Number(precioUnitario),
                     impuestos: [{
                         codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
                         codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
@@ -141,7 +141,6 @@ export const AgregarProducto = ({ id }) => {
         setAgrePro(true)
         setEditarPro(false)
         setEditar(false)
-
     }
 
     const eliminarFormStock = async (idForm) => {
@@ -174,8 +173,6 @@ export const AgregarProducto = ({ id }) => {
         })
 
     }
-
-    console.log(productos);
 
     return (
         <div

@@ -11,7 +11,7 @@ export default function Paginacion({ data }) {
 
 
     return (
-        <div className="flex flex-col justify-center items-center mt-10">
+        <div className="flex flex-col justify-center items-center mt-5">
             <Paginador totalPages={totalPages} currentPage={currentPage} setCurrentPage={setCurrentPage} />
             <span className="text-center text-[11px] font-semibold mt-[-5px]">{totalPages} Registros</span>
         </div>

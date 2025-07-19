@@ -34,7 +34,7 @@ export default function SinAcceso() {
                 >
 
                     <h1 className="font-bold text-3xl text-center lg:text-start md:text-6xl uppercase">Sin Acceso</h1>
-                    <p className="mt-1 mb-6 text-center text-sm md:text-lg">Estas intentando acceder a una página <br />que no tienes acceso.</p>
+                    <p className="mt-1 mb-6 text-center text-sm md:text-lg">Estas intentando acceder a una página <br />que no tienes permiso.</p>
 
                     <Link
                         href={'/'}

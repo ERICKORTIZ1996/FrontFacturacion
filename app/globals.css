@@ -105,6 +105,32 @@
     /* background: linear-gradient(to bottom, #153350, #1f3850); */
 }
 
+/* ----------- ESTILOS PAGE BALANCES ------------- */
+
+.banner-pruebas {
+    background: linear-gradient(to top, #000c1b, #000e202c),
+        url("/images/banner-produccion.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+}
+
+.banner-produccion {
+    background: linear-gradient(to top, #000c1b, #000e202c),
+        url("/images/banner-pruebas.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+}
+
+.banner-productos-vendidos {
+    background: linear-gradient(to top, #000c1bab, #000e202c),
+        url("/images/banner-productos-vendidos.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+}
+
 /* ----------- ESTILOS DEL SPPINER ------------- */
 
 .sk-folding-cube {

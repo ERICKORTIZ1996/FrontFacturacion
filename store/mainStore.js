@@ -6,6 +6,9 @@ export const useMainStore = create((set, get) => ({
 
     /* ---------- state ---------- */
     modalCrearNotificacion: false,
+    modalCrearEmpresa: false,
+    modalCrearSucursal: false,
+    modalCrearPuntoEmision: false,
     modalNotificacionesGlobales: false,
     productos: [],
     formulariosFactura: [],
@@ -23,6 +26,9 @@ export const useMainStore = create((set, get) => ({
     setAcceso: (value) => set({ acceso: value }),
     setIsLoading: (value) => set({ isLoading: value }),
     changeModalCrearNotificacion: () => set((state) => ({ modalCrearNotificacion: !state.modalCrearNotificacion })),
+    changeModalCrearEmpresa: () => set((state) => ({ modalCrearEmpresa: !state.modalCrearEmpresa })),
+    changeModalCrearSucursal: () => set((state) => ({ modalCrearSucursal: !state.modalCrearSucursal })),
+    changeModalCrearPuntoEmision: () => set((state) => ({ modalCrearPuntoEmision: !state.modalCrearPuntoEmision })),
     changeModalNotificacionesGlobales: () => set((state) => ({ modalNotificacionesGlobales: !state.modalNotificacionesGlobales })),
     crearFormProducto: (producto) => set((state) => ({
         productos: [...state.productos, producto],
