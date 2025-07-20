@@ -42,6 +42,9 @@ export const useMainStore = create((set, get) => ({
             return null;
         }
     },
+    cerrarSesion: () => {
+        localStorage.removeItem('dataUser');
+    },
 
     /* ------- local storage ------- */
     dataFromLocalStorage: () => {
