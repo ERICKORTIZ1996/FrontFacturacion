@@ -4,9 +4,6 @@ import axios from "axios";
 
 export default function BotonImprimirFactura({ nombreArchivo }) {
 
-    console.log(nombreArchivo);
-
-
     const imprimirFactura = async () => {
 
         try {
