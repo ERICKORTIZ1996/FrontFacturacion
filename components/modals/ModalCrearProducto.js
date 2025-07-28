@@ -3,24 +3,25 @@
 import { Dialog, DialogPanel, DialogTitle, Button } from '@headlessui/react'
 import { useMainStore } from '@/store/mainStore'
 import { toast } from 'react-toastify';
-import { crearPuntoEmisionSchema } from '@/schema';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { productoStockSchema } from '@/schema';
 import axios from 'axios'
 
-export default function ModalCrearPuntoEmision() {
+export default function ModalCrearProducto() {
 
-    const modalCrearPuntoEmision = useMainStore((state) => state.modalCrearPuntoEmision)
-    const changeModalCrearPuntoEmision = useMainStore((state) => state.changeModalCrearPuntoEmision)
+    const modalCrearProducto = useMainStore((state) => state.modalCrearProducto)
+    const changeModalCrearProducto = useMainStore((state) => state.changeModalCrearProducto)
 
-    const handleSubmit = async (formData) => {
+    const crearPuntoEmision = async (formData) => {
 
         const data = {
-            ruc: formData.get('ruc-empresa'),
-            estab: formData.get('estab'),
-            ptoEmi: formData.get('punto-emision')
+            codigo: formData.get('codigo-producto'),
+            nombre: formData.get('nombre-producto'),
+            cantidad: formData.get('cantidad-producto'),
+            precioUnitario: formData.get('precio-unitario-producto'),
+            descuento: formData.get('descuento-producto')
         }
 
-        const result = crearPuntoEmisionSchema.safeParse(data)
+        const result = productoStockSchema.safeParse(data)
 
         if (!result.success) {
 
@@ -30,12 +31,10 @@ export default function ModalCrearPuntoEmision() {
             return
         }
 
-        mutate(formData)
+        console.log(data);
 
-    }
 
-    const crearPuntoEmision = async (formData) => {
-
+        return
         try {
             const { data: dataPuntoEmision } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/puntos-emision`, {
                 ruc: formData.get('ruc-empresa'),
@@ -43,31 +42,18 @@ export default function ModalCrearPuntoEmision() {
                 ptoEmi: formData.get('punto-emision')
             })
 
-            return dataPuntoEmision
+            toast.success(dataPuntoEmision.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
+            changeModalCrearProducto()
 
         } catch (e) {
+            toast.error(e?.response?.data?.mensaje || e?.response?.data?.message?.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim());
             console.log(e);
-            throw new Error(e?.response?.data?.mensaje || e?.response?.data?.message?.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim());
         }
     };
 
-    const queryClient = useQueryClient();
-
-    const { mutate } = useMutation({
-        mutationFn: crearPuntoEmision, // Funcion a consultar
-        onSuccess: (dataPuntoEmision) => { // Petición exitosa
-            toast.success(dataPuntoEmision.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
-            queryClient.invalidateQueries({ queryKey: ['puntos_emision'] }); // Traer los datos actualizados
-            changeModalCrearPuntoEmision()
-        },
-        onError: (error) => {
-            toast.error(error.message);
-        }
-    })
-
     return (
         <>
-            <Dialog open={modalCrearPuntoEmision} onClose={() => { }} className="relative z-50">
+            <Dialog open={modalCrearProducto} onClose={() => { }} className="relative z-50">
                 <div className="fixed inset-0 flex w-screen items-center justify-center p-4 bg-gray-800/40 main-background">
 
                     {/* shadow shadow-[#245e95] */}
@@ -75,13 +61,13 @@ export default function ModalCrearPuntoEmision() {
 
                         <div className='flex h-full flex-col justify-between'>
                             <form
-                                action={handleSubmit}
+                                action={crearPuntoEmision}
                                 className='overflow-y-auto h-full barra pr-8'
-                                id='form-crear-punto-emision'
+                                id='form-crear-producto-stock'
                             >
 
                                 <DialogTitle className="font-semibold text-xl text-center w-full uppercase">
-                                    Crear Punto de Emisión
+                                    Crear Producto
                                 </DialogTitle>
 
                                 <h2 className='my-5 text-xl flex gap-2 items-center'>
@@ -96,43 +82,64 @@ export default function ModalCrearPuntoEmision() {
                                 </h2>
 
                                 <div className='flex flex-col gap-5'>
+
                                     <div className='flex flex-col'>
-                                        <label htmlFor="ruc-empresa" className='mb-1'>Ruc</label>
+                                        <label htmlFor="codigo-producto" className='mb-1'>Código</label>
                                         <input
-                                            id='ruc-empresa'
+                                            id='codigo-producto'
                                             type="text"
-                                            name='ruc-empresa'
+                                            name='codigo-producto'
                                             className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
-                                            placeholder='Ej: 1754854585001'
-                                            minLength={13}
-                                            maxLength={13}
+                                            placeholder='Ej: EDJN-ASDFA'
                                         />
                                     </div>
 
                                     <div className='flex flex-col'>
-                                        <label htmlFor="estab" className='mb-1'>Establecimiento</label>
+                                        <label htmlFor="nombre-producto" className='mb-1'>Nombre</label>
                                         <input
-                                            id='estab'
+                                            id='nombre-producto'
                                             type="text"
-                                            name='estab'
+                                            name='nombre-producto'
                                             className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
-                                            placeholder='001'
-                                            minLength={3}
-                                            maxLength={3}
+                                            placeholder='Ej: Pantalones Jeans Hombre XL'
                                         />
                                     </div>
 
-                                    <div className='flex flex-col'>
-                                        <label htmlFor="punto-emision" className='mb-1'>Punto Emisión</label>
-                                        <input
-                                            id='punto-emision'
-                                            type="text"
-                                            name='punto-emision'
-                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
-                                            placeholder='001'
-                                            minLength={3}
-                                            maxLength={3}
-                                        />
+                                    <div className='flex items-center gap-3 w-full'>
+
+                                        <div className='flex flex-col'>
+                                            <label htmlFor="cantidad-producto" className='mb-1'>Cantidad</label>
+                                            <input
+                                                id='cantidad-producto'
+                                                type="text"
+                                                name='cantidad-producto'
+                                                className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-full'
+                                                placeholder='Ej: 24'
+                                                min={1}
+                                            />
+                                        </div>
+
+                                        <div className='flex flex-col'>
+                                            <label htmlFor="precio-unitario-producto" className='mb-1'>Precio Unitario</label>
+                                            <input
+                                                id='precio-unitario-producto'
+                                                type="text"
+                                                name='precio-unitario-producto'
+                                                className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-full'
+                                                placeholder='Ej: 22.51'
+                                            />
+                                        </div>
+
+                                        <div className='flex flex-col'>
+                                            <label htmlFor="descuento-producto" className='mb-1'>Descuento</label>
+                                            <input
+                                                id='descuento-producto'
+                                                type="text"
+                                                name='descuento-producto'
+                                                className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-full'
+                                                placeholder='5'
+                                            />
+                                        </div>
                                     </div>
 
                                 </div>
@@ -142,7 +149,7 @@ export default function ModalCrearPuntoEmision() {
                                 <Button
                                     className="font-semibold text-gray-100 cursor-pointer rounded-xl transition-colors px-4 py-1 border border-gray-100 flex gap-2 items-center hover:bg-[#d24148] hover:text-gray-200 hover:border-[#d24148]"
                                     onClick={() => {
-                                        changeModalCrearPuntoEmision()
+                                        changeModalCrearProducto()
                                     }}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
@@ -154,12 +161,12 @@ export default function ModalCrearPuntoEmision() {
                                 <Button
                                     className={`bg-gray-100 font-semibold cursor-pointer rounded-xl px-4 py-1 border border-gray-100 text-gray-800 flex items-center`}
                                     type='submit'
-                                    form='form-crear-punto-emision'
+                                    form='form-crear-producto-stock'
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                     </svg>
-                                    Crear Punto de Emisión
+                                    Crear Producto
                                 </Button>
                             </form>
                         </div>

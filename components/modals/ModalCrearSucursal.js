@@ -4,6 +4,7 @@ import { Dialog, DialogPanel, DialogTitle, Button } from '@headlessui/react'
 import { useMainStore } from '@/store/mainStore'
 import { toast } from 'react-toastify';
 import { crearSucursalSchema } from '@/schema';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios'
 
 export default function ModalCrearSucursal() {
@@ -11,8 +12,7 @@ export default function ModalCrearSucursal() {
     const modalCrearSucursal = useMainStore((state) => state.modalCrearSucursal)
     const changeModalCrearSucursal = useMainStore((state) => state.changeModalCrearSucursal)
 
-    const crearSucursal = async (formData) => {
-
+    const handleSubmit = async (formData) => {
         const data = {
             ruc: formData.get('ruc-empresa'),
             estab: formData.get('estab'),
@@ -30,6 +30,11 @@ export default function ModalCrearSucursal() {
             return
         }
 
+        mutate(formData)
+    }
+
+    const crearSucursal = async (formData) => {
+
         try {
             const { data: dataSucursal } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/sucursales`, {
                 ruc: formData.get('ruc-empresa'),
@@ -38,16 +43,28 @@ export default function ModalCrearSucursal() {
                 dirEstablecimiento: formData.get('direccion-sucursal')
             })
 
-            toast.success(dataSucursal.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
-            changeModalCrearSucursal()
-
+            return dataSucursal
 
         } catch (e) {
-            toast.error(e?.response?.data?.mensaje || e?.response?.data?.message?.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim());
             console.log(e);
+            throw new Error(e?.response?.data?.mensaje || e?.response?.data?.message?.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim());
 
         }
     };
+
+    const queryClient = useQueryClient();
+
+    const { mutate } = useMutation({
+        mutationFn: crearSucursal, // Funcion a consultar
+        onSuccess: (dataSucursal) => { // Petición exitosa
+            toast.success(dataSucursal.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
+            queryClient.invalidateQueries({ queryKey: ['sucursales'] }); // Traer los datos actualizados
+            changeModalCrearSucursal()
+        },
+        onError: (error) => {
+            toast.error(error.message);
+        }
+    })
 
     return (
         <>
@@ -59,7 +76,7 @@ export default function ModalCrearSucursal() {
 
                         <div className='flex h-full flex-col justify-between'>
                             <form
-                                action={crearSucursal}
+                                action={handleSubmit}
                                 className='overflow-y-auto h-full barra pr-8'
                                 id='form-crear-sucursal'
                             >

@@ -2,18 +2,29 @@
 
 import axios from "axios";
 
-export default function BotonImprimirFactura() {
+export default function BotonImprimirFactura({ nombreArchivo }) {
+
+    console.log(nombreArchivo);
+
 
     const imprimirFactura = async () => {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/generar/SIMBA_SIMBAÑA_KEVIN_FABIAN_000000037`, { responseType: 'blob' })
 
-        const blob = new Blob([data], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
+        try {
 
-        setTimeout(() => {
-            URL.revokeObjectURL(url);
-        }, 1000);
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/generar/${nombreArchivo}`, { responseType: 'blob' })
+
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+            }, 1000);
+
+        } catch (error) {
+            console.log(error);
+        }
+
     }
 
     return (

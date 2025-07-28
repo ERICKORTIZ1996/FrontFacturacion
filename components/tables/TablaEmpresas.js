@@ -1,14 +1,15 @@
 import Link from "next/link"
 
-export default function TablaEmpresas() {
+export default function TablaEmpresas({ empresa }) {
 
     return (
         <tr className="border-b border-[#2e5274]/60 even:bg-[#23374d]/60">
-            <td className="p-2">1900275865001</td>
-            <td className="p-2">Cristhian Lorenzo Velez Zambrano</td>
+            <td className="p-2">{empresa.ruc}</td>
+            <td className="p-2">{empresa.razonSocial}</td>
             <td className="p-2">
-                <span className="text-green-950 text-sm bg-green-200 rounded-full px-2 py-1">Quito</span>
+                <span className="text-green-950 text-sm bg-green-200 rounded-full px-2 py-1 text-nowrap">{empresa.dirMatriz}</span>
             </td>
+            <td className="p-2">{empresa.sucursales.length}</td>
             <td>
                 {/* <Link
                     className="cursor-pointer px-3 py-1 hover:bg-gray-200 hover:text-gray-800 transition-colors rounded-xl text-nowrap block w-fit"

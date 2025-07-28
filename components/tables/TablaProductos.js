@@ -1,17 +1,14 @@
 import Link from "next/link"
 
-export default function TablaSucursales({ sucursal }) {
-
+export default function TablaProductos() {
     return (
         <tr className="border-b border-[#2e5274]/60 even:bg-[#23374d]/60">
-            <td className="p-2">{sucursal.empresa.ruc}</td>
-            <td className="p-2">{sucursal.estab}</td>
-            <td className="p-2">{sucursal.nombre}</td>
             <td className="p-2">
-                <span className="text-green-950 text-sm bg-green-200 rounded-full px-2 py-1 text-nowrap">
-                    {sucursal.dirEstablecimiento}
-                </span>
+                <span className="text-green-950 text-sm bg-green-200 rounded-full px-2 py-1">CBN20</span>
             </td>
+            <td className="p-2">Pantalones Jeans Hombre XL</td>
+            <td className="p-2">50</td>
+            <td className="p-2">$ 22.00</td>
             <td>
                 {/* <Link
                     className="cursor-pointer px-3 py-1 hover:bg-gray-200 hover:text-gray-800 transition-colors rounded-xl text-nowrap block w-fit"

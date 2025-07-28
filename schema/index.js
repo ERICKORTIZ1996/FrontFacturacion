@@ -115,3 +115,42 @@ export const crearPuntoEmisionSchema = z.object({
     ptoEmi: z.string().length(3, 'PUNTO EMISIÓN: Debe tener 3 dígitos')
 });
 
+export const productoStockSchema = z.object({
+
+    codigo: z.string().min(1, "CÓDIGO: Es requerido"),
+    nombre: z.string().min(1, "NOMBRE: Es requerido"),
+    cantidad: z.preprocess(
+        (val) => {
+            if (typeof val === "string") return val;
+            if (val === undefined || val === null) return "";
+            return String(val);
+        },
+        z.string()
+            .min(1, "CANTIDAD: no puede estar vacio")
+            .regex(/^\d+$/, "CANTIDAD: Cantidad inválida")
+            .transform((val) => parseInt(val, 10))
+            .refine((val) => val >= 1, { message: "CANTIDAD: debe ser mayor o igual a 1" })),
+    precioUnitario: z.preprocess(
+        (val) => {
+            if (typeof val === "string") return val;
+            if (val === undefined || val === null) return "";
+            return String(val);
+        },
+        z.string()
+            .min(1, "PRECIO UNITARIO: no puede estar vacio")
+            .regex(/^(0|[1-9]\d*)([.,]\d+)?$/, "PRECIO UNITARIO: Cantidad inválida")
+            .transform((val) => parseInt(val, 10))
+            .refine((val) => val >= 0.00, { message: "PRECIO UNITARIO: debe ser mayor o igual a 1" })),
+    descuento: z.preprocess(
+        (val) => {
+            if (typeof val === "string") return val;
+            if (val === undefined || val === null) return "";
+            return String(val);
+        },
+        z.string()
+            .regex(/^\d+$/, "DESCUENTO: debe ser un número entero válido")
+            .transform((val) => parseInt(val, 10))
+            .refine((val) => val >= 1 && val <= 100, {
+                message: "DESCUENTO: debe estar entre 1 y 100"
+            })),
+})

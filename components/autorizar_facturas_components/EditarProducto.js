@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useMemo, useState } from "react";
 import { useMainStore } from "@/store/mainStore";
 import axios from "axios";
@@ -5,19 +7,16 @@ import { toast } from 'react-toastify';
 import { productoSchema } from "@/schema";
 import Swal from 'sweetalert2';
 
-export const AgregarProducto = ({ id }) => {
+export const EditarProducto = ({ id }) => {
 
-    const crearFormProducto = useMainStore((state) => state.crearFormProducto)
     const editar = useMainStore((state) => state.editar)
     const setEditar = useMainStore((state) => state.setEditar)
     const facturaState = useMainStore((state) => state.facturaState)
-    const formulariosFactura = useMainStore((state) => state.formulariosFactura)
-    const setFormulariosFactura = useMainStore((state) => state.setFormulariosFactura)
     const productos = useMainStore((state) => state.productos)
     const setProductos = useMainStore((state) => state.setProductos)
 
     const [alerta, setAlerta] = useState(false);
-    const [agrePro, setAgrePro] = useState(false)
+    const [agrePro, setAgrePro] = useState(true)
     const [editarPro, setEditarPro] = useState(false)
     const isEditable = !(editar || agrePro) || editarPro;
 
@@ -36,57 +35,6 @@ export const AgregarProducto = ({ id }) => {
     const [valor, setvalor] = useState(0)
 
     const total = useMemo(() => (cantidadProducto * precioUnitario), [cantidadProducto, precioUnitario])
-
-    const emitirProducto = async () => {
-
-        const data = {
-            codigoPrincipal: "001",
-            descripcion: descripcionProducto,
-            cantidad: Number(cantidadProducto),
-            precioUnitario: Number(precioUnitario),
-            descuento: Number(descuento),
-            precioTotalSinImpuesto: Number(precioUnitario),
-            impuestos: [{
-                codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
-                codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
-                tarifa: 15,
-                baseImponible: Number(precioUnitario),
-                valor: (Number(precioUnitario) * 0.15)
-            }]
-        }
-
-        const result = productoSchema.safeParse(data)
-
-        if (!result.success) {
-            result.error.issues.forEach(issue => {
-                toast.error(issue.message)
-            })
-            return
-        }
-
-        try {
-
-            crearFormProducto({
-                id,
-                codigoPrincipal: "001",
-                descripcion: descripcionProducto,
-                cantidad: Number(cantidadProducto),
-                precioUnitario: Number(precioUnitario),
-                descuento: Number(descuento),
-                precioTotalSinImpuesto: Number(precioUnitario),
-                impuestos: [{
-                    codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
-                    codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
-                    tarifa: 15,
-                    baseImponible: 100.00,
-                    valor: 15.00
-                }]
-            })
-
-            setAgrePro(true) // Desabilita el icono de (+)
-
-        } catch (error) { console.log(error) }
-    }
 
     const editarProducto = async () => {
 
@@ -199,7 +147,7 @@ export const AgregarProducto = ({ id }) => {
                         className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-24 disabled:cursor-not-allowed'
                         placeholder='Ej: 2'
                         onChange={(e) => setCantidadProducto(e.target.value)}
-                        disabled={!isEditable}
+                        disabled={editar || agrePro ? !editarPro : null}
                     />
                 </div>
 
@@ -241,21 +189,6 @@ export const AgregarProducto = ({ id }) => {
             </div>
 
             <div className="flex gap-2 items-center md:mt-8 lg:mt-0">
-
-                {/* Crear  */}
-                <button
-                    type="button"
-                    className={`bg-white text-gray-800 hover:bg-green-500 border border-gray-200 px-3 py-1 flex items-center rounded-full cursor-pointer p-2 hover:border-green-500 hover:text-gray-200 transition-colors disabled:cursor-not-allowed ${agrePro ? 'hidden' : 'block'} ${editarPro ? 'hidden' : ''}`}
-                    onClick={emitirProducto}
-                    disabled={editar}
-                >
-
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-
-                    Agregar Artículo
-                </button>
 
                 {/* Editar */}
                 <button

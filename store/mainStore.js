@@ -5,11 +5,12 @@ import CryptoJS from "crypto-js";
 export const useMainStore = create((set, get) => ({
 
     /* ---------- state ---------- */
-    modalCrearNotificacion: false,
+    modalEmitirFactura: false,
     modalCrearEmpresa: false,
     modalCrearSucursal: false,
     modalCrearPuntoEmision: false,
     modalNotificacionesGlobales: false,
+    modalCrearProducto: false,
     productos: [],
     formulariosFactura: [],
     editar: false,
@@ -25,11 +26,12 @@ export const useMainStore = create((set, get) => ({
     setEditar: (value) => set({ editar: value }),
     setAcceso: (value) => set({ acceso: value }),
     setIsLoading: (value) => set({ isLoading: value }),
-    changeModalCrearNotificacion: () => set((state) => ({ modalCrearNotificacion: !state.modalCrearNotificacion })),
+    changeModalEmitirFactura: () => set((state) => ({ modalEmitirFactura: !state.modalEmitirFactura })),
     changeModalCrearEmpresa: () => set((state) => ({ modalCrearEmpresa: !state.modalCrearEmpresa })),
     changeModalCrearSucursal: () => set((state) => ({ modalCrearSucursal: !state.modalCrearSucursal })),
     changeModalCrearPuntoEmision: () => set((state) => ({ modalCrearPuntoEmision: !state.modalCrearPuntoEmision })),
     changeModalNotificacionesGlobales: () => set((state) => ({ modalNotificacionesGlobales: !state.modalNotificacionesGlobales })),
+    changeModalCrearProducto: () => set((state) => ({ modalCrearProducto: !state.modalCrearProducto })),
     crearFormProducto: (producto) => set((state) => ({
         productos: [...state.productos, producto],
         formulariosFactura: [...state.formulariosFactura, generarId()]

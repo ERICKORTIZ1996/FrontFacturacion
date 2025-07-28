@@ -1,8 +1,10 @@
+
+
 import axios from "axios";
 import Link from "next/link";
 import MainLayout from "@/components/layouts/MainLayout";
 import ComprobarAcceso from "@/components/others/ComprobarAcceso";
-import BotonImprimirFactura from "@/components/emitir_facturas_componentes/BotonImprimirFactura";
+import { EditarProducto } from "@/components/autorizar_facturas_components/EditarProducto";
 import { formatearFecha } from "@/helpers";
 
 async function obtenerFactura(nombreArchivo) {
@@ -10,11 +12,9 @@ async function obtenerFactura(nombreArchivo) {
     return data
 }
 
-export default async function Factura({ params }) {
+export default async function FacturaPendiente({ params }) {
 
     const factura = await obtenerFactura(params.id);
-    // console.log(factura.data.detalles);
-
 
     return (
         <ComprobarAcceso>
@@ -24,7 +24,7 @@ export default async function Factura({ params }) {
 
                     <Link
                         className="font-semibold text-gray-100 cursor-pointer rounded-full transition-colors px-4 py-1 border border-gray-100 flex gap-2 items-center hover:bg-gray-100 hover:text-gray-800"
-                        href={"/emitir-facturas"}
+                        href={"/emitir-facturas/autorizar-facturas"}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
@@ -33,9 +33,16 @@ export default async function Factura({ params }) {
                         Regresar
                     </Link>
 
-                    <p className="bg-gray-100 font-semibold rounded-full px-4 py-1 border border-gray-100">
-                        Factura: {factura?.nombreArchivo?.split('_')[4]}
-                    </p>
+
+                    <div className="flex items-center bg-gray-100 font-semibold rounded-full px-4 py-1 w-fit text-gray-800 gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
+                        </svg>
+
+                        <p>Autorizar Factura: {factura?.nombreArchivo?.split('_')[4]}</p>
+
+                    </div>
 
                     <p className="text-gray-200">Fecha: {formatearFecha(factura.data.fechaEmision)}</p>
                 </div>
@@ -61,7 +68,7 @@ export default async function Factura({ params }) {
                                 <span
                                     className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                 >
-                                    /Nombre Empresa/
+                                    Pay&Play
                                 </span>
                             </div>
 
@@ -70,7 +77,7 @@ export default async function Factura({ params }) {
                                 <span
                                     className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                 >
-                                    /Ruc/
+                                    1750851956001
                                 </span>
                             </div>
 
@@ -79,7 +86,7 @@ export default async function Factura({ params }) {
                                 <span
                                     className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                 >
-                                    /Matriz/
+                                    Quito
                                 </span>
                             </div>
 
@@ -88,7 +95,7 @@ export default async function Factura({ params }) {
                                 <span
                                     className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                 >
-                                    /Dirección/
+                                    PICHINCHA / QUITO / COCHAPAMBA / N54 LT-20 Y N54A
                                 </span>
                             </div>
                         </div>
@@ -112,7 +119,7 @@ export default async function Factura({ params }) {
                                     <span
                                         className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                     >
-                                        /Nombres/
+                                        Cristhian Lorenzo
                                     </span>
                                 </div>
 
@@ -121,7 +128,7 @@ export default async function Factura({ params }) {
                                     <span
                                         className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                     >
-                                        /Apellidos/
+                                        Velez Zambrano
                                     </span>
                                 </div>
 
@@ -130,7 +137,7 @@ export default async function Factura({ params }) {
                                     <span
                                         className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                     >
-                                        /Identificación/
+                                        1750851956
                                     </span>
                                 </div>
 
@@ -139,7 +146,7 @@ export default async function Factura({ params }) {
                                     <span
                                         className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                     >
-                                        /Dirección/
+                                        La Planada
                                     </span>
                                 </div>
                             </div>
@@ -186,53 +193,9 @@ export default async function Factura({ params }) {
 
                         {
                             factura.data.detalles.map(detalle => (
-                                <div className='flex gap-10' key={detalle.id}>
-                                    <div className='flex flex-col'>
-                                        <span className='mb-1'>Descripción</span>
-                                        <span
-                                            className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
-                                        >
-                                            {detalle.descripcion}
-                                        </span>
-                                    </div>
-
-                                    <div className='flex flex-col'>
-                                        <span className='mb-1'>Cantidad</span>
-                                        <span
-                                            className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
-                                        >
-                                            {detalle.cantidad}
-                                        </span>
-                                    </div>
-
-
-                                    <div className='flex flex-col'>
-                                        <span className='mb-1'>Precio Unitario</span>
-                                        <span
-                                            className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
-                                        >
-                                            $ {detalle.precioUnitario}
-                                        </span>
-                                    </div>
-
-                                    <div className='flex flex-col'>
-                                        <span className='mb-1'>Descuento</span>
-                                        <span
-                                            className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
-                                        >
-                                            {detalle.descuento}
-                                        </span>
-                                    </div>
-
-                                    <div className='flex flex-col'>
-                                        <span className='mb-1'>Total</span>
-                                        <span
-                                            className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
-                                        >
-                                            $ {detalle.cantidad * detalle.precioUnitario}
-                                        </span>
-                                    </div>
-                                </div>
+                                <EditarProducto
+                                    key={detalle.id}
+                                />
                             ))
                         }
 
@@ -243,19 +206,15 @@ export default async function Factura({ params }) {
                         <div className="rounded-3xl bg-gradient-to-b from-[#153350]/60 to-[#1f3850]/60 px-6 py-4">
 
 
-                            <span className="block">SUBTOTAL: $ {factura.data.totalSinImpuestos}</span>
-                            <span className="block">IVA 15%: $ {factura.data.importeTotal * 0.15}</span>
-                            <span className="block">DESCUENTO: $ {factura.data.totalDescuento}</span>
+                            <span className="block">SUBTOTAL: $ 00.00</span>
+                            <span className="block">IVA 15%: $ 00.00</span>
+                            <span className="block">DESCUENTO: $ 00.00</span>
 
                             <div className="flex gap-3 items-center mt-5">
 
                                 <p className='font-semibold text-gray-800 bg-gray-100 rounded-xl px-3 py-1 w-fit'>
-                                    Total a Pagar: $ {factura.data.importeTotal}
+                                    Total a Pagar: $ 00.00
                                 </p>
-
-                                <BotonImprimirFactura
-                                    nombreArchivo={factura.nombreArchivo}
-                                />
                             </div>
                         </div>
                     </div>

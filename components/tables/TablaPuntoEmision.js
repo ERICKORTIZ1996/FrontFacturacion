@@ -1,12 +1,15 @@
 import Link from "next/link"
 
-export default function TablaPuntoEmision() {
+export default function TablaPuntoEmision({ puntoEmision }) {
+
     return (
         <tr className="border-b border-[#2e5274]/60 even:bg-[#23374d]/60">
-            <td className="p-2">1900275865001</td>
-            <td className="p-2">002</td>
+            <td className="p-2">{puntoEmision.sucursal.empresa.ruc}</td>
+            <td className="p-2">{puntoEmision.ptoEmi}</td>
             <td className="p-2">
-                <span className="text-green-950 text-sm bg-green-200 rounded-full px-2 py-1">003</span>
+                <span className="text-green-950 text-sm bg-green-200 rounded-full px-2 py-1">
+                    {puntoEmision.sucursal.estab}
+                </span>
             </td>
             <td>
                 {/* <Link

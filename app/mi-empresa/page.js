@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import MainLayout from "@/components/layouts/MainLayout"
 import ComprobarAcceso from "@/components/others/ComprobarAcceso"
 import TablaEmpresas from "@/components/tables/TablaEmpresas"
@@ -9,8 +9,11 @@ import TablaPuntoEmision from "@/components/tables/TablaPuntoEmision"
 import ModalCrearEmpresa from "@/components/modals/ModalCrearEmpresa"
 import ModalCrearSucursal from "@/components/modals/ModalCrearSucursal"
 import ModalCrearPuntoEmision from "@/components/modals/ModalCrearPuntoEmision"
+import { useQuery } from "@tanstack/react-query"
 import Paginacion from "@/components/emitir_facturas_componentes/Paginacion"
+import axios from "axios"
 import { useMainStore } from "@/store/mainStore"
+import SmallSpinner from "@/components/layouts/SmallSpinner"
 
 export default function MiEmpresa() {
 
@@ -22,6 +25,57 @@ export default function MiEmpresa() {
     const [ventanaEmpresa, setVentanaEmpresa] = useState(true)
     const [ventanaSucursal, setVentanaSucursal] = useState(false)
     const [ventanaPuntoEmision, setVentanaPuntoEmision] = useState(false)
+
+
+    const consultarEmpresas = async () => {
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/empresas`)
+            return data
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const consultarSucursales = async () => {
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/sucursales`)
+            return data
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const consultarPuntosEmision = async () => {
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/puntos-emision`)
+            return data
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const { data, isLoading } = useQuery({
+        queryKey: ['empresas'], // Identificador unico para cada Query
+        queryFn: consultarEmpresas, // Funcion a consultar
+        enabled: ventanaEmpresa, // Solo ejecuta cuando esta ventana esté activa
+        refetchOnWindowFocus: false, // No volver a hacer fetch al cambiar de pestaña
+    })
+
+    const { data: dataSucursales, isLoading: isLoadingSucursales } = useQuery({
+        queryKey: ['sucursales'], // Identificador unico para cada Query
+        queryFn: consultarSucursales, // Funcion a consultar 
+        enabled: ventanaSucursal, // Solo ejecuta cuando esta ventana esté activa
+        refetchOnWindowFocus: false, // No volver a hacer fetch al cambiar de pestaña
+    })
+
+    const { data: dataPuntosEmision, isLoading: isLoadingPuntosEmision } = useQuery({
+        queryKey: ['puntos_emision'], // Identificador unico para cada Query
+        queryFn: consultarPuntosEmision, // Funcion a consultar
+        enabled: ventanaPuntoEmision, // Solo ejecuta cuando esta ventana esté activa
+        refetchOnWindowFocus: false, // No volver a hacer fetch al cambiar de pestaña
+    })
+
+
 
     return (
         <ComprobarAcceso>
@@ -99,7 +153,6 @@ export default function MiEmpresa() {
                             </li>
                         </ul>
                     </nav>
-
                 </div>
 
                 {ventanaEmpresa && (
@@ -157,25 +210,38 @@ export default function MiEmpresa() {
                         </div>
 
                         <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
-                            <table className="w-full mt-5">
-                                <thead className="bg-[#05121f]/60">
-                                    <tr className="border-b-2 border-[#061727]">
-                                        <th className="text-start font-semibold p-2">Ruc</th>
-                                        <th className="text-start font-semibold p-2">Razon Social</th>
-                                        <th className="text-start font-semibold p-2">Matriz</th>
-                                        <th className="text-start font-semibold p-2">Detalle</th>
-                                    </tr>
-                                </thead>
 
-                                <tbody>
-                                    <TablaEmpresas />
-                                    <TablaEmpresas />
-                                    <TablaEmpresas />
-                                    <TablaEmpresas />
-                                </tbody>
-                            </table>
+                            {isLoading ? (
+                                <SmallSpinner />
+                            ) : data.data && data.data.length ? (
+                                <>
+                                    <table className="w-full mt-5">
+                                        <thead className="bg-[#05121f]/60">
+                                            <tr className="border-b-2 border-[#061727]">
+                                                <th className="text-start font-semibold p-2">Ruc</th>
+                                                <th className="text-start font-semibold p-2">Razon Social</th>
+                                                <th className="text-start font-semibold p-2">Matriz</th>
+                                                <th className="text-start font-semibold p-2">Sucursales</th>
+                                                <th className="text-start font-semibold p-2">Detalle</th>
+                                            </tr>
+                                        </thead>
 
-                            < Paginacion />
+                                        <tbody>
+                                            {data.data.map(empresa => (
+                                                <TablaEmpresas
+                                                    key={empresa.id}
+                                                    empresa={empresa}
+                                                />
+                                            ))}
+                                        </tbody>
+                                    </table>
+
+                                    <Paginacion />
+                                </>
+                            ) : (
+                                <p className="text-center uppercase">Sin datos</p>
+                            )}
+
                         </div>
                     </>
                 )}
@@ -234,26 +300,38 @@ export default function MiEmpresa() {
                         </div>
 
                         <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
-                            <table className="w-full mt-5">
-                                <thead className="bg-[#05121f]/60">
-                                    <tr className="border-b-2 border-[#061727]">
-                                        <th className="text-start font-semibold p-2">Ruc</th>
-                                        <th className="text-start font-semibold p-2">Establecimiento</th>
-                                        <th className="text-start font-semibold p-2">Nombre</th>
-                                        <th className="text-start font-semibold p-2">Dirección</th>
-                                        <th className="text-start font-semibold p-2">Detalle</th>
-                                    </tr>
-                                </thead>
 
-                                <tbody>
-                                    <TablaSucursales />
-                                    <TablaSucursales />
-                                    <TablaSucursales />
-                                    <TablaSucursales />
-                                </tbody>
-                            </table>
+                            {isLoadingSucursales ? (
+                                <SmallSpinner />
+                            ) : dataSucursales.data && dataSucursales.data.length ? (
+                                <>
+                                    <table className="w-full mt-5">
+                                        <thead className="bg-[#05121f]/60">
+                                            <tr className="border-b-2 border-[#061727]">
+                                                <th className="text-start font-semibold p-2">Ruc</th>
+                                                <th className="text-start font-semibold p-2">Establecimiento</th>
+                                                <th className="text-start font-semibold p-2">Nombre</th>
+                                                <th className="text-start font-semibold p-2">Dirección</th>
+                                                <th className="text-start font-semibold p-2">Detalle</th>
+                                            </tr>
+                                        </thead>
 
-                            < Paginacion />
+                                        <tbody>
+                                            {dataSucursales.data.map(sucursal => (
+                                                <TablaSucursales
+                                                    key={sucursal.id}
+                                                    sucursal={sucursal}
+                                                />
+                                            ))}
+                                        </tbody>
+                                    </table>
+
+                                    < Paginacion />
+                                </>
+                            ) : (
+                                <p className="text-center uppercase">Sin datos</p>
+                            )}
+
                         </div>
                     </>
                 )}
@@ -313,25 +391,39 @@ export default function MiEmpresa() {
                         </div>
 
                         <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
-                            <table className="w-full mt-5">
-                                <thead className="bg-[#05121f]/60">
-                                    <tr className="border-b-2 border-[#061727]">
-                                        <th className="text-start font-semibold p-2">Ruc</th>
-                                        <th className="text-start font-semibold p-2">Establecimiento</th>
-                                        <th className="text-start font-semibold p-2">Punto de Emisión</th>
-                                        <th className="text-start font-semibold p-2">Detalle</th>
-                                    </tr>
-                                </thead>
 
-                                <tbody>
-                                    <TablaPuntoEmision />
-                                    <TablaPuntoEmision />
-                                    <TablaPuntoEmision />
-                                    <TablaPuntoEmision />
-                                </tbody>
-                            </table>
 
-                            < Paginacion />
+                            {isLoadingPuntosEmision ? (
+                                <SmallSpinner />
+                            ) : dataPuntosEmision.data && dataPuntosEmision.data.length ? (
+                                <>
+                                    <table className="w-full mt-5">
+                                        <thead className="bg-[#05121f]/60">
+                                            <tr className="border-b-2 border-[#061727]">
+                                                <th className="text-start font-semibold p-2">Ruc</th>
+                                                <th className="text-start font-semibold p-2">Establecimiento</th>
+                                                <th className="text-start font-semibold p-2">Punto de Emisión</th>
+                                                <th className="text-start font-semibold p-2">Detalle</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            {dataPuntosEmision.data.map(puntoEmision => (
+                                                <TablaPuntoEmision
+                                                    key={puntoEmision.id}
+                                                    puntoEmision={puntoEmision}
+                                                />
+                                            ))}
+                                        </tbody>
+                                    </table>
+
+                                    < Paginacion />
+                                </>
+                            ) : (
+                                <p className="text-center uppercase">Sin datos</p>
+                            )}
+
+
                         </div>
                     </>
                 )}
@@ -341,6 +433,6 @@ export default function MiEmpresa() {
                 <ModalCrearPuntoEmision />
 
             </MainLayout >
-        </ComprobarAcceso>
+        </ComprobarAcceso >
     )
 }

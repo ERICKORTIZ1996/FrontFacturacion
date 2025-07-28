@@ -166,7 +166,7 @@ export default async function page() {
 
                                     <div className="flex justify-center gap-7 -mt-5">
                                         <div className="flex flex-col items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-[#478bb3]">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-[#077eeb]">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
                                             </svg>
@@ -175,7 +175,7 @@ export default async function page() {
                                         </div>
 
                                         <div className="flex flex-col items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-[#478bb3]">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-[#077eeb]">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z" />
                                             </svg>
                                             <p>Total Importe</p>
@@ -191,9 +191,15 @@ export default async function page() {
                         <div className="bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 flex justify-between items-center rounded-3xl p-3 mb-3">
 
                             <div className="flex gap-3 items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-11 bg-[#2e556b] rounded-2xl p-1">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                </svg>
+                                <div className="relative w-12">
+                                    <Image
+                                        src={"/images/icono-total.png"}
+                                        width={100}
+                                        height={100}
+                                        alt="icono-balances"
+                                        className="rounded-2xl w-full aspect-square object-cover"
+                                    />
+                                </div>
 
                                 <p className="text-[#478bb3] font-semibold">Total Importe</p>
                             </div>
@@ -204,10 +210,15 @@ export default async function page() {
                         <div className="bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 flex justify-between items-center rounded-3xl p-3">
 
                             <div className="flex gap-3 items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-11 bg-[#2e556b] rounded-2xl p-1">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                </svg>
-
+                                <div className="relative w-12">
+                                    <Image
+                                        src={"/images/icono-total.png"}
+                                        width={100}
+                                        height={100}
+                                        alt="icono-balances"
+                                        className="rounded-2xl w-full aspect-square object-cover"
+                                    />
+                                </div>
                                 <p className="text-[#478bb3] font-semibold">Promedio Importe</p>
                             </div>
 
@@ -225,9 +236,15 @@ export default async function page() {
                             <div className="bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 shadow-lg rounded-3xl pl-3 pr-6 py-2 flex justify-between items-center gap-3">
                                 <div className="flex gap-3 items-center">
 
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 bg-[#2e556b] rounded-2xl p-1">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-                                    </svg>
+                                    <div className="relative w-12">
+                                        <Image
+                                            src={"/images/icono-pendiente.png"}
+                                            width={100}
+                                            height={100}
+                                            alt="icono-balances"
+                                            className="rounded-2xl w-full aspect-square object-cover"
+                                        />
+                                    </div>
 
                                     <p className="font-semibold text-[#478bb3]">Pendientes</p>
                                 </div>
@@ -240,9 +257,15 @@ export default async function page() {
 
                                 <div className="flex gap-3 items-center">
 
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 bg-[#2e556b] rounded-2xl p-1">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                                    </svg>
+                                    <div className="relative w-12">
+                                        <Image
+                                            src={"/images/icono-firma.png"}
+                                            width={100}
+                                            height={100}
+                                            alt="icono-balances"
+                                            className="rounded-2xl w-full aspect-square object-cover"
+                                        />
+                                    </div>
 
                                     <p className="font-semibold text-[#478bb3]">Firmadas</p>
                                 </div>
@@ -255,10 +278,16 @@ export default async function page() {
                             <div className="bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 bg-opacity-60 shadow-lg border-gray-400 rounded-3xl pl-3 pr-6 py-2 flex justify-between items-center gap-3">
 
                                 <div className="flex gap-3 items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 bg-[#2e556b] rounded-2xl p-1">
 
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
-                                    </svg>
+                                    <div className="relative w-12">
+                                        <Image
+                                            src={"/images/icono-autorizacion.png"}
+                                            width={100}
+                                            height={100}
+                                            alt="icono-balances"
+                                            className="rounded-2xl w-full aspect-square object-cover"
+                                        />
+                                    </div>
 
                                     <p className="font-semibold text-[#478bb3]">Autorizadas</p>
                                 </div>
@@ -270,9 +299,15 @@ export default async function page() {
                             <div className="bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 bg-opacity-60 shadow-lg border-gray-400 rounded-3xl pl-3 pr-6 py-2 flex justify-between items-center gap-3">
                                 <div className="flex gap-3 items-center">
 
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 bg-[#2e556b] rounded-2xl p-1">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                                    </svg>
+                                    <div className="relative w-12">
+                                        <Image
+                                            src={"/images/icono-rechazo.png"}
+                                            width={100}
+                                            height={100}
+                                            alt="icono-balances"
+                                            className="rounded-2xl w-full aspect-square object-cover"
+                                        />
+                                    </div>
 
                                     <p className="font-semibold text-[#478bb3]">Rechazadas</p>
                                 </div>
@@ -284,9 +319,15 @@ export default async function page() {
                             <div className="bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 bg-opacity-60 shadow-lg border-gray-400 rounded-3xl pl-3 pr-6 py-2 flex justify-between items-center gap-3">
                                 <div className="flex gap-3 items-center">
 
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 bg-[#2e556b] rounded-2xl p-1">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                    </svg>
+                                    <div className="relative w-12">
+                                        <Image
+                                            src={"/images/icono-validas.png"}
+                                            width={100}
+                                            height={100}
+                                            alt="icono-balances"
+                                            className="rounded-2xl w-full aspect-square object-cover"
+                                        />
+                                    </div>
 
                                     <p className="font-semibold text-[#478bb3]">Validadas</p>
                                 </div>

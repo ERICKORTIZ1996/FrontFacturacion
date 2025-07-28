@@ -35,7 +35,7 @@ export default function GraficoFacturas() {
                         cursor={{ fill: "rgba(0, 0, 0, 0.05)" }}
                         contentStyle={{ backgroundColor: "#fff", border: "none", borderRadius: "10px", fontSize: "12px" }}
                     />
-                    <Bar dataKey="facturas" fill="#326684" radius={[5, 5, 0, 0]} />
+                    <Bar dataKey="facturas" fill="#077eeb" radius={[5, 5, 0, 0]} />
                 </BarChart>
             </ResponsiveContainer>
         </div>

@@ -4,6 +4,7 @@ import { Dialog, DialogPanel, DialogTitle, Button } from '@headlessui/react'
 import { useMainStore } from '@/store/mainStore'
 import { toast } from 'react-toastify';
 import { crearEmpresaSchema } from '@/schema';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios'
 
 export default function ModalCrearEmpresa() {
@@ -11,7 +12,7 @@ export default function ModalCrearEmpresa() {
     const modalCrearEmpresa = useMainStore((state) => state.modalCrearEmpresa)
     const changeModalCrearEmpresa = useMainStore((state) => state.changeModalCrearEmpresa)
 
-    const crearEmpresa = async (formData) => {
+    const handleSubmit = async (formData) => {
 
         const data = {
             ruc: formData.get('ruc-empresa'),
@@ -39,6 +40,11 @@ export default function ModalCrearEmpresa() {
             return
         }
 
+        mutate(formData)
+    }
+
+    const crearEmpresa = async (formData) => {
+
         try {
             const { data: dataEmpresa } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/empresas`, {
                 ruc: formData.get('ruc-empresa'),
@@ -56,14 +62,27 @@ export default function ModalCrearEmpresa() {
                 }
             })
 
-            toast.success(dataEmpresa.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
-            changeModalCrearEmpresa()
+            return dataEmpresa
 
         } catch (e) {
-            toast.error(e?.response?.data?.mensaje || e?.response?.data?.message?.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim());
             console.log(e);
+            throw new Error(e?.response?.data?.mensaje || e?.response?.data?.message?.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim());
         }
     };
+
+    const queryClient = useQueryClient();
+
+    const { mutate } = useMutation({
+        mutationFn: crearEmpresa, // Funcion a consultar
+        onSuccess: (dataEmpresa) => { // Petición exitosa
+            toast.success(dataEmpresa.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
+            queryClient.invalidateQueries({ queryKey: ['empresas'] }); // Traer los datos actualizados
+            changeModalCrearEmpresa()
+        },
+        onError: (error) => {
+            toast.error(error.message);
+        }
+    })
 
     return (
         <>
@@ -75,7 +94,7 @@ export default function ModalCrearEmpresa() {
 
                         <div className='flex h-full flex-col justify-between'>
                             <form
-                                action={crearEmpresa}
+                                action={handleSubmit}
                                 className='overflow-y-auto h-full barra pr-8'
                                 id='form-crear-empresa'
                             >

@@ -2,15 +2,15 @@
 
 import { useMainStore } from "@/store/mainStore"
 
-export default function BotonAgregarFactura() {
+export default function BotonAgregarProducto() {
 
-    const changeModalEmitirFactura = useMainStore((state) => state.changeModalEmitirFactura)
+    const changeModalCrearProducto = useMainStore((state) => state.changeModalCrearProducto)
 
     return (
         <button
             type="button"
             className="flex items-center gap-3 bg-[#2e4760] rounded-xl px-3 py-1 hover:bg-[#3a546e] transition-colors cursor-pointer"
-            onClick={() => changeModalEmitirFactura()}
+            onClick={() => changeModalCrearProducto()}
         >
             Agregar
 

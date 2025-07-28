@@ -1,18 +1,19 @@
 'use client'
 
 import { useEffect, useMemo, useState, useRef } from 'react'
-import { Description, Dialog, DialogPanel, DialogTitle, Button } from '@headlessui/react'
+import { Dialog, DialogPanel, DialogTitle, Button } from '@headlessui/react'
 import { useMainStore } from '@/store/mainStore'
 import { facturaSchema } from '@/schema'
 import { toast } from 'react-toastify';
 import { AgregarProducto } from '../emitir_facturas_componentes/AgregarProducto'
 import { consultarFechaEcuador } from '@/helpers'
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios'
 
 export default function ModalEmitirFactura() {
 
-    const modalCrearNotificacion = useMainStore((state) => state.modalCrearNotificacion)
-    const changeModalCrearNotificacion = useMainStore((state) => state.changeModalCrearNotificacion)
+    const modalEmitirFactura = useMainStore((state) => state.modalEmitirFactura)
+    const changeModalEmitirFactura = useMainStore((state) => state.changeModalEmitirFactura)
     const formulariosFactura = useMainStore((state) => state.formulariosFactura)
     const crearFormProducto = useMainStore((state) => state.crearFormProducto)
     const setFormulariosFactura = useMainStore((state) => state.setFormulariosFactura)
@@ -29,48 +30,19 @@ export default function ModalEmitirFactura() {
     const inputApellidosCliente = useRef(null)
     const inputDireccionCliente = useRef(null)
 
-    // infoTributaria
-    const [ambiente, setAmbiente] = useState('')
-    const [tipoEmision, setTipoEmision] = useState('')
-    const [razonSocial, setRazonSocial] = useState('')
-    const [nombreComercial, setNombreComercial] = useState('')
-    const [ruc, setruc] = useState('')
-    const [claveAcceso, setClaveAcceso] = useState('')
-    const [codDoc, setCodDoc] = useState('')
-    const [estab, setEstab] = useState('')
-    const [ptoEmi, setPtoEmi] = useState('')
-    const [secuencial, setSecuencial] = useState('')
-    const [dirMatriz, setDirMatriz] = useState('')
+    const queryClient = useQueryClient();
 
-    // infoFactura
-    const [fechaEmision, setFechaEmision] = useState('')
-    const [dirEstablecimiento, setDirEstablecimiento] = useState('')
-    const [obligadoContabilidad, setObligadoContabilidad] = useState('')
-    const [tipoIdentificacionComprador, setTipoIdentificacionComprador] = useState('')
-    const [razonSocialComprador, setRazonSocialComprador] = useState('')
-    const [identificacionComprador, setiIdentificacionComprador] = useState('')
-    const [totalSinImpuestos, setTotalSinImpuestos] = useState('')
-    const [totalDescuento, setTotalDescuento] = useState('')
-    const [propina, setPropina] = useState('')
-    const [importeTotal, setImporteTotal] = useState('')
-    const [moneda, setMoneda] = useState('')
-    // pagos - pago
-    const [formaPago, setFormaPago] = useState('')
-    const [total, setTotal] = useState('')
-    const [plazo, setPlazo] = useState('')
-    const [unidadTiempo, setUnidadTiempo] = useState('')
+    const totalSinIVA = useMemo(() => {
+        const lista = Array.isArray(productos) ? productos : [];
+        return lista.reduce((total, p) => total + (Number(p?.precioUnitario) || 0), 0);
+    }, [productos]);
 
     const mostrarFormProducto = () => {
         crearFormProducto({ id: 'empty' })
         setBotonMas(false)
     }
 
-    const emitirFactura = async (formData) => {
-
-        // 2. Extraigo el ID del CUERPO
-        const productosFormateados = productos
-            .filter(producto => producto.id !== "empty")
-            .map(({ id, ...prducto }) => prducto);
+    const handleSubmit = async (formData) => {
 
         const data = {
             ambiente: "Pruebas", // Cambiado a "Pruebas" o "Produccion" según el diccionario CodigoAmbiente
@@ -88,26 +60,25 @@ export default function ModalEmitirFactura() {
             razonSocialCompradorApellidos: `${formData.get('apellidos-cliente')}`,
             identificacionComprador: formData.get('identificacion-cliente'),
             direccionComprador: formData.get('direccion-comprador'),
-            totalSinImpuestos: 0.00,
+            totalSinImpuestos: Number(totalSinIVA),
             totalDescuento: 0.00,
             totalConImpuestos: [
                 {
-                    codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
-                    codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
-                    baseImponible: 100.00,
+                    codigo: "IVA",
+                    codigoPorcentaje: "15%",
+                    baseImponible: Number(totalSinIVA),
                     tarifa: 15,
-                    valor: 15.00,
-                    valorDevolucionIva: 0.00
+                    valor: (Number(totalSinIVA) * 0.15),
+                    valorDevolucionIva: 0.00 // -> Quemado
                 }
             ],
-            propina: 0.00,
-            importeTotal: 0.00,
+            propina: 0.00, // -> Quemado
+            importeTotal: Number(totalSinIVA) + (Number(totalSinIVA) * 0.15),
             moneda: "DOLAR",
             pagos: [{
                 formaPago: "Efectivo", // Cambiado a un valor que coincida con las claves de FormasPago
-                total: 0.00,
+                total: Number(totalSinIVA) + (Number(totalSinIVA) * 0.15),
             }],
-            detalles: productosFormateados
         }
 
         const result = facturaSchema.safeParse(data)
@@ -119,6 +90,19 @@ export default function ModalEmitirFactura() {
             })
             return
         }
+
+        mutate(formData)
+    }
+
+    const emitirFactura = async (formData) => {
+
+        const totalDescuento = productos.reduce((total, p) => total + (
+            (Number(p?.precioUnitario) * p?.descuento) || (Number(p?.precioUnitario) * p?.descuento) || 0), 0)
+
+        // 2. Extraigo el ID del CUERPO
+        const productosFormateados = productos
+            .filter(producto => producto.id !== "empty")
+            .map(({ id, ...prducto }) => prducto);
 
         try {
             const { data: dataFactura } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/crearXML`, {
@@ -137,7 +121,7 @@ export default function ModalEmitirFactura() {
                 identificacionComprador: formData.get('identificacion-cliente'),
                 direccionComprador: formData.get('direccion-comprador'),
                 totalSinImpuestos: 1.00, // ->
-                totalDescuento: 0.00,
+                totalDescuento: totalDescuento,
                 totalConImpuestos: [
                     {
                         codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
@@ -158,21 +142,31 @@ export default function ModalEmitirFactura() {
                 detalles: productosFormateados
             })
 
+            return dataFactura
+
+        } catch (e) {
+            console.log(e);
+            throw new Error(e.response.data.mensaje)
+        }
+    };
+
+    const { mutate } = useMutation({
+        mutationFn: emitirFactura, // Funcion a consultar
+        onSuccess: (dataFactura) => { // Petición exitosa
+
             setTipoIdentificacion("")
             setLongitudIdentificacion(0)
             setFormulariosFactura([])
             setProductos([])
             setBotonMas(true)
-            changeModalCrearNotificacion()
             toast.success(dataFactura.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
-
-
-        } catch (e) {
-            toast.error(e.response.data.mensaje)
-            console.log(e);
-
+            queryClient.invalidateQueries({ queryKey: ['emitir_facturas'] }); // Traer los datos actualizados
+            changeModalEmitirFactura()
+        },
+        onError: (error) => {
+            toast.error(error.message);
         }
-    };
+    })
 
     const controlInputIdentificacion = (value) => {
 
@@ -232,16 +226,16 @@ export default function ModalEmitirFactura() {
 
     }
 
-    const totalFactura = useMemo(() => productos.reduce((total, p) => total + (Number(p?.precioUnitario) || Number(p?.precioUnitario) || 0), 0), [productos])
+    console.log(productos);
+
 
     useEffect(() => {
         setFechaEcuador(consultarFechaEcuador())
     }, [])
 
-
     return (
         <>
-            <Dialog open={modalCrearNotificacion} onClose={() => { }} className="relative z-50">
+            <Dialog open={modalEmitirFactura} onClose={() => { }} className="relative z-50">
                 <div className="fixed inset-0 flex w-screen items-center justify-center p-4 bg-gray-800/40 main-background">
 
                     {/* shadow shadow-[#245e95] */}
@@ -249,7 +243,7 @@ export default function ModalEmitirFactura() {
 
                         <div className='flex h-full flex-col justify-between'>
                             <form
-                                action={emitirFactura}
+                                action={handleSubmit}
                                 className='overflow-y-auto h-full barra pr-8'
                                 id='main-form-emitir-factura'
                             >
@@ -494,15 +488,13 @@ export default function ModalEmitirFactura() {
                                         Agregar Artículo
                                     </button>
                                 }
+
                                 {
-                                    formulariosFactura.length ? (
-                                        formulariosFactura?.map(id => (
-                                            <AgregarProducto
-                                                key={id}
-                                                id={id}
-                                            />
+                                    Array.isArray(formulariosFactura) && formulariosFactura.length > 0 && (
+                                        formulariosFactura.map(id => (
+                                            <AgregarProducto key={id} id={id} />
                                         ))
-                                    ) : null
+                                    )
                                 }
                             </form>
 
@@ -510,7 +502,7 @@ export default function ModalEmitirFactura() {
                                 <div className='flex justify-between gap-5 items-center mt-5'>
 
                                     <p className='font-semibold text-gray-800 text-xl bg-gray-100 rounded-xl px-3 py-1'>
-                                        Total a Pagar: $ {totalFactura}
+                                        Total a Pagar: $ {totalSinIVA}
                                     </p>
 
                                     <div className='flex gap-3 items-center'>
@@ -522,7 +514,7 @@ export default function ModalEmitirFactura() {
                                                 setFormulariosFactura([])
                                                 setProductos([])
                                                 setBotonMas(true)
-                                                changeModalCrearNotificacion()
+                                                changeModalEmitirFactura()
                                             }}
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
