@@ -26,7 +26,7 @@ export default function DataFactura() {
     return (
         isLoading ? (
             <SmallSpinner />
-        ) : data.data && data.data.length ? (
+        ) : data?.data && data?.data?.length ? (
             <>
                 <table className="w-full mt-5">
                     <thead className="bg-[#05121f]/60">

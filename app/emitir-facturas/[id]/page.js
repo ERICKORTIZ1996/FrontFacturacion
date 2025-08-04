@@ -13,7 +13,7 @@ async function obtenerFactura(nombreArchivo) {
 export default async function Factura({ params }) {
 
     const factura = await obtenerFactura(params.id);
-    // console.log(factura.data.detalles);
+    console.log(factura);
 
 
     return (

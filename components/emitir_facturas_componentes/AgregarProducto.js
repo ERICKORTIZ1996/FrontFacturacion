@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useMainStore } from "@/store/mainStore";
-import axios from "axios";
 import { toast } from 'react-toastify';
 import { productoSchema } from "@/schema";
 import Swal from 'sweetalert2';
@@ -10,132 +9,76 @@ export const AgregarProducto = ({ id }) => {
     const crearFormProducto = useMainStore((state) => state.crearFormProducto)
     const editar = useMainStore((state) => state.editar)
     const setEditar = useMainStore((state) => state.setEditar)
-    const facturaState = useMainStore((state) => state.facturaState)
     const formulariosFactura = useMainStore((state) => state.formulariosFactura)
     const setFormulariosFactura = useMainStore((state) => state.setFormulariosFactura)
     const productos = useMainStore((state) => state.productos)
     const setProductos = useMainStore((state) => state.setProductos)
 
-    const [alerta, setAlerta] = useState(false);
     const [agrePro, setAgrePro] = useState(false)
     const [editarPro, setEditarPro] = useState(false)
+    const [resultadoProductos, setResultadoProductos] = useState([])
+    const [ventanaResultadoProductos, setventanaResultadoProductos] = useState(false)
     const isEditable = !(editar || agrePro) || editarPro;
 
-    // detalle
-    const [codigoPrincipal, setcodigoPrincipal] = useState('')
-    const [descripcionProducto, setDescripcionProducto] = useState('')
-    const [cantidadProducto, setCantidadProducto] = useState(0)
-    const [precioUnitario, setPrecioUnitario] = useState(0)
-    const [descuento, setDescuento] = useState(0)
-    // impuestos - impuesto
-    const [codigo, setcodigo] = useState(0)
-    const [codigoPorcentaje, setcodigoPorcentaje] = useState(0)
-    const [tarifa, settarifa] = useState(0)
-    const [baseImponible, setbaseImponible] = useState(0)
-    const [precioTotalSinImpuestos, setPrecioTotalSinImpuestos] = useState(0)
-    const [valor, setvalor] = useState(0)
+    const [detalle, setDetalle] = useState({
+        codigoPrincipal: '',
+        descripcion: '',
+        cantidadProducto: 0,
+        precioUnitario: 0,
+        descuento: 0,
+        precioTotalSinImpuesto: 0,
+        codigo: 0,
+        codigoPorcentaje: 0,
+        tarifa: 0,
+        baseImponible: 0,
+        valor: 0,
+    })
 
-    const total = useMemo(() => (cantidadProducto * precioUnitario), [cantidadProducto, precioUnitario])
+    const subtotal = detalle.cantidadProducto * detalle.precioUnitario;
+    const total = subtotal - (subtotal * detalle.descuento) / 100;
 
-    const emitirProducto = async () => {
+    const construirYValidarProducto = () => {
 
         const data = {
-            codigoPrincipal: "001",
-            descripcion: descripcionProducto,
-            cantidad: Number(cantidadProducto),
-            precioUnitario: Number(precioUnitario),
-            descuento: Number(descuento),
-            precioTotalSinImpuesto: Number(precioUnitario),
+            codigoPrincipal: detalle.codigoPrincipal,
+            descripcion: detalle.descripcion,
+            cantidad: Number(detalle.cantidadProducto),
+            precioUnitario: Number(detalle.precioUnitario),
+            descuento: Number(detalle.descuento),
+            precioTotalSinImpuesto: Number(detalle.precioTotalSinImpuesto),
             impuestos: [{
-                codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
-                codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
-                tarifa: 15,
-                baseImponible: Number(precioUnitario),
-                valor: (Number(precioUnitario) * 0.15)
+                codigo: detalle.codigo,
+                codigoPorcentaje: detalle.codigoPorcentaje,
+                tarifa: detalle.tarifa,
+                baseImponible: detalle.baseImponible,
+                valor: detalle.valor
             }]
         }
 
         const result = productoSchema.safeParse(data)
 
         if (!result.success) {
-            result.error.issues.forEach(issue => {
-                toast.error(issue.message)
-            })
-            return
+            result.error.issues.forEach(issue => toast.error(issue.message))
+            return;
         }
 
-        try {
+        return data;
+    }
 
-            crearFormProducto({
-                id,
-                codigoPrincipal: "001",
-                descripcion: descripcionProducto,
-                cantidad: Number(cantidadProducto),
-                precioUnitario: Number(precioUnitario),
-                descuento: Number(descuento),
-                precioTotalSinImpuesto: Number(precioUnitario),
-                impuestos: [{
-                    codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
-                    codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
-                    tarifa: 15,
-                    baseImponible: 100.00,
-                    valor: 15.00
-                }]
-            })
+    const emitirProducto = async () => {
 
-            setAgrePro(true) // Desabilita el icono de (+)
-
-        } catch (error) { console.log(error) }
+        const productoValido = construirYValidarProducto();
+        if (!productoValido) return;
+        crearFormProducto({ id, ...productoValido })
+        setAgrePro(true) // Desabilita el icono de (+)
     }
 
     const editarProducto = async () => {
 
-        const data = {
-            codigoPrincipal: "001",
-            descripcion: descripcionProducto,
-            cantidad: Number(cantidadProducto),
-            precioUnitario: Number(precioUnitario),
-            descuento: Number(descuento),
-            precioTotalSinImpuesto: Number(precioUnitario),
-            impuestos: [{
-                codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
-                codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
-                tarifa: 15,
-                baseImponible: 100.00,
-                valor: 15.00
-            }]
-        }
+        const productoValido = construirYValidarProducto();
+        if (!productoValido) return;
 
-        const result = productoSchema.safeParse(data)
-
-        if (!result.success) {
-            result.error.issues.forEach(issue => {
-                toast.error(issue.message)
-            })
-            return
-        }
-
-        const nuevoPro = productos.map((p) => {
-            if (p.id === id) {
-                return {
-                    ...p,
-                    codigoPrincipal: "001",
-                    descripcion: descripcionProducto,
-                    cantidad: Number(cantidadProducto),
-                    precioUnitario: Number(precioUnitario),
-                    descuento: Number(descuento),
-                    precioTotalSinImpuesto: Number(precioUnitario),
-                    impuestos: [{
-                        codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
-                        codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
-                        tarifa: 15,
-                        baseImponible: 100.00,
-                        valor: 15.00
-                    }]
-                };
-            }
-            return p;
-        });
+        const nuevoPro = productos.map(p => p.id === id ? { ...p, ...productoValido } : p);
 
         setProductos(nuevoPro);
         setAgrePro(true)
@@ -174,11 +117,66 @@ export const AgregarProducto = ({ id }) => {
 
     }
 
+    const productosExample = [
+        {
+            codigoPrincipal: "001",
+            descripcion: "Pantalones",
+            cantidad: 5,
+            precioUnitario: 10.52,
+            descuento: 20,
+            precioTotalSinImpuesto: 10.52,
+            impuestos: [{
+                codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
+                codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
+                tarifa: 15,
+                baseImponible: 10.52,
+                valor: (10.52 * 0.15)
+            }]
+        },
+        {
+            codigoPrincipal: "002",
+            descripcion: "Camisetas",
+            cantidad: 2,
+            precioUnitario: 5.52,
+            descuento: 0,
+            precioTotalSinImpuesto: 5.52,
+            impuestos: [{
+                codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
+                codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
+                tarifa: 15,
+                baseImponible: 5.52,
+                valor: (5.52 * 0.15)
+            }]
+        }
+    ]
+
+    const verificarProducto = (value) => {
+        setResultadoProductos(productosExample.filter(p => p.descripcion.toLowerCase().includes(value)))
+    }
+
+    const llenarInputsArticulo = (articulo) => {
+
+        setDetalle(prev => ({
+            ...prev,
+            codigoPrincipal: articulo.codigoPrincipal,
+            descripcion: articulo.descripcion,
+            // cantidadProducto -> Se maneja en otro lado
+            precioUnitario: articulo.precioUnitario,
+            descuento: articulo.descuento,
+            precioTotalSinImpuesto: articulo.precioTotalSinImpuesto,
+            codigo: articulo.impuestos[0].codigo,
+            codigoPorcentaje: articulo.impuestos[0].codigoPorcentaje,
+            tarifa: articulo.impuestos[0].tarifa,
+            baseImponible: articulo.impuestos[0].baseImponible,
+            valor: articulo.impuestos[0].valor,
+        }));
+    }
+
     return (
         <div
             className={`flex flex-col gap-3 md:flex-row md:items-end md:gap-10 mt-4 border-b pb-5 border-b-[#486b8f] last-of-type:border-none ${agrePro ? !editarPro ? 'opacity-70' : '' : ''} ${editar ? !agrePro ? 'opacity-70' : '' : ''}`}
         >
-            <div className='flex gap-3'>
+            <div className='flex gap-3 relative'>
                 <div className='flex flex-col'>
                     <label htmlFor={`descripcion-producto-${id}`} className='mb-1'>Descripción</label>
                     <input
@@ -186,8 +184,17 @@ export const AgregarProducto = ({ id }) => {
                         type="text"
                         className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 disabled:cursor-not-allowed'
                         placeholder='Ej: Pantalones baqueros gris'
-                        onChange={(e) => setDescripcionProducto(e.target.value)}
-                        disabled={editar || agrePro ? !editarPro : null}
+                        value={detalle.descripcion}
+                        onChange={(e) => {
+                            setDetalle(prev => ({ ...prev, descripcion: e.target.value }));
+                            verificarProducto(e.target.value);
+                        }}
+                        disabled={!isEditable}
+                        onFocus={() => setventanaResultadoProductos(true)}
+                        onBlur={() => {
+                            setTimeout(() => setventanaResultadoProductos(false), 100);
+                        }}
+                        autoComplete="off"
                     />
                 </div>
 
@@ -198,7 +205,12 @@ export const AgregarProducto = ({ id }) => {
                         type="text"
                         className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-24 disabled:cursor-not-allowed'
                         placeholder='Ej: 2'
-                        onChange={(e) => setCantidadProducto(e.target.value)}
+                        onChange={(e) =>
+                            setDetalle(prev => ({
+                                ...prev,
+                                cantidadProducto: e.target.value
+                            }))
+                        }
                         disabled={!isEditable}
                     />
                 </div>
@@ -210,8 +222,9 @@ export const AgregarProducto = ({ id }) => {
                         type="text"
                         className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-24 disabled:cursor-not-allowed'
                         placeholder='Ej: 22.50'
-                        onChange={(e) => setPrecioUnitario(e.target.value)}
-                        disabled={editar || agrePro ? !editarPro : null}
+                        value={detalle.precioUnitario}
+                        disabled
+                        readOnly
                     />
                 </div>
 
@@ -220,10 +233,11 @@ export const AgregarProducto = ({ id }) => {
                     <input
                         id={`descuento-${id}`}
                         type="text"
-                        className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-24 disabled:cursor-not-allowed'
+                        className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-20 disabled:cursor-not-allowed'
                         placeholder='Ej: 5%'
-                        onChange={(e) => setDescuento(e.target.value)}
-                        disabled={editar || agrePro ? !editarPro : null}
+                        value={detalle.descuento}
+                        disabled
+                        readOnly
                     />
                 </div>
 
@@ -236,8 +250,26 @@ export const AgregarProducto = ({ id }) => {
                         placeholder='Ej: 23.00'
                         value={total.toString()}
                         disabled
+                        readOnly
                     />
                 </div>
+
+                {ventanaResultadoProductos && resultadoProductos?.length > 0 && (
+                    <div className="bg-gradient-to-t from-[#102940] to-[#182a3b] w-full h-40 absolute rounded-xl p-2 bottom-[110%] text-gray-200">
+                        <ul className="overflow-auto barra h-full w-full">
+                            {resultadoProductos.map((p) => (
+                                <li
+                                    key={p.codigoPrincipal}
+                                    className="text-nowrap px-3 py-1 hover:bg-[#2e4760] cursor-pointer rounded-lg w-full transition-colors"
+                                    onClick={() => llenarInputsArticulo(p)}
+                                >
+                                    <span className='font-bold'>ITEM:</span> {p.descripcion} - <span className='font-bold'>CÓDIGO:</span> {p.codigoPrincipal} - <span className='font-bold'>DESCUENTO:</span> {p.descuento}%
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
             </div>
 
             <div className="flex gap-2 items-center md:mt-8 lg:mt-0">

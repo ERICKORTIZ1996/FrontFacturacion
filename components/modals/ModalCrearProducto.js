@@ -54,10 +54,10 @@ export default function ModalCrearProducto() {
     return (
         <>
             <Dialog open={modalCrearProducto} onClose={() => { }} className="relative z-50">
-                <div className="fixed inset-0 flex w-screen items-center justify-center p-4 bg-gray-800/40 main-background">
+                <div className="fixed inset-0 flex w-screen items-center justify-center p-4 bg-gray-800/40 modal-background">
 
                     {/* shadow shadow-[#245e95] */}
-                    <DialogPanel className="w-[100%] md:w-[30%] h-[70%] space-y-4 px-8 py-6 rounded-3xl bg-gradient-to-b from-[#153350]/60 to-[#1f3850]/60">
+                    <DialogPanel className="w-[100%] md:w-[30%] h-[70%] space-y-4 px-8 py-6 rounded-3xl bg-gradient-to-b from-[#153350]/90 to-[#1f3850]/90 backdrop-blur-sm shadow shadow-[#166fc2]">
 
                         <div className='flex h-full flex-col justify-between'>
                             <form

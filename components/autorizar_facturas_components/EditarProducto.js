@@ -1,13 +1,15 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react";
-import { useMainStore } from "@/store/mainStore";
 import axios from "axios";
 import { toast } from 'react-toastify';
 import { productoSchema } from "@/schema";
+import { useMainStore } from "@/store/mainStore";
 import Swal from 'sweetalert2';
 
-export const EditarProducto = ({ id }) => {
+export const EditarProducto = ({ id, detalle }) => {
+
+    const formulariosFactura = useMainStore((state) => state.formulariosFactura)
 
     const editar = useMainStore((state) => state.editar)
     const setEditar = useMainStore((state) => state.setEditar)
@@ -22,10 +24,10 @@ export const EditarProducto = ({ id }) => {
 
     // detalle
     const [codigoPrincipal, setcodigoPrincipal] = useState('')
-    const [descripcionProducto, setDescripcionProducto] = useState('')
-    const [cantidadProducto, setCantidadProducto] = useState(0)
-    const [precioUnitario, setPrecioUnitario] = useState(0)
-    const [descuento, setDescuento] = useState(0)
+    const [descripcionProducto, setDescripcionProducto] = useState(detalle?.descripcion || "")
+    const [cantidadProducto, setCantidadProducto] = useState(detalle?.cantidad || 0)
+    const [precioUnitario, setPrecioUnitario] = useState(detalle.precioUnitario || 0)
+    const [descuento, setDescuento] = useState(detalle?.descuento || 0)
     // impuestos - impuesto
     const [codigo, setcodigo] = useState(0)
     const [codigoPorcentaje, setcodigoPorcentaje] = useState(0)
@@ -64,7 +66,7 @@ export const EditarProducto = ({ id }) => {
         }
 
         const nuevoPro = productos.map((p) => {
-            if (p.id === id) {
+            if (p.id === detalle.id) {
                 return {
                     ...p,
                     codigoPrincipal: "001",
@@ -91,7 +93,7 @@ export const EditarProducto = ({ id }) => {
         setEditar(false)
     }
 
-    const eliminarFormStock = async (idForm) => {
+    const eliminarFormStock = async (id) => {
 
         Swal.fire({
             title: '¿Estas seguro de eliminar este artículo?',
@@ -109,10 +111,7 @@ export const EditarProducto = ({ id }) => {
         }).then(async (result) => {
             if (result.isConfirmed) {
 
-                const nuevoFormFact = formulariosFactura.filter(fp => fp !== idForm)
-                const nuevoPro = productos.filter(p => p.id !== idForm)
-
-                setFormulariosFactura(nuevoFormFact)
+                const nuevoPro = productos.filter(p => p.id !== id)
                 setProductos(nuevoPro)
 
             } else if (result.isDenied) {
@@ -134,6 +133,7 @@ export const EditarProducto = ({ id }) => {
                         type="text"
                         className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 disabled:cursor-not-allowed'
                         placeholder='Ej: Pantalones baqueros gris'
+                        value={descripcionProducto}
                         onChange={(e) => setDescripcionProducto(e.target.value)}
                         disabled={editar || agrePro ? !editarPro : null}
                     />
@@ -146,6 +146,7 @@ export const EditarProducto = ({ id }) => {
                         type="text"
                         className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-24 disabled:cursor-not-allowed'
                         placeholder='Ej: 2'
+                        value={cantidadProducto}
                         onChange={(e) => setCantidadProducto(e.target.value)}
                         disabled={editar || agrePro ? !editarPro : null}
                     />
@@ -159,6 +160,7 @@ export const EditarProducto = ({ id }) => {
                         className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-24 disabled:cursor-not-allowed'
                         placeholder='Ej: 22.50'
                         onChange={(e) => setPrecioUnitario(e.target.value)}
+                        value={precioUnitario}
                         disabled={editar || agrePro ? !editarPro : null}
                     />
                 </div>
@@ -170,6 +172,7 @@ export const EditarProducto = ({ id }) => {
                         type="text"
                         className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-24 disabled:cursor-not-allowed'
                         placeholder='Ej: 5%'
+                        value={descuento}
                         onChange={(e) => setDescuento(e.target.value)}
                         disabled={editar || agrePro ? !editarPro : null}
                     />
@@ -223,7 +226,7 @@ export const EditarProducto = ({ id }) => {
                     <button
                         type="button"
                         className="border bg-transparent border-gray-200 text-gray-200 hover:bg-red-500 hover:border-red-500 px-2 rounded-full p-2 cursor-pointer transition-colors disabled:cursor-not-allowed"
-                        onClick={() => eliminarFormStock(id)}
+                        onClick={() => eliminarFormStock(detalle.id)}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
                             <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />

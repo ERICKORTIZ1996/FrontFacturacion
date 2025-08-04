@@ -1,11 +1,12 @@
-
-
 import axios from "axios";
-import Link from "next/link";
 import MainLayout from "@/components/layouts/MainLayout";
 import ComprobarAcceso from "@/components/others/ComprobarAcceso";
-import { EditarProducto } from "@/components/autorizar_facturas_components/EditarProducto";
 import { formatearFecha } from "@/helpers";
+import BotonReenviarFactura from "@/components/emitir_facturas_componentes/BotonReenviarFactura";
+import TotalFactura from "@/components/emitir_facturas_componentes/TotalFactura";
+import InicializarAutorizarFactura from "@/components/emitir_facturas_componentes/InicializarAutorizarFactura";
+import EditarFactura from "@/components/emitir_facturas_componentes/EditarFactura";
+import BotonRegresarAutorizarFactura from "@/components/emitir_facturas_componentes/BotonRegresarAutorizarFactura";
 
 async function obtenerFactura(nombreArchivo) {
     const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/nombre/${nombreArchivo}`);
@@ -15,24 +16,19 @@ async function obtenerFactura(nombreArchivo) {
 export default async function FacturaPendiente({ params }) {
 
     const factura = await obtenerFactura(params.id);
+    console.log(factura);
 
     return (
         <ComprobarAcceso>
             <MainLayout>
 
+                <InicializarAutorizarFactura
+                    factura={factura}
+                />
+
                 <div className="flex items-center text-gray-800 gap-4">
 
-                    <Link
-                        className="font-semibold text-gray-100 cursor-pointer rounded-full transition-colors px-4 py-1 border border-gray-100 flex gap-2 items-center hover:bg-gray-100 hover:text-gray-800"
-                        href={"/emitir-facturas/autorizar-facturas"}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-                        </svg>
-
-                        Regresar
-                    </Link>
-
+                    <BotonRegresarAutorizarFactura />
 
                     <div className="flex items-center bg-gray-100 font-semibold rounded-full px-4 py-1 w-fit text-gray-800 gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -191,32 +187,18 @@ export default async function FacturaPendiente({ params }) {
 
                         </h2>
 
-                        {
-                            factura.data.detalles.map(detalle => (
-                                <EditarProducto
-                                    key={detalle.id}
-                                />
-                            ))
-                        }
+                        <EditarFactura />
 
                     </div>
 
                     <div>
 
-                        <div className="rounded-3xl bg-gradient-to-b from-[#153350]/60 to-[#1f3850]/60 px-6 py-4">
+                        <TotalFactura />
 
+                        <BotonReenviarFactura
+                            idFctura="1"
+                        />
 
-                            <span className="block">SUBTOTAL: $ 00.00</span>
-                            <span className="block">IVA 15%: $ 00.00</span>
-                            <span className="block">DESCUENTO: $ 00.00</span>
-
-                            <div className="flex gap-3 items-center mt-5">
-
-                                <p className='font-semibold text-gray-800 bg-gray-100 rounded-xl px-3 py-1 w-fit'>
-                                    Total a Pagar: $ 00.00
-                                </p>
-                            </div>
-                        </div>
                     </div>
 
                 </div>
