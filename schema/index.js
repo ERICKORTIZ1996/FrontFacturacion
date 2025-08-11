@@ -1,5 +1,12 @@
 import { z } from "zod/v4";
 
+const formasPagoEnum = z.enum([
+    'Efectivo',
+    'Tarjeta de débito',
+    'Dinero electrónico',
+    'Tarjeta de crédito'
+]);
+
 export const facturaSchema = z.object({
     razonSocial: z.string().min(1, 'RAZÓN SOCIAL: Es requerido'),
     ruc: z.string()
@@ -13,7 +20,8 @@ export const facturaSchema = z.object({
         message: 'TIPO IDENTIFICACIÓN: Seleccione uno'
     }),
     identificacionComprador: z.string().min(1, 'IDENTIFICACIÓN CLIENTE: Es requerido'),
-    direccionComprador: z.string().min(1, 'DIRECCIÓN CLIENTE: Es requerido')
+    direccionComprador: z.string().min(1, 'DIRECCIÓN CLIENTE: Es requerido'),
+    formaPago: formasPagoEnum
 }).check((ctx) => {
     const { tipoIdentificacionComprador: tipo, identificacionComprador: value } = ctx.value;
 
@@ -150,7 +158,7 @@ export const productoStockSchema = z.object({
         z.string()
             .regex(/^\d+$/, "DESCUENTO: debe ser un número entero válido")
             .transform((val) => parseInt(val, 10))
-            .refine((val) => val >= 1 && val <= 100, {
+            .refine((val) => val >= 0 && val <= 100, {
                 message: "DESCUENTO: debe estar entre 1 y 100"
             })),
 })

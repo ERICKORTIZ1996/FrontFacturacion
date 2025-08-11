@@ -4,17 +4,48 @@ import MainLayout from "@/components/layouts/MainLayout";
 import ComprobarAcceso from "@/components/others/ComprobarAcceso";
 import BotonImprimirFactura from "@/components/emitir_facturas_componentes/BotonImprimirFactura";
 import { formatearFecha } from "@/helpers";
+import { redirect } from "next/navigation";
 
 async function obtenerFactura(nombreArchivo) {
-    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/nombre/${nombreArchivo}`);
-    return data
+    try {
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/nombre/${nombreArchivo}`);
+        return data
+    } catch (e) {
+        redirect("/facturas/no-encontrada"); // redirección automática
+    }
+
 }
 
 export default async function Factura({ params }) {
 
     const factura = await obtenerFactura(params.id);
-    console.log(factura);
+    console.log(factura.data);
 
+    const nombresApellidosCliente = factura.data.cliente.razonSocialComprador.split(" ")
+
+    const totalSinIVA = factura.data.detalles.reduce((total, p) => {
+        const precio = Number(p?.precioUnitario);
+        const cantidad = Number(p?.cantidad);
+
+        const subtotal = precio * cantidad;
+
+        return total + subtotal;
+    }, 0);
+
+    const totalDescuento = factura.data.detalles.reduce((total, p) => {
+        const precio = Number(p?.precioUnitario) || 0;
+        const cantidad = Number(p?.cantidad) || 0;
+        const descuento = Number(p?.descuento) || 0;
+
+        const subtotal = precio * cantidad;
+        const totalDescuento = (subtotal * descuento / 100);
+
+        return total + totalDescuento;
+    }, 0);
+
+    const baseImponible = totalSinIVA - totalDescuento
+    const iva = baseImponible * 0.15
+    const totalFinal = baseImponible + iva
 
     return (
         <ComprobarAcceso>
@@ -57,20 +88,20 @@ export default async function Factura({ params }) {
                         <div className='flex gap-10'>
 
                             <div className='flex flex-col'>
-                                <span htmlFor="razon-social" className='mb-1'>Nombre de Empresa</span>
-                                <span
-                                    className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
-                                >
-                                    /Nombre Empresa/
-                                </span>
-                            </div>
-
-                            <div className='flex flex-col'>
                                 <span htmlFor="razon-social" className='mb-1'>Ruc</span>
                                 <span
                                     className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                 >
-                                    /Ruc/
+                                    {factura.data.sucursal.empresa.ruc}
+                                </span>
+                            </div>
+
+                            <div className='flex flex-col'>
+                                <span htmlFor="razon-social" className='mb-1'>Razón Social</span>
+                                <span
+                                    className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
+                                >
+                                    {factura.data.sucursal.empresa.razonSocial}
                                 </span>
                             </div>
 
@@ -79,7 +110,7 @@ export default async function Factura({ params }) {
                                 <span
                                     className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                 >
-                                    /Matriz/
+                                    {factura.data.sucursal.empresa.dirMatriz}
                                 </span>
                             </div>
 
@@ -88,7 +119,7 @@ export default async function Factura({ params }) {
                                 <span
                                     className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                 >
-                                    /Dirección/
+                                    {factura.data.sucursal.dirEstablecimiento}
                                 </span>
                             </div>
                         </div>
@@ -107,21 +138,13 @@ export default async function Factura({ params }) {
                         <div className='grid grid-cols-1 gap-20'>
 
                             <div className='flex gap-10'>
-                                <div className='flex flex-col'>
-                                    <span htmlFor="razon-social" className='mb-1'>Nombres</span>
-                                    <span
-                                        className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
-                                    >
-                                        /Nombres/
-                                    </span>
-                                </div>
 
                                 <div className='flex flex-col'>
-                                    <span htmlFor="razon-social" className='mb-1'>Apellidos</span>
+                                    <span htmlFor="razon-social" className='mb-1'>Tipo de Identificación</span>
                                     <span
                                         className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                     >
-                                        /Apellidos/
+                                        {factura.data.cliente.tipoIdentificacionComprador}
                                     </span>
                                 </div>
 
@@ -130,7 +153,25 @@ export default async function Factura({ params }) {
                                     <span
                                         className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                     >
-                                        /Identificación/
+                                        {factura.data.cliente.identificacionComprador}
+                                    </span>
+                                </div>
+
+                                <div className='flex flex-col'>
+                                    <span htmlFor="razon-social" className='mb-1'>Nombres</span>
+                                    <span
+                                        className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
+                                    >
+                                        {nombresApellidosCliente.slice(0, 2).join(" ")}
+                                    </span>
+                                </div>
+
+                                <div className='flex flex-col'>
+                                    <span htmlFor="razon-social" className='mb-1'>Apellidos</span>
+                                    <span
+                                        className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
+                                    >
+                                        {nombresApellidosCliente.slice(2).join(" ")}
                                     </span>
                                 </div>
 
@@ -139,7 +180,7 @@ export default async function Factura({ params }) {
                                     <span
                                         className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                     >
-                                        /Dirección/
+                                        {factura.data.cliente.direccion}
                                     </span>
                                 </div>
                             </div>
@@ -185,55 +226,59 @@ export default async function Factura({ params }) {
                         </h2>
 
                         {
-                            factura.data.detalles.map(detalle => (
-                                <div className='flex gap-10' key={detalle.id}>
-                                    <div className='flex flex-col'>
-                                        <span className='mb-1'>Descripción</span>
-                                        <span
-                                            className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
-                                        >
-                                            {detalle.descripcion}
-                                        </span>
-                                    </div>
+                            factura.data.detalles.map(detalle => {
 
-                                    <div className='flex flex-col'>
-                                        <span className='mb-1'>Cantidad</span>
-                                        <span
-                                            className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
-                                        >
-                                            {detalle.cantidad}
-                                        </span>
-                                    </div>
+                                const subtotal = detalle.cantidad * detalle.precioUnitario;
+                                const total = subtotal - (subtotal * detalle.descuento) / 100;
 
+                                return (
+                                    <div className='flex gap-10' key={detalle.id}>
+                                        <div className='flex flex-col'>
+                                            <span className='mb-1'>Descripción</span>
+                                            <span
+                                                className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
+                                            >
+                                                {detalle.descripcion}
+                                            </span>
+                                        </div>
 
-                                    <div className='flex flex-col'>
-                                        <span className='mb-1'>Precio Unitario</span>
-                                        <span
-                                            className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
-                                        >
-                                            $ {detalle.precioUnitario}
-                                        </span>
-                                    </div>
+                                        <div className='flex flex-col'>
+                                            <span className='mb-1'>Cantidad</span>
+                                            <span
+                                                className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
+                                            >
+                                                {detalle.cantidad}
+                                            </span>
+                                        </div>
 
-                                    <div className='flex flex-col'>
-                                        <span className='mb-1'>Descuento</span>
-                                        <span
-                                            className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
-                                        >
-                                            {detalle.descuento}
-                                        </span>
-                                    </div>
+                                        <div className='flex flex-col'>
+                                            <span className='mb-1'>Precio Unitario</span>
+                                            <span
+                                                className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
+                                            >
+                                                $ {detalle.precioUnitario}
+                                            </span>
+                                        </div>
 
-                                    <div className='flex flex-col'>
-                                        <span className='mb-1'>Total</span>
-                                        <span
-                                            className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
-                                        >
-                                            $ {detalle.cantidad * detalle.precioUnitario}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))
+                                        <div className='flex flex-col'>
+                                            <span className='mb-1'>Descuento</span>
+                                            <span
+                                                className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
+                                            >
+                                                {detalle.descuento}
+                                            </span>
+                                        </div>
+
+                                        <div className='flex flex-col'>
+                                            <span className='mb-1'>Total</span>
+                                            <span
+                                                className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
+                                            >
+                                                $ {total}
+                                            </span>
+                                        </div>
+                                    </div>)
+                            })
                         }
 
                     </div>
@@ -242,21 +287,35 @@ export default async function Factura({ params }) {
 
                         <div className="rounded-3xl bg-gradient-to-b from-[#153350]/60 to-[#1f3850]/60 px-6 py-4">
 
+                            {/* Subtotal: {totalSinIVA.toFixed(2)} <br />
+                                        Descuento: {totalDescuento.toFixed(2)} <br />
+                                        Base imponible: {baseImponible.toFixed(2)} <br />
+                                        IVA (15%): {iva.toFixed(2)} <br />
+                                        Total a pagar: {totalFinal.toFixed(2)} <br /> */}
 
-                            <span className="block">SUBTOTAL: $ {factura.data.totalSinImpuestos}</span>
-                            <span className="block">IVA 15%: $ {factura.data.importeTotal * 0.15}</span>
-                            <span className="block">DESCUENTO: $ {factura.data.totalDescuento}</span>
+                            <span className="block">SUBTOTAL: $ {totalSinIVA.toFixed(2)}</span>
+                            <span className="block">Descuento: $ {totalDescuento.toFixed(2)}</span>
+                            <span className="block">Base imponible: $ {baseImponible.toFixed(2)}</span>
+                            <span className="block">IVA 15%: $ {iva.toFixed(2)}</span>
 
                             <div className="flex gap-3 items-center mt-5">
 
                                 <p className='font-semibold text-gray-800 bg-gray-100 rounded-xl px-3 py-1 w-fit'>
-                                    Total a Pagar: $ {factura.data.importeTotal}
+                                    Total a Pagar: $ {totalFinal.toFixed(2)}
                                 </p>
 
-                                <BotonImprimirFactura
-                                    nombreArchivo={factura.nombreArchivo}
-                                />
+                                {factura.data.estado.toLowerCase() === 'validada' && (
+                                    <BotonImprimirFactura
+                                        nombreArchivo={factura.nombreArchivo}
+                                    />
+                                )}
+
                             </div>
+
+                            {factura.data.estado.toLowerCase() !== 'validada' && (
+                                <p className="mt-3">Valida tu factura <br /> para poder imprimirla</p>
+                            )}
+
                         </div>
                     </div>
 

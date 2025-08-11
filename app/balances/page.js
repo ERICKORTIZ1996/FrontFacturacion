@@ -10,9 +10,29 @@ async function obtenerDashboardBalances() {
     return data
 }
 
+async function obtenerProductosMasVendidos() {
+    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/productos/mas-vendidos`);
+    return data
+}
+
+async function balancesYProductosMasVendidos() {
+
+    const [balancesData, productosData] = await Promise.allSettled([
+        obtenerDashboardBalances(),
+        obtenerProductosMasVendidos()
+    ])
+
+    return [
+        balancesData.status === "fulfilled" ? balancesData.value : null,
+        productosData.status === "fulfilled" ? productosData.value : null
+    ];
+
+}
+
+
 export default async function page() {
 
-    const balances = await obtenerDashboardBalances()
+    const [balances, productos] = await balancesYProductosMasVendidos()
 
     return (
         <ComprobarAcceso>
@@ -67,85 +87,34 @@ export default async function page() {
                         <div className="grid grid-cols-2 mt-5 gap-5">
                             <div className="shadow-lg border-gray-400 rounded-3xl px-8 py-6 banner-productos-vendidos">
 
-                                <h2 className="font-semibold text-gray-100 text-lg mb-5">Productos más Vendidos - mensuales</h2>
+                                <h2 className="font-semibold text-gray-100 text-lg mb-5">Productos más Vendidos</h2>
 
-                                <div className="bg-gradient-to-t from-[#102940]/20 to-[#182a3b]/20 shadow-lg rounded-2xl px-3 py-1 flex justify-between items-center gap-3 mb-2">
-                                    <div className="flex gap-3 items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-                                        </svg>
+                                {productos.data.map(p => (
+                                    <div
+                                        className="bg-gradient-to-t from-[#102940]/20 to-[#182a3b]/20 shadow-lg rounded-2xl px-3 py-1 flex justify-between items-center gap-3 mb-2"
+                                        key={p.id}
+                                    >
+                                        <div className="flex gap-3 items-center">
 
-                                        <p className="font-semibold">Camisa formal</p>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                                            </svg>
+
+                                            <div>
+                                                <p className="font-semibold">{p.nombre}</p>
+                                                <p className="text-sm -mt-1">En Stock: {p.stock}</p>
+                                            </div>
+                                        </div>
+
+
+                                        <div className="flex flex-col items-end">
+                                            <p className="text-xl">$ {p.totalVendido}</p>
+                                            <p className="text-[11px] -mt-1">TOTAL VENDIDO</p>
+                                        </div>
+
+
                                     </div>
-
-                                    <p className="text-xl">30</p>
-
-                                </div>
-
-                                <div className="bg-gradient-to-t from-[#102940]/20 to-[#182a3b]/20 shadow-lg rounded-2xl px-3 py-1 flex justify-between items-center gap-3 mb-2">
-                                    <div className="flex gap-3 items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-                                        </svg>
-
-                                        <p className="font-semibold">Pantalos Jeans</p>
-                                    </div>
-
-                                    <p className="text-xl">40</p>
-
-                                </div>
-
-                                <div className="bg-gradient-to-t from-[#102940]/20 to-[#182a3b]/20 shadow-lg rounded-2xl px-3 py-1 flex justify-between items-center gap-3 mb-2">
-                                    <div className="flex gap-3 items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-                                        </svg>
-
-                                        <p className="font-semibold">Reloj XX-ED</p>
-                                    </div>
-
-                                    <p className="text-xl">10</p>
-
-                                </div>
-
-                                <div className="bg-gradient-to-t from-[#102940]/20 to-[#182a3b]/20 shadow-lg rounded-2xl px-3 py-1 flex justify-between items-center gap-3 mb-2">
-                                    <div className="flex gap-3 items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-                                        </svg>
-
-                                        <p className="font-semibold">Zapatos deportivos FILA T. 40</p>
-                                    </div>
-
-                                    <p className="text-xl">34</p>
-
-                                </div>
-
-                                <div className="bg-gradient-to-t from-[#102940]/20 to-[#182a3b]/20 shadow-lg rounded-2xl px-3 py-1 flex justify-between items-center gap-3 mb-2">
-                                    <div className="flex gap-3 items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-                                        </svg>
-
-                                        <p className="font-semibold">Zapatos deportivos OBOO T. 42</p>
-                                    </div>
-
-                                    <p className="text-xl">32</p>
-
-                                </div>
-
-                                <div className="bg-gradient-to-t from-[#102940]/20 to-[#182a3b]/20 shadow-lg rounded-2xl px-3 py-1 flex justify-between items-center gap-3 mb-2">
-                                    <div className="flex gap-3 items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-                                        </svg>
-
-                                        <p className="font-semibold">Camiseta ODOO T. M - Hombre</p>
-                                    </div>
-
-                                    <p className="text-xl">67</p>
-
-                                </div>
+                                ))}
 
                             </div>
 
@@ -375,6 +344,6 @@ export default async function page() {
                 </div>
 
             </MainLayout >
-        </ComprobarAcceso>
+        </ComprobarAcceso >
     )
 }

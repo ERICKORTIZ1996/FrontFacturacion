@@ -10,6 +10,7 @@ import { consultarFechaEcuador } from '@/helpers'
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios'
 import SmallSpinner from '../layouts/SmallSpinner'
+import { set } from 'zod/v4'
 
 export default function ModalEmitirFactura() {
 
@@ -28,7 +29,7 @@ export default function ModalEmitirFactura() {
     const [ventanaResultadosRuc, setVentanaResultadosRuc] = useState(false)
     const [loading, setLoading] = useState(false)
 
-    const [resultadoRuc, setResultadoRuc] = useState([])
+    const [resultadoRuc, setResultadoRuc] = useState({})
 
     const inputIdentificacion = useRef(null)
     const inputNombresCliente = useRef(null)
@@ -38,27 +39,18 @@ export default function ModalEmitirFactura() {
     const inputRazonSocial = useRef(null)
     const inputMatriz = useRef(null)
     const inputDireccion = useRef(null)
-
+    const inputEstab = useRef(null)
+    const inputPtoEmi = useRef(null)
+    const inputObligadoContabilidad = useRef(null)
 
     const queryClient = useQueryClient();
 
-    // const subtotal = useMemo(() => detalle.cantidadProducto * detalle.precioUnitario, [detalle]);
-    // const total = useMemo(() => subtotal - (subtotal * detalle.descuento) / 100, [subtotal, detalle.descuento]);
-
-    const total = useMemo(() => {
-        if (!Array.isArray(productos)) return 0;
-
-        return productos.reduce((total, p) => {
-            const precio = Number(p?.precioUnitario) || 0;
-            const cantidad = Number(p?.cantidad) || 0;
-            const descuento = Number(p?.descuento) || 0;
-
-            const subtotal = precio * cantidad;
-            const totalConDescuento = subtotal - (subtotal * descuento / 100);
-
-            return total + totalConDescuento;
-        }, 0);
-    }, [productos]);
+    const formasDePago = {
+        forma1: { codigo: 1, descripcion: "Efectivo" },
+        forma16: { codigo: 16, descripcion: "Tarjeta de débito" },
+        forma17: { codigo: 17, descripcion: "Dinero electrónico" },
+        forma19: { codigo: 19, descripcion: "Tarjeta de crédito" },
+    };
 
     const totalSinIVA = useMemo(() => {
         if (!Array.isArray(productos)) return 0;
@@ -88,6 +80,11 @@ export default function ModalEmitirFactura() {
         }, 0);
     }, [productos]);
 
+    const baseImponible = useMemo(() => totalSinIVA - totalDescuento, [totalSinIVA, totalDescuento]);
+    const iva = useMemo(() => baseImponible * 0.15, [baseImponible]);
+    const totalFinal = useMemo(() => baseImponible + iva, [baseImponible, iva]);
+
+
     const mostrarFormProducto = () => {
         crearFormProducto({ id: 'empty' })
         setBotonMas(false)
@@ -95,41 +92,25 @@ export default function ModalEmitirFactura() {
 
     const handleSubmit = async (formData) => {
 
+        const metodoPago = formasDePago[formData.get('forma-pago')]
+
         const data = {
             ambiente: "Pruebas", // Cambiado a "Pruebas" o "Produccion" según el diccionario CodigoAmbiente
             tipoEmision: "EmisionNormal", // Cambiado a un valor que coincida con las claves de TipoEmision
             razonSocial: formData.get('razon-social'),
             ruc: formData.get('ruc'),
             codDoc: "Factura", // Cambiado a un valor que coincida con las claves de CodigoTipoComprobante
-            estab: "001",
-            ptoEmi: "001",
+            estab: formData.get('etab'),
+            ptoEmi: formData.get('ptoEmi'),
             dirMatriz: formData.get('matriz'),
             dirEstablecimiento: formData.get('direccion'),
-            obligadoContabilidad: "NO",
+            obligadoContabilidad: formData.get('obligadoContabilidad'),
             tipoIdentificacionComprador: formData.get('tipo-identificacion'),
             razonSocialComprador: `${formData.get('nombres-cliente')}`,
             razonSocialCompradorApellidos: `${formData.get('apellidos-cliente')}`,
             identificacionComprador: formData.get('identificacion-cliente'),
             direccionComprador: formData.get('direccion-comprador'),
-            totalSinImpuestos: Number(totalSinIVA),
-            totalDescuento: 0.00,
-            totalConImpuestos: [
-                {
-                    codigo: "IVA",
-                    codigoPorcentaje: "15%",
-                    baseImponible: Number(totalSinIVA),
-                    tarifa: 15,
-                    valor: (Number(totalSinIVA) * 0.15),
-                    valorDevolucionIva: 0.00 // -> Quemado
-                }
-            ],
-            propina: 0.00, // -> Quemado
-            importeTotal: Number(totalSinIVA) + (Number(totalSinIVA) * 0.15),
-            moneda: "DOLAR",
-            pagos: [{
-                formaPago: "Efectivo", // Cambiado a un valor que coincida con las claves de FormasPago
-                total: Number(totalSinIVA) + (Number(totalSinIVA) * 0.15),
-            }],
+            formaPago: metodoPago.descripcion, // Cambiado a un valor que coincida con las claves de FormasPago
         }
 
         const result = facturaSchema.safeParse(data)
@@ -152,6 +133,8 @@ export default function ModalEmitirFactura() {
             .filter(producto => producto.id !== "empty")
             .map(({ id, ...prducto }) => prducto);
 
+        const metodoPago = formasDePago[formData.get('forma-pago')]
+
         try {
             const { data: dataFactura } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/crearXML`, {
                 ambiente: "Pruebas", // Cambiado a "Pruebas" o "Produccion" según el diccionario CodigoAmbiente
@@ -159,36 +142,38 @@ export default function ModalEmitirFactura() {
                 razonSocial: formData.get('razon-social'),
                 ruc: formData.get('ruc'),
                 codDoc: "Factura", // Cambiado a un valor que coincida con las claves de CodigoTipoComprobante
-                estab: "001",
-                ptoEmi: "001",
+                estab: formData.get('etab'),
+                ptoEmi: formData.get('ptoEmi'),
                 dirMatriz: formData.get('matriz'),
                 dirEstablecimiento: formData.get('direccion'),
-                obligadoContabilidad: "NO",
+                obligadoContabilidad: formData.get('obligadoContabilidad'),
                 tipoIdentificacionComprador: formData.get('tipo-identificacion'),
                 razonSocialComprador: `${formData.get('nombres-cliente')} ${formData.get('apellidos-cliente')}`,
                 identificacionComprador: formData.get('identificacion-cliente'),
                 direccionComprador: formData.get('direccion-comprador'),
-                totalSinImpuestos: 1.00, // ->
+                totalSinImpuestos: Number(baseImponible),
                 totalDescuento: totalDescuento,
                 totalConImpuestos: [
                     {
-                        codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
-                        codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
-                        baseImponible: 100.00,
+                        codigo: "IVA",
+                        codigoPorcentaje: "15%",
+                        baseImponible: Number(baseImponible),
                         tarifa: 15,
-                        valor: 15.00,
-                        valorDevolucionIva: 0.00
+                        valor: Number(iva),
+                        valorDevolucionIva: 0.00 // -> Quemado
                     }
                 ],
-                propina: 0.00,
-                importeTotal: 1.00, // ->
+                propina: 0.00, // -> QUEMADO
+                importeTotal: Number(totalFinal),
                 moneda: "DOLAR",
                 pagos: [{
-                    formaPago: "Efectivo", // Cambiado a un valor que coincida con las claves de FormasPago
-                    total: 1.00 // ->
+                    formaPago: metodoPago.descripcion, // Cambiado a un valor que coincida con las claves de FormasPago
+                    total: Number(totalFinal),
                 }],
                 detalles: productosFormateados
             })
+
+            console.log(dataFactura);
 
             return dataFactura
 
@@ -210,7 +195,10 @@ export default function ModalEmitirFactura() {
             setResultadoRuc([])
             toast.success(dataFactura.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
             queryClient.invalidateQueries({ queryKey: ['emitir_facturas'] }); // Traer los datos actualizados
-            changeModalEmitirFactura()
+
+            // setTimeout(() => {
+            //     changeModalEmitirFactura()
+            // }, 500);
         },
         onError: (error) => {
             toast.error(error.message);
@@ -274,61 +262,55 @@ export default function ModalEmitirFactura() {
         inputDireccionCliente.current.value = ""
     }
 
-    const usuarios = [
-        { id: 1, razonSocialComprador: "Cristian Lorenzo Velez Zambrano", direccionComprador: "LA PLANADA", identificacionComprador: "1750851956" }
-    ]
-
     const consultarCliente = async () => {
 
         try {
 
             setLoading(true)
-            const data = usuarios.filter(u => u.identificacionComprador === inputIdentificacion.current.value)
 
-            if (data.length) {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/clientes/buscar/${inputIdentificacion.current.value}`)
 
-                inputNombresCliente.current.value = data[0].razonSocialComprador
-                inputApellidosCliente.current.value = data[0].razonSocialComprador
-                inputDireccionCliente.current.value = data[0].direccionComprador
-                setLoading(false)
+            const nombresYApellidos = data.data.nombres.split(" ");
 
-            } else {
-                setLoading(false)
-                toast.error('Sin resultados')
-            }
+            setTimeout(() => {
+                inputNombresCliente.current.value = nombresYApellidos.slice(0, 2).join(" ")
+                inputApellidosCliente.current.value = nombresYApellidos.slice(2).join(" ")
+                inputDireccionCliente.current.value = data.data.direccion
+            }, 200);
 
-            // const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}`)
-            // console.log(data);
-
-        } catch (error) {
             setLoading(false)
-            toast.error('Sin resultados')
+
+        } catch (e) {
+            console.log(e);
+            setLoading(false)
+            toast.error(e.response.data.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
         }
     }
 
     const consultarEmpresa = async () => {
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/empresas/ruc/${inputRuc.current.value}`)
+            setResultadoRuc(data.data);
+            setVentanaResultadosRuc(true)
+            console.log(data.data);
 
+        } catch (e) {
+            toast.error(e.response.data.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, ''))
+            console.log(e);
+        }
     }
 
-    const rucs = [
-        { ruc: "0989486603", razonSocial: "ORTIZ MENDOZA ERICK ALEXANDER", dirMatriz: "PICHINCHA / QUITO / COCHAPAMBA / N54 LT-20 Y N54A", dirEstablecimiento: 'N89A y E1B' },
-        { ruc: "1750851956", razonSocial: "CRISTHIAN LORENZO VELEZ ZAMBRANO", dirMatriz: "PICHINCHA", dirEstablecimiento: 'N89A y E1B' },
-        { ruc: "1900275924", razonSocial: "ORTIZ MENDOZA ERICK ALEXANDER", dirMatriz: "QUITO / COCHAPAMBA / N54 LT-20 Y N54A", dirEstablecimiento: 'N89A y E1B' },
-        { ruc: "0989796236", razonSocial: "ORTIZ MENDOZA ERICK ALEXANDER", dirMatriz: "54 LT-20 Y N54A", dirEstablecimiento: 'N89A y E1B' },
-        { ruc: "0554785452", razonSocial: "CRISTHIAN LORENZO VELEZ ZAMBRANO", dirMatriz: "PICHINCHA / QUITO / COCHAPAMBA / N54 LT-20 Y N54A", dirEstablecimiento: 'N89A y E1B' },
-    ]
-
-    const verificarRuc = (value) => {
-        setResultadoRuc(rucs.filter(r => r.ruc.includes(value)))
-    }
-
-    const llenarInputsRuc = (ruc, razonSocial, dirMatriz, dirEstablecimiento) => {
-        console.log(razonSocial);
-
+    const llenarInputsRuc = (ruc, razonSocial, dirMatriz, dirEstablecimiento, estab, ptoEmi, obligadoContablilidad) => {
         inputRuc.current.value = ruc
         inputRazonSocial.current.value = razonSocial
         inputMatriz.current.value = dirMatriz
         inputDireccion.current.value = dirEstablecimiento
+
+        inputEstab.current.value = estab
+        inputPtoEmi.current.value = ptoEmi
+        inputObligadoContabilidad.current.value = obligadoContablilidad
+
+        setVentanaResultadosRuc(false)
     }
 
     // console.log(productos);
@@ -386,17 +368,13 @@ export default function ModalEmitirFactura() {
                                                 className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
                                                 placeholder='Ej: 1750851956001'
                                                 maxLength={13}
-                                                onChange={e => verificarRuc(e.target.value)}
                                                 ref={inputRuc}
-                                                onFocus={() => setVentanaResultadosRuc(true)}
-                                                onBlur={() => {
-                                                    setTimeout(() => setVentanaResultadosRuc(false), 100);
-                                                }}
                                                 autoComplete="off"
+                                                onFocus={() => setVentanaResultadosRuc(true)}
                                             />
                                         </div>
 
-                                        {/* <button
+                                        <button
                                             type='button'
                                             onClick={() => consultarEmpresa()}
                                             className='rounded-full bg-[#2e4760] w-fit p-2 cursor-pointer hover:bg-[#3a546e] transition-colors'
@@ -404,7 +382,7 @@ export default function ModalEmitirFactura() {
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                                             </svg>
-                                        </button> */}
+                                        </button>
                                     </div>
 
                                     <div className='flex flex-col'>
@@ -443,17 +421,70 @@ export default function ModalEmitirFactura() {
                                         />
                                     </div>
 
-                                    {ventanaResultadosRuc && resultadoRuc?.length > 0 && (
-                                        <div className="bg-gradient-to-t from-[#102940] to-[#182a3b] w-full h-40 absolute rounded-xl p-2 top-[110%] text-gray-200">
+                                    {/* INPUTS OCULATOS */}
+                                    <div className='flex flex-col'>
+                                        <input
+                                            id='etab'
+                                            type="text"
+                                            ref={inputEstab}
+                                            name='etab'
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                            placeholder=''
+                                            hidden
+                                        />
+                                    </div>
+                                    <div className='flex flex-col'>
+                                        <input
+                                            id='ptoEmi'
+                                            type="text"
+                                            ref={inputPtoEmi}
+                                            name='ptoEmi'
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                            placeholder=''
+                                            hidden
+                                        />
+                                    </div>
+                                    <div className='flex flex-col'>
+                                        <input
+                                            id='obligadoContabilidad'
+                                            type="text"
+                                            ref={inputObligadoContabilidad}
+                                            name='obligadoContabilidad'
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                            placeholder=''
+                                            hidden
+                                        />
+                                    </div>
+                                    {/* ================ */}
+
+                                    {ventanaResultadosRuc && resultadoRuc.ruc > 0 && (
+                                        <div className="bg-gradient-to-t from-[#102940] to-[#182a3b] w-full h-60 absolute rounded-xl p-2 top-[110%] text-gray-200">
+
+                                            <div className='flex justify-between px-3'>
+
+                                                <h2 className=''>RESULTADOS:</h2>
+
+                                                <button
+                                                    type='button'
+                                                    onClick={() => setVentanaResultadosRuc(false)}
+                                                    className="font-semibold text-gray-100 cursor-pointer rounded-xl transition-colors px-4 py-1 border border-gray-100 flex gap-2 items-center hover:bg-[#d24148] hover:text-gray-200 hover:border-[#d24148]"
+                                                >
+                                                    Cerrar
+                                                </button>
+                                            </div>
+
                                             <ul className="overflow-auto barra h-full w-full">
-                                                {resultadoRuc.map((r) => (
-                                                    <li
-                                                        key={r.ruc}
-                                                        className="text-nowrap px-3 py-1 hover:bg-[#2e4760] cursor-pointer rounded-lg w-full transition-colors"
-                                                        onClick={() => llenarInputsRuc(r.ruc, r.razonSocial, r.dirMatriz, r.dirEstablecimiento)}
-                                                    >
-                                                        <span className='font-bold'>RUC:</span> {r.ruc} - <span className='font-bold'>MATRIZ:</span> {r.dirMatriz}
-                                                    </li>
+                                                {resultadoRuc.sucursales.map((s) => (
+                                                    s.puntosEmision.map((pe) => (
+                                                        <li
+                                                            key={pe.id}
+                                                            className="text-nowrap px-3 py-1 hover:bg-[#2e4760] cursor-pointer rounded-lg w-full transition-colors"
+                                                            onClick={() => llenarInputsRuc(resultadoRuc.ruc, resultadoRuc.razonSocial, resultadoRuc.dirMatriz, s.dirEstablecimiento, s.estab, pe?.ptoEmi, resultadoRuc.obligadoContabilidad)}
+
+                                                        >
+                                                            <span className='font-bold'>Ruc:</span> {resultadoRuc.ruc} - <span className='font-bold'>Matriz:</span> {resultadoRuc.dirMatriz} - <span className='font-bold'>Dirección:</span> {s.dirEstablecimiento} - <span className='font-bold'> Pto. Emisión: </span> {pe?.ptoEmi}
+                                                        </li>
+                                                    ))
                                                 ))}
                                             </ul>
                                         </div>
@@ -529,8 +560,6 @@ export default function ModalEmitirFactura() {
 
                                         </div>
 
-
-
                                         {loading ?
                                             <SmallSpinner />
                                             :
@@ -605,6 +634,32 @@ export default function ModalEmitirFactura() {
                                 <h2 className='my-5 text-xl flex gap-2 items-center'>
 
                                     <span className='bg-gray-200 rounded-full p-1 text-gray-800'>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                        </svg>
+                                    </span>
+
+                                    Forma de Pago
+                                </h2>
+
+                                <div className='flex flex-col'>
+                                    <label htmlFor="forma-pago" className='mb-1'>Forma de Pago</label>
+
+                                    <select
+                                        name="forma-pago"
+                                        id="forma-pago"
+                                        className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-fit'
+                                    >
+                                        <option value="forma1">Efectivo</option>
+                                        <option value="forma16">Tarjeta de débito</option>
+                                        <option value="forma17">Dinero electrónico</option>
+                                        <option value="forma19">Tarjeta de crédito</option>
+                                    </select>
+                                </div>
+
+                                <h2 className='my-5 text-xl flex gap-2 items-center'>
+
+                                    <span className='bg-gray-200 rounded-full p-1 text-gray-800'>
 
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
@@ -649,9 +704,11 @@ export default function ModalEmitirFactura() {
                                 <div className='flex justify-between gap-5 items-center mt-5'>
 
                                     <p className='font-semibold text-gray-800 text-xl bg-gray-100 rounded-xl px-3 py-1'>
-                                        Subtotal: $ {totalSinIVA} |
-                                        Total: $ {total} |
-                                        Descuento: $ {totalDescuento}
+                                        Subtotal: {totalSinIVA.toFixed(2)} <br />
+                                        Descuento: {totalDescuento.toFixed(2)} <br />
+                                        Base imponible: {baseImponible.toFixed(2)} <br />
+                                        IVA (15%): {iva.toFixed(2)} <br />
+                                        Total a pagar: {totalFinal.toFixed(2)} <br />
                                     </p>
 
                                     <div className='flex gap-3 items-center'>
@@ -689,8 +746,8 @@ export default function ModalEmitirFactura() {
                         </div>
                     </DialogPanel>
 
-                </div>
-            </Dialog>
+                </div >
+            </Dialog >
         </>
     )
 }

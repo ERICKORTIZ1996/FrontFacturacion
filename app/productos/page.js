@@ -1,10 +1,8 @@
 import MainLayout from "@/components/layouts/MainLayout"
 import BotonAgregarProducto from "@/components/productos_components/BotonAgregarProducto"
 import ModalCrearProducto from "@/components/modals/ModalCrearProducto"
-import Paginacion from "@/components/emitir_facturas_componentes/Paginacion"
-import TablaProductos from "@/components/tables/TablaProductos"
 import ComprobarAcceso from "@/components/others/ComprobarAcceso"
-import axios from "axios"
+import DataProductos from "@/components/productos_components/DataProductos"
 
 export default function Productos() {
     return (
@@ -43,27 +41,7 @@ export default function Productos() {
 
                 <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
 
-                    <table className="w-full mt-5">
-                        <thead className="bg-[#05121f]/60">
-                            <tr className="border-b-2 border-[#061727]">
-                                <th className="text-start font-semibold p-2">Código</th>
-                                <th className="text-start font-semibold p-2">Nombre</th>
-                                <th className="text-start font-semibold p-2">Cantidad</th>
-                                <th className="text-start font-semibold p-2">Pre. Unit. - Sin IVA</th>
-                                <th className="text-start font-semibold p-2">Detalle</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <TablaProductos />
-                            <TablaProductos />
-                            <TablaProductos />
-                        </tbody>
-                    </table>
-
-                    <Paginacion
-                    // data={bills}
-                    />
+                    <DataProductos />
 
                 </div>
 

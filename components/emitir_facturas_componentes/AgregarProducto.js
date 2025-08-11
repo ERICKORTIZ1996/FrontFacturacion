@@ -3,6 +3,7 @@ import { useMainStore } from "@/store/mainStore";
 import { toast } from 'react-toastify';
 import { productoSchema } from "@/schema";
 import Swal from 'sweetalert2';
+import axios from "axios";
 
 export const AgregarProducto = ({ id }) => {
 
@@ -47,8 +48,10 @@ export const AgregarProducto = ({ id }) => {
             descuento: Number(detalle.descuento),
             precioTotalSinImpuesto: Number(detalle.precioTotalSinImpuesto),
             impuestos: [{
-                codigo: detalle.codigo,
-                codigoPorcentaje: detalle.codigoPorcentaje,
+                // codigo: detalle.codigo,
+                // codigoPorcentaje: detalle.codigoPorcentaje,
+                codigo: "IVA",
+                codigoPorcentaje: "15%",
                 tarifa: detalle.tarifa,
                 baseImponible: detalle.baseImponible,
                 valor: detalle.valor
@@ -117,41 +120,16 @@ export const AgregarProducto = ({ id }) => {
 
     }
 
-    const productosExample = [
-        {
-            codigoPrincipal: "001",
-            descripcion: "Pantalones",
-            cantidad: 5,
-            precioUnitario: 10.52,
-            descuento: 20,
-            precioTotalSinImpuesto: 10.52,
-            impuestos: [{
-                codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
-                codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
-                tarifa: 15,
-                baseImponible: 10.52,
-                valor: (10.52 * 0.15)
-            }]
-        },
-        {
-            codigoPrincipal: "002",
-            descripcion: "Camisetas",
-            cantidad: 2,
-            precioUnitario: 5.52,
-            descuento: 0,
-            precioTotalSinImpuesto: 5.52,
-            impuestos: [{
-                codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
-                codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
-                tarifa: 15,
-                baseImponible: 5.52,
-                valor: (5.52 * 0.15)
-            }]
-        }
-    ]
+    const verificarProducto = async (value) => {
 
-    const verificarProducto = (value) => {
-        setResultadoProductos(productosExample.filter(p => p.descripcion.toLowerCase().includes(value)))
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/productos/buscar?descripcion=${value}`)
+            setResultadoProductos(data.data);
+            console.log(data.data);
+
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     const llenarInputsArticulo = (articulo) => {
@@ -164,6 +142,7 @@ export const AgregarProducto = ({ id }) => {
             precioUnitario: articulo.precioUnitario,
             descuento: articulo.descuento,
             precioTotalSinImpuesto: articulo.precioTotalSinImpuesto,
+            // IMPUESTOS
             codigo: articulo.impuestos[0].codigo,
             codigoPorcentaje: articulo.impuestos[0].codigoPorcentaje,
             tarifa: articulo.impuestos[0].tarifa,
@@ -192,7 +171,7 @@ export const AgregarProducto = ({ id }) => {
                         disabled={!isEditable}
                         onFocus={() => setventanaResultadoProductos(true)}
                         onBlur={() => {
-                            setTimeout(() => setventanaResultadoProductos(false), 100);
+                            setTimeout(() => setventanaResultadoProductos(false), 500);
                         }}
                         autoComplete="off"
                     />
@@ -216,7 +195,7 @@ export const AgregarProducto = ({ id }) => {
                 </div>
 
                 <div className='flex flex-col'>
-                    <label htmlFor={`precio-unitario-${id}`} className='mb-1'>Precio Unitario - Sin IVA</label>
+                    <label htmlFor={`precio-unitario-${id}`} className='mb-1'>Precio Unitario</label>
                     <input
                         id={`precio-unitario-${id}`}
                         type="text"
@@ -242,7 +221,7 @@ export const AgregarProducto = ({ id }) => {
                 </div>
 
                 <div className='flex flex-col'>
-                    <label htmlFor={`total-${id}`} className='mb-1'>Total - Con IVA</label>
+                    <label htmlFor={`total-${id}`} className='mb-1'>Total</label>
                     <input
                         id={`total-${id}`}
                         type="text"

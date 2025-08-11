@@ -4,6 +4,7 @@ import { Dialog, DialogPanel, DialogTitle, Button } from '@headlessui/react'
 import { useMainStore } from '@/store/mainStore'
 import { toast } from 'react-toastify';
 import { productoStockSchema } from '@/schema';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios'
 
 export default function ModalCrearProducto() {
@@ -11,45 +12,89 @@ export default function ModalCrearProducto() {
     const modalCrearProducto = useMainStore((state) => state.modalCrearProducto)
     const changeModalCrearProducto = useMainStore((state) => state.changeModalCrearProducto)
 
-    const crearPuntoEmision = async (formData) => {
+    const queryClient = useQueryClient();
+
+    const tiposIVA = {
+        iva0: { codigo: "IVA", codigoPorcentaje: "12%", tarifa: 12 },
+        ivaNoObjeto: { codigo: "IVA", codigoPorcentaje: "14%", tarifa: 14 },
+        iva15: { codigo: "IVA", codigoPorcentaje: "15%", tarifa: 15 },
+        ivaExento: { codigo: "IVA", codigoPorcentaje: "0%", tarifa: 0 },
+    };
+
+    const handleSubmit = async (formData) => {
 
         const data = {
             codigo: formData.get('codigo-producto'),
             nombre: formData.get('nombre-producto'),
-            cantidad: formData.get('cantidad-producto'),
-            precioUnitario: formData.get('precio-unitario-producto'),
-            descuento: formData.get('descuento-producto')
+            cantidad: Number(formData.get('cantidad-producto')),
+            precioUnitario: Number(formData.get('precio-unitario-producto')),
+            descuento: Number(formData.get('descuento-producto')),
+            precioTotalSinImpuesto: Number(formData.get('precio-unitario-producto')),
+            // IMPUESTOS -> Se agregan despúes de pasar la validación
+            // codigo: impuesto.codigo,
+            // codigoPorcentaje: impuesto.codigoPorcentaje,
+            // tarifa: impuesto.tarifa,
+            // baseImponible: Number(formData.get('precio-unitario-producto')),
+            // valor: (Number(formData.get('precio-unitario-producto')) * impuesto.tarifa) / 100,
         }
 
         const result = productoStockSchema.safeParse(data)
 
         if (!result.success) {
-
             result.error.issues.forEach((issue) => {
                 toast.error(issue.message)
             })
             return
         }
 
-        console.log(data);
+        mutate(formData)
 
+    }
 
-        return
+    const crearProducto = async (formData) => {
+
+        const impuesto = tiposIVA[formData.get('impuestos')]
+
         try {
-            const { data: dataPuntoEmision } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/puntos-emision`, {
-                ruc: formData.get('ruc-empresa'),
-                estab: formData.get('estab'),
-                ptoEmi: formData.get('punto-emision')
+            const { data: dataProducto } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/productos/completo`, {
+                codigoPrincipal: formData.get('codigo-producto'),
+                descripcion: formData.get('nombre-producto'),
+                cantidad: Number(formData.get('cantidad-producto')),
+                precioUnitario: Number(formData.get('precio-unitario-producto')),
+                descuento: Number(formData.get('descuento-producto')),
+                precioTotalSinImpuesto: Number(formData.get('precio-unitario-producto')),
+                impuestos: [
+                    {
+                        codigo: impuesto.codigo,
+                        codigoPorcentaje: impuesto.codigoPorcentaje,
+                        tarifa: impuesto.tarifa,
+                        baseImponible: Number(formData.get('precio-unitario-producto')),
+                        valor: (Number(formData.get('precio-unitario-producto')) * impuesto.tarifa) / 100,
+                    }
+                ]
             })
 
-            toast.success(dataPuntoEmision.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
-            changeModalCrearProducto()
+            return dataProducto
 
         } catch (e) {
-            toast.error(e?.response?.data?.mensaje || e?.response?.data?.message?.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim());
             console.log(e);
+            throw new Error(e?.response?.data?.mensaje || e?.response?.data?.message?.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim());
         }
     };
+
+    const { mutate } = useMutation({
+        mutationFn: crearProducto, // Funcion a consultar
+        onSuccess: (dataFactura) => { // Petición exitosa
+
+            toast.success(dataFactura.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
+            queryClient.invalidateQueries({ queryKey: ['crear_producto'] }); // Traer los datos actualizados
+            changeModalCrearProducto()
+
+        },
+        onError: (error) => {
+            toast.error(error.message);
+        }
+    })
 
     return (
         <>
@@ -57,11 +102,11 @@ export default function ModalCrearProducto() {
                 <div className="fixed inset-0 flex w-screen items-center justify-center p-4 bg-gray-800/40 modal-background">
 
                     {/* shadow shadow-[#245e95] */}
-                    <DialogPanel className="w-[100%] md:w-[30%] h-[70%] space-y-4 px-8 py-6 rounded-3xl bg-gradient-to-b from-[#153350]/90 to-[#1f3850]/90 backdrop-blur-sm shadow shadow-[#166fc2]">
+                    <DialogPanel className="w-[100%] md:w-[30%] h-[90%] space-y-4 px-8 py-6 rounded-3xl bg-gradient-to-b from-[#153350]/90 to-[#1f3850]/90 backdrop-blur-sm shadow shadow-[#166fc2]">
 
                         <div className='flex h-full flex-col justify-between'>
                             <form
-                                action={crearPuntoEmision}
+                                action={handleSubmit}
                                 className='overflow-y-auto h-full barra pr-8'
                                 id='form-crear-producto-stock'
                             >
@@ -140,6 +185,23 @@ export default function ModalCrearProducto() {
                                                 placeholder='5'
                                             />
                                         </div>
+                                    </div>
+
+                                    <div className='flex flex-col'>
+
+                                        <label htmlFor="impuestos" className='mb-1'>Impuestos</label>
+
+                                        <select
+                                            id="impuestos"
+                                            name="impuestos"
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                            defaultValue="iva15"
+                                        >
+                                            <option value="iva0">IVA 12%</option>
+                                            <option value="ivaNoObjeto">IVA 14%</option>
+                                            <option value="iva15">IVA 15% - Tarifa general</option>
+                                            <option value="ivaExento">IVA 0%</option>
+                                        </select>
                                     </div>
 
                                 </div>

@@ -16,6 +16,7 @@ async function obtenerFactura(nombreArchivo) {
 export default async function FacturaPendiente({ params }) {
 
     const factura = await obtenerFactura(params.id);
+    const nombresApellidosCliente = factura.data.cliente.razonSocialComprador.split(" ")
     console.log(factura);
 
     return (
@@ -60,20 +61,20 @@ export default async function FacturaPendiente({ params }) {
                         <div className='flex gap-10'>
 
                             <div className='flex flex-col'>
-                                <span htmlFor="razon-social" className='mb-1'>Nombre de Empresa</span>
-                                <span
-                                    className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
-                                >
-                                    Pay&Play
-                                </span>
-                            </div>
-
-                            <div className='flex flex-col'>
                                 <span htmlFor="razon-social" className='mb-1'>Ruc</span>
                                 <span
                                     className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                 >
-                                    1750851956001
+                                    {factura.data.sucursal.empresa.ruc}
+                                </span>
+                            </div>
+
+                            <div className='flex flex-col'>
+                                <span htmlFor="razon-social" className='mb-1'>Razón Social</span>
+                                <span
+                                    className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
+                                >
+                                    {factura.data.sucursal.empresa.razonSocial}
                                 </span>
                             </div>
 
@@ -82,7 +83,7 @@ export default async function FacturaPendiente({ params }) {
                                 <span
                                     className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                 >
-                                    Quito
+                                    {factura.data.sucursal.empresa.dirMatriz}
                                 </span>
                             </div>
 
@@ -91,7 +92,7 @@ export default async function FacturaPendiente({ params }) {
                                 <span
                                     className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                 >
-                                    PICHINCHA / QUITO / COCHAPAMBA / N54 LT-20 Y N54A
+                                    {factura.data.sucursal.dirEstablecimiento}
                                 </span>
                             </div>
                         </div>
@@ -110,21 +111,13 @@ export default async function FacturaPendiente({ params }) {
                         <div className='grid grid-cols-1 gap-20'>
 
                             <div className='flex gap-10'>
-                                <div className='flex flex-col'>
-                                    <span htmlFor="razon-social" className='mb-1'>Nombres</span>
-                                    <span
-                                        className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
-                                    >
-                                        Cristhian Lorenzo
-                                    </span>
-                                </div>
 
                                 <div className='flex flex-col'>
-                                    <span htmlFor="razon-social" className='mb-1'>Apellidos</span>
+                                    <span htmlFor="razon-social" className='mb-1'>Tipo de Identificación</span>
                                     <span
                                         className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                     >
-                                        Velez Zambrano
+                                        {factura.data.cliente.tipoIdentificacionComprador}
                                     </span>
                                 </div>
 
@@ -133,7 +126,25 @@ export default async function FacturaPendiente({ params }) {
                                     <span
                                         className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                     >
-                                        1750851956
+                                        {factura.data.cliente.identificacionComprador}
+                                    </span>
+                                </div>
+
+                                <div className='flex flex-col'>
+                                    <span htmlFor="razon-social" className='mb-1'>Nombres</span>
+                                    <span
+                                        className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
+                                    >
+                                        {nombresApellidosCliente.slice(0, 2).join(" ")}
+                                    </span>
+                                </div>
+
+                                <div className='flex flex-col'>
+                                    <span htmlFor="razon-social" className='mb-1'>Apellidos</span>
+                                    <span
+                                        className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
+                                    >
+                                        {nombresApellidosCliente.slice(2).join(" ")}
                                     </span>
                                 </div>
 
@@ -142,7 +153,7 @@ export default async function FacturaPendiente({ params }) {
                                     <span
                                         className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] w-fit'
                                     >
-                                        La Planada
+                                        {factura.data.cliente.direccion}
                                     </span>
                                 </div>
                             </div>
