@@ -48,10 +48,10 @@ export const AgregarProducto = ({ id }) => {
             descuento: Number(detalle.descuento),
             precioTotalSinImpuesto: Number(detalle.precioTotalSinImpuesto),
             impuestos: [{
-                // codigo: detalle.codigo,
-                // codigoPorcentaje: detalle.codigoPorcentaje,
-                codigo: "IVA",
-                codigoPorcentaje: "15%",
+                codigo: detalle.codigo,
+                codigoPorcentaje: detalle.codigoPorcentaje,
+                // codigo: "IVA",
+                // codigoPorcentaje: "15%",
                 tarifa: detalle.tarifa,
                 baseImponible: detalle.baseImponible,
                 valor: detalle.valor
