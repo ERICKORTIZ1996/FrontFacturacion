@@ -7,10 +7,9 @@ import { facturaSchema } from '@/schema'
 import { toast } from 'react-toastify';
 import { AgregarProducto } from '../emitir_facturas_componentes/AgregarProducto'
 import { consultarFechaEcuador } from '@/helpers'
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import axios from 'axios'
 import SmallSpinner from '../layouts/SmallSpinner'
-import { set } from 'zod/v4'
 
 export default function ModalEmitirFactura() {
 
@@ -27,9 +26,6 @@ export default function ModalEmitirFactura() {
     const [tipoIdentificacion, setTipoIdentificacion] = useState("")
     const [longitudIdentificacion, setLongitudIdentificacion] = useState(0)
     const [ventanaResultadosRuc, setVentanaResultadosRuc] = useState(false)
-    const [loading, setLoading] = useState(false)
-
-    const [resultadoRuc, setResultadoRuc] = useState({})
 
     const inputIdentificacion = useRef(null)
     const inputNombresCliente = useRef(null)
@@ -164,6 +160,7 @@ export default function ModalEmitirFactura() {
                     }
                 ],
                 propina: 0.00, // -> QUEMADO
+                formaPago: metodoPago.descripcion,
                 importeTotal: Number(totalFinal),
                 moneda: "DOLAR",
                 pagos: [{
@@ -192,13 +189,10 @@ export default function ModalEmitirFactura() {
             setFormulariosFactura([])
             setProductos([])
             setBotonMas(true)
-            setResultadoRuc([])
+            setVentanaResultadosRuc(false)
             toast.success(dataFactura.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
             queryClient.invalidateQueries({ queryKey: ['emitir_facturas'] }); // Traer los datos actualizados
-
-            // setTimeout(() => {
-            //     changeModalEmitirFactura()
-            // }, 500);
+            // changeModalEmitirFactura()
         },
         onError: (error) => {
             toast.error(error.message);
@@ -266,8 +260,6 @@ export default function ModalEmitirFactura() {
 
         try {
 
-            setLoading(true)
-
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/clientes/buscar/${inputIdentificacion.current.value}`)
 
             const nombresYApellidos = data.data.nombres.split(" ");
@@ -278,11 +270,10 @@ export default function ModalEmitirFactura() {
                 inputDireccionCliente.current.value = data.data.direccion
             }, 200);
 
-            setLoading(false)
+            return data
 
         } catch (e) {
             console.log(e);
-            setLoading(false)
             toast.error(e.response.data.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
         }
     }
@@ -290,15 +281,28 @@ export default function ModalEmitirFactura() {
     const consultarEmpresa = async () => {
         try {
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/empresas/ruc/${inputRuc.current.value}`)
-            setResultadoRuc(data.data);
             setVentanaResultadosRuc(true)
-            console.log(data.data);
+            return data.data
 
         } catch (e) {
             toast.error(e.response.data.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, ''))
             console.log(e);
         }
     }
+
+    const { data: dataCliente, isLoading: isLoadingCliente, refetch: refetchCliente } = useQuery({
+        queryKey: ['datos-cliente'], // Identificador unico para cada Query
+        queryFn: consultarCliente, // Funcion a consultar 
+        refetchOnWindowFocus: false, // No volver a hacer fetch al cambiar de pestaña
+        enabled: false // No ejecutar al inicio
+    })
+
+    const { data: dataEmpresa, isLoading: isLoadingEmpresa, refetch: refetchEmpresa } = useQuery({
+        queryKey: ['datos-empresa'], // Identificador unico para cada Query
+        queryFn: consultarEmpresa, // Funcion a consultar 
+        refetchOnWindowFocus: false, // No volver a hacer fetch al cambiar de pestaña
+        enabled: false // No ejecutar al inicio
+    })
 
     const llenarInputsRuc = (ruc, razonSocial, dirMatriz, dirEstablecimiento, estab, ptoEmi, obligadoContablilidad) => {
         inputRuc.current.value = ruc
@@ -311,6 +315,16 @@ export default function ModalEmitirFactura() {
         inputObligadoContabilidad.current.value = obligadoContablilidad
 
         setVentanaResultadosRuc(false)
+    }
+
+    const cancelarFactura = () => {
+        setTipoIdentificacion("")
+        setLongitudIdentificacion(0)
+        setFormulariosFactura([])
+        setProductos([])
+        setBotonMas(true)
+        setVentanaResultadosRuc(false)
+        changeModalEmitirFactura()
     }
 
     // console.log(productos);
@@ -376,7 +390,7 @@ export default function ModalEmitirFactura() {
 
                                         <button
                                             type='button'
-                                            onClick={() => consultarEmpresa()}
+                                            onClick={() => refetchEmpresa()}
                                             className='rounded-full bg-[#2e4760] w-fit p-2 cursor-pointer hover:bg-[#3a546e] transition-colors'
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -457,7 +471,7 @@ export default function ModalEmitirFactura() {
                                     </div>
                                     {/* ================ */}
 
-                                    {ventanaResultadosRuc && resultadoRuc.ruc > 0 && (
+                                    {ventanaResultadosRuc && dataEmpresa?.ruc > 0 && (
                                         <div className="bg-gradient-to-t from-[#102940] to-[#182a3b] w-full h-60 absolute rounded-xl p-2 top-[110%] text-gray-200">
 
                                             <div className='flex justify-between px-3'>
@@ -474,15 +488,15 @@ export default function ModalEmitirFactura() {
                                             </div>
 
                                             <ul className="overflow-auto barra h-full w-full">
-                                                {resultadoRuc.sucursales.map((s) => (
+                                                {dataEmpresa.sucursales.map((s) => (
                                                     s.puntosEmision.map((pe) => (
                                                         <li
                                                             key={pe.id}
                                                             className="text-nowrap px-3 py-1 hover:bg-[#2e4760] cursor-pointer rounded-lg w-full transition-colors"
-                                                            onClick={() => llenarInputsRuc(resultadoRuc.ruc, resultadoRuc.razonSocial, resultadoRuc.dirMatriz, s.dirEstablecimiento, s.estab, pe?.ptoEmi, resultadoRuc.obligadoContabilidad)}
+                                                            onClick={() => llenarInputsRuc(dataEmpresa.ruc, dataEmpresa.razonSocial, dataEmpresa.dirMatriz, s.dirEstablecimiento, s.estab, pe?.ptoEmi, dataEmpresa.obligadoContabilidad)}
 
                                                         >
-                                                            <span className='font-bold'>Ruc:</span> {resultadoRuc.ruc} - <span className='font-bold'>Matriz:</span> {resultadoRuc.dirMatriz} - <span className='font-bold'>Dirección:</span> {s.dirEstablecimiento} - <span className='font-bold'> Pto. Emisión: </span> {pe?.ptoEmi}
+                                                            <span className='font-bold'>Ruc:</span> {dataEmpresa.ruc} - <span className='font-bold'>Matriz:</span> {dataEmpresa.dirMatriz} - <span className='font-bold'>Dirección:</span> {s.dirEstablecimiento} - <span className='font-bold'> Pto. Emisión: </span> {pe?.ptoEmi}
                                                         </li>
                                                     ))
                                                 ))}
@@ -530,7 +544,7 @@ export default function ModalEmitirFactura() {
 
                                                 <button
                                                     type='button'
-                                                    onClick={() => consultarCliente()}
+                                                    onClick={() => refetchCliente()}
                                                     className='rounded-full bg-[#2e4760] w-fit p-2 cursor-pointer hover:bg-[#3a546e] transition-colors'
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -560,7 +574,7 @@ export default function ModalEmitirFactura() {
 
                                         </div>
 
-                                        {loading ?
+                                        {isLoadingCliente ?
                                             <SmallSpinner />
                                             :
                                             <>
@@ -714,15 +728,7 @@ export default function ModalEmitirFactura() {
                                     <div className='flex gap-3 items-center'>
                                         <Button
                                             className="font-semibold text-gray-100 cursor-pointer rounded-xl transition-colors px-4 py-1 border border-gray-100 flex gap-2 items-center hover:bg-[#d24148] hover:text-gray-200 hover:border-[#d24148]"
-                                            onClick={() => {
-                                                setTipoIdentificacion("")
-                                                setLongitudIdentificacion(0)
-                                                setFormulariosFactura([])
-                                                setProductos([])
-                                                setBotonMas(true)
-                                                setResultadoRuc([])
-                                                changeModalEmitirFactura()
-                                            }}
+                                            onClick={() => cancelarFactura()}
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />

@@ -75,7 +75,7 @@ export default function ModalNotificacionesGlobales() {
                                 ))}
                             </ul>
                         ) : (
-                            <p className="text-center uppercase">Sin datos</p>
+                            <p className="text-center uppercase">No tienes notificaciones</p>
                         )}
 
                     </DialogPanel>

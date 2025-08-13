@@ -89,32 +89,39 @@ export default async function page() {
 
                                 <h2 className="font-semibold text-gray-100 text-lg mb-5">Productos más Vendidos</h2>
 
-                                {productos.data.map(p => (
-                                    <div
-                                        className="bg-gradient-to-t from-[#102940]/20 to-[#182a3b]/20 shadow-lg rounded-2xl px-3 py-1 flex justify-between items-center gap-3 mb-2"
-                                        key={p.id}
-                                    >
-                                        <div className="flex gap-3 items-center">
+                                {
+                                    productos && productos.data.length ? (
+                                        productos?.data?.map(p => (
+                                            <div
+                                                className="bg-gradient-to-t from-[#102940]/20 to-[#182a3b]/20 shadow-lg rounded-2xl px-3 py-1 flex justify-between items-center gap-3 mb-2"
+                                                key={p.id}
+                                            >
+                                                <div className="flex gap-3 items-center">
 
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-                                            </svg>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                                                    </svg>
 
-                                            <div>
-                                                <p className="font-semibold">{p.nombre}</p>
-                                                <p className="text-sm -mt-1">En Stock: {p.stock}</p>
+                                                    <div>
+                                                        <p className="font-semibold">{p.nombre}</p>
+                                                        <p className="text-sm -mt-1">En Stock: {p.stock}</p>
+                                                    </div>
+                                                </div>
+
+
+                                                <div className="flex flex-col items-end">
+                                                    <p className="text-xl">$ {p.totalVendido}</p>
+                                                    <p className="text-[11px] -mt-1">TOTAL VENDIDO</p>
+                                                </div>
+
+
                                             </div>
-                                        </div>
-
-
-                                        <div className="flex flex-col items-end">
-                                            <p className="text-xl">$ {p.totalVendido}</p>
-                                            <p className="text-[11px] -mt-1">TOTAL VENDIDO</p>
-                                        </div>
-
-
-                                    </div>
-                                ))}
+                                        ))
+                                    ) :
+                                        (
+                                            <p>Sin historial</p>
+                                        )
+                                }
 
                             </div>
 
@@ -127,8 +134,8 @@ export default async function page() {
 
                                         {/* "totalImporte": 12345.67, "promedioImporte": 123.45 */}
                                         <GraficoFacturas
-                                            totalFacturas={balances.totalFacturas}
-                                            totalImporte={balances.totalImporte}
+                                            totalFacturas={balances?.totalFacturas}
+                                            totalImporte={balances?.totalImporte}
                                         />
 
                                     </div>
@@ -173,7 +180,7 @@ export default async function page() {
                                 <p className="text-[#478bb3] font-semibold">Total Importe</p>
                             </div>
 
-                            <p className="text-xl">$ {balances?.data?.totalImporte}</p>
+                            <p className="text-xl">$ {balances?.data?.totalImporte.toFixed(2)}</p>
                         </div>
 
                         <div className="bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 flex justify-between items-center rounded-3xl p-3">
@@ -191,7 +198,7 @@ export default async function page() {
                                 <p className="text-[#478bb3] font-semibold">Promedio Importe</p>
                             </div>
 
-                            <p className="text-xl">$ {balances?.data?.promedioImporte}</p>
+                            <p className="text-xl">$ {balances?.data?.promedioImporte.toFixed(2)}</p>
                         </div>
 
                     </div>

@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMainStore } from "@/store/mainStore";
 import { toast } from 'react-toastify';
 import { productoSchema } from "@/schema";
 import Swal from 'sweetalert2';
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 export const AgregarProducto = ({ id }) => {
@@ -20,6 +21,9 @@ export const AgregarProducto = ({ id }) => {
     const [resultadoProductos, setResultadoProductos] = useState([])
     const [ventanaResultadoProductos, setventanaResultadoProductos] = useState(false)
     const isEditable = !(editar || agrePro) || editarPro;
+
+    const [inputValue, setInputValue] = useState("");
+    const [productoBuscado, setProductoBuscado] = useState("");
 
     const [detalle, setDetalle] = useState({
         codigoPrincipal: '',
@@ -50,11 +54,10 @@ export const AgregarProducto = ({ id }) => {
             impuestos: [{
                 codigo: detalle.codigo,
                 codigoPorcentaje: detalle.codigoPorcentaje,
-                // codigo: "IVA",
-                // codigoPorcentaje: "15%",
                 tarifa: detalle.tarifa,
                 baseImponible: detalle.baseImponible,
                 valor: detalle.valor
+
             }]
         }
 
@@ -120,17 +123,26 @@ export const AgregarProducto = ({ id }) => {
 
     }
 
-    const verificarProducto = async (value) => {
+    const verificarProducto = async ({ queryKey, signal }) => {
 
-        try {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/productos/buscar?descripcion=${value}`)
-            setResultadoProductos(data.data);
-            console.log(data.data);
+        const [, value] = queryKey;
 
-        } catch (e) {
-            console.log(e);
-        }
-    }
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/productos/buscar?descripcion=${value}`,
+            { signal } // <-- Cancelación automática aquí
+        );
+
+        console.log(data.data);
+
+
+        return data?.data ?? [];
+    };
+
+    const { data: dataProducto, isLoading: isLoadingProducto } = useQuery({
+        queryKey: ['datos-producto', productoBuscado], // Identificador unico para cada Query
+        queryFn: verificarProducto, // Funcion a consultar 
+        refetchOnWindowFocus: false, // No volver a hacer fetch al cambiar de pestaña
+        enabled: !!productoBuscado // Solo si hay texto para buscar
+    })
 
     const llenarInputsArticulo = (articulo) => {
 
@@ -140,16 +152,25 @@ export const AgregarProducto = ({ id }) => {
             descripcion: articulo.descripcion,
             // cantidadProducto -> Se maneja en otro lado
             precioUnitario: articulo.precioUnitario,
-            descuento: articulo.descuento,
+            descuento: articulo.descuento.porcentaje,
             precioTotalSinImpuesto: articulo.precioTotalSinImpuesto,
             // IMPUESTOS
-            codigo: articulo.impuestos[0].codigo,
-            codigoPorcentaje: articulo.impuestos[0].codigoPorcentaje,
+            codigo: articulo.impuestos[0].nombre,
+            codigoPorcentaje: articulo.impuestos[0].porcentaje,
             tarifa: articulo.impuestos[0].tarifa,
             baseImponible: articulo.impuestos[0].baseImponible,
             valor: articulo.impuestos[0].valor,
         }));
     }
+
+    // Debounce para evitar ejecutar en cada tecla
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setProductoBuscado(inputValue.trim());
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [inputValue]);
 
     return (
         <div
@@ -166,7 +187,7 @@ export const AgregarProducto = ({ id }) => {
                         value={detalle.descripcion}
                         onChange={(e) => {
                             setDetalle(prev => ({ ...prev, descripcion: e.target.value }));
-                            verificarProducto(e.target.value);
+                            setInputValue(e.target.value);
                         }}
                         disabled={!isEditable}
                         onFocus={() => setventanaResultadoProductos(true)}
@@ -208,7 +229,7 @@ export const AgregarProducto = ({ id }) => {
                 </div>
 
                 <div className='flex flex-col'>
-                    <label htmlFor={`descuento-${id}`} className='mb-1'>Descuento</label>
+                    <label htmlFor={`descuento-${id}`} className='mb-1'>Descuento {'%'}</label>
                     <input
                         id={`descuento-${id}`}
                         type="text"
@@ -233,16 +254,16 @@ export const AgregarProducto = ({ id }) => {
                     />
                 </div>
 
-                {ventanaResultadoProductos && resultadoProductos?.length > 0 && (
+                {ventanaResultadoProductos && dataProducto?.length > 0 && (
                     <div className="bg-gradient-to-t from-[#102940] to-[#182a3b] w-full h-40 absolute rounded-xl p-2 bottom-[110%] text-gray-200">
                         <ul className="overflow-auto barra h-full w-full">
-                            {resultadoProductos.map((p) => (
+                            {dataProducto.map((p) => (
                                 <li
                                     key={p.codigoPrincipal}
                                     className="text-nowrap px-3 py-1 hover:bg-[#2e4760] cursor-pointer rounded-lg w-full transition-colors"
                                     onClick={() => llenarInputsArticulo(p)}
                                 >
-                                    <span className='font-bold'>ITEM:</span> {p.descripcion} - <span className='font-bold'>CÓDIGO:</span> {p.codigoPrincipal} - <span className='font-bold'>DESCUENTO:</span> {p.descuento}%
+                                    <span className='font-bold'>ITEM:</span> {p.descripcion} - <span className='font-bold'>CÓDIGO:</span> {p.codigoPrincipal} - <span className='font-bold'>DESCUENTO:</span> {p.descuento.porcentaje}%
                                 </li>
                             ))}
                         </ul>

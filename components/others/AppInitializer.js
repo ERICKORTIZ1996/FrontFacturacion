@@ -12,7 +12,7 @@ export default function AppInitializer() {
 
     useEffect(() => {
 
-        const tieneAcceso = !!dataUser.token && !!dataUser.active;
+        const tieneAcceso = !!dataUser?.token && !!dataUser?.active;
         setAcceso(tieneAcceso);
         setIsLoading(false);
 

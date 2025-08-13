@@ -14,11 +14,23 @@ export default function ModalCrearProducto() {
 
     const queryClient = useQueryClient();
 
-    const tiposIVA = {
-        iva0: { codigo: "IVA", codigoPorcentaje: "12%", tarifa: 12 },
-        ivaNoObjeto: { codigo: "IVA", codigoPorcentaje: "14%", tarifa: 14 },
-        iva15: { codigo: "IVA", codigoPorcentaje: "15%", tarifa: 15 },
-        ivaExento: { codigo: "IVA", codigoPorcentaje: "0%", tarifa: 0 },
+    const ImpuestosCod = {
+        iva1: { codigoUnico: "2", codigo: "IVA" },
+        iva2: { codigoUnico: "3", codigo: "ICE" },
+        iva3: { codigoUnico: "4", codigo: "IRBPNR" },
+        iva3: { codigoUnico: "4", codigo: "IRBPNR" },
+    };
+
+    const TarifaIVA = {
+        tarifa1: { codigoUnico: "0", codigo: "0%", porcentaje: 0 },
+        tarifa2: { codigoUnico: "2", codigo: "12%", porcentaje: 12 },
+        tarifa3: { codigoUnico: "3", codigo: "14%", porcentaje: 14 },
+        tarifa4: { codigoUnico: "4", codigo: "15%", porcentaje: 15 },
+        tarifa5: { codigoUnico: "5", codigo: "5%", porcentaje: 5 },
+        tarifa6: { codigoUnico: "6", codigo: "NoObjetoImpuesto", porcentaje: 0 },
+        tarifa7: { codigoUnico: "7", codigo: "ExentoIVA", porcentaje: 0 },
+        tarifa8: { codigoUnico: "8", codigo: "IVA_Diferenciado", porcentaje: 0 },
+        tarifa9: { codigoUnico: "10", codigo: "13%", porcentaje: 13 },
     };
 
     const handleSubmit = async (formData) => {
@@ -26,16 +38,10 @@ export default function ModalCrearProducto() {
         const data = {
             codigo: formData.get('codigo-producto'),
             nombre: formData.get('nombre-producto'),
+            descripcion: formData.get('descripcion-producto'),
             cantidad: Number(formData.get('cantidad-producto')),
             precioUnitario: Number(formData.get('precio-unitario-producto')),
-            descuento: Number(formData.get('descuento-producto')),
-            precioTotalSinImpuesto: Number(formData.get('precio-unitario-producto')),
-            // IMPUESTOS -> Se agregan despúes de pasar la validación
-            // codigo: impuesto.codigo,
-            // codigoPorcentaje: impuesto.codigoPorcentaje,
-            // tarifa: impuesto.tarifa,
-            // baseImponible: Number(formData.get('precio-unitario-producto')),
-            // valor: (Number(formData.get('precio-unitario-producto')) * impuesto.tarifa) / 100,
+            descuento: Number(formData.get('descuento-producto'))
         }
 
         const result = productoStockSchema.safeParse(data)
@@ -53,23 +59,24 @@ export default function ModalCrearProducto() {
 
     const crearProducto = async (formData) => {
 
-        const impuesto = tiposIVA[formData.get('impuestos')]
+        const impuesto = ImpuestosCod[formData.get('impuestos')]
+        const tarifa = TarifaIVA[formData.get('tarifa')]
 
         try {
-            const { data: dataProducto } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/productos/completo`, {
-                codigoPrincipal: formData.get('codigo-producto'),
-                descripcion: formData.get('nombre-producto'),
-                cantidad: Number(formData.get('cantidad-producto')),
-                precioUnitario: Number(formData.get('precio-unitario-producto')),
+            const { data: dataProducto } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/productos`, {
+                codigo: formData.get('codigo-producto'),
+                nombre: formData.get('nombre-producto'),
+                descripcion: formData.get('descripcion-producto'),
+                precio: Number(formData.get('precio-unitario-producto')),
+                stock: Number(formData.get('cantidad-producto')),
                 descuento: Number(formData.get('descuento-producto')),
-                precioTotalSinImpuesto: Number(formData.get('precio-unitario-producto')),
+                descuentoValor: (Number(formData.get('precio-unitario-producto')) * Number(formData.get('descuento-producto'))) / 100,
                 impuestos: [
                     {
                         codigo: impuesto.codigo,
-                        codigoPorcentaje: impuesto.codigoPorcentaje,
-                        tarifa: impuesto.tarifa,
-                        baseImponible: Number(formData.get('precio-unitario-producto')),
-                        valor: (Number(formData.get('precio-unitario-producto')) * impuesto.tarifa) / 100,
+                        codigoPorcentaje: tarifa.codigo,
+                        tarifa: Number(tarifa.porcentaje),
+                        activo: true
                     }
                 ]
             })
@@ -146,7 +153,18 @@ export default function ModalCrearProducto() {
                                             type="text"
                                             name='nombre-producto'
                                             className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
-                                            placeholder='Ej: Pantalones Jeans Hombre XL'
+                                            placeholder='Ej: Pantalones Jeans'
+                                        />
+                                    </div>
+
+                                    <div className='flex flex-col'>
+                                        <label htmlFor="descripcion-producto" className='mb-1'>Descripción</label>
+                                        <input
+                                            id='descripcion-producto'
+                                            type="text"
+                                            name='descripcion-producto'
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                            placeholder='Ej: Pantalones Jeans para Hombre, talla XL'
                                         />
                                     </div>
 
@@ -176,7 +194,7 @@ export default function ModalCrearProducto() {
                                         </div>
 
                                         <div className='flex flex-col'>
-                                            <label htmlFor="descuento-producto" className='mb-1'>Descuento</label>
+                                            <label htmlFor="descuento-producto" className='mb-1'>Descuento {'(%)'}</label>
                                             <input
                                                 id='descuento-producto'
                                                 type="text"
@@ -187,22 +205,48 @@ export default function ModalCrearProducto() {
                                         </div>
                                     </div>
 
-                                    <div className='flex flex-col'>
 
-                                        <label htmlFor="impuestos" className='mb-1'>Impuestos</label>
+                                    <div className='flex gap-5 w-full'>
+                                        <div className='flex-1 flex flex-col'>
 
-                                        <select
-                                            id="impuestos"
-                                            name="impuestos"
-                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
-                                            defaultValue="iva15"
-                                        >
-                                            <option value="iva0">IVA 12%</option>
-                                            <option value="ivaNoObjeto">IVA 14%</option>
-                                            <option value="iva15">IVA 15% - Tarifa general</option>
-                                            <option value="ivaExento">IVA 0%</option>
-                                        </select>
+                                            <label htmlFor="impuestos" className='mb-1'>Impuesto</label>
+
+                                            <select
+                                                id="impuestos"
+                                                name="impuestos"
+                                                className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-full'
+                                                defaultValue="iva1"
+                                            >
+                                                <option value="iva1">IVA</option>
+                                                <option value="iva2">ICE</option>
+                                                <option value="iva3">IRBPNR</option>
+                                                <option value="iva4">IEPS</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='flex-1 flex flex-col'>
+
+                                            <label htmlFor="tarifa" className='mb-1'>Tarifa</label>
+
+                                            <select
+                                                id="tarifa"
+                                                name="tarifa"
+                                                className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-full'
+                                                defaultValue="tarifa4"
+                                            >
+                                                <option value="tarifa1">0%</option>
+                                                <option value="tarifa2">12%</option>
+                                                <option value="tarifa3">14%</option>
+                                                <option value="tarifa4">15%</option>
+                                                <option value="tarifa5">5%</option>
+                                                <option value="tarifa6">0%</option>
+                                                <option value="tarifa7">No Objeto Impuesto</option>
+                                                <option value="tarifa8">Exento IVA</option>
+                                                <option value="tarifa9">13%</option>
+                                            </select>
+                                        </div>
                                     </div>
+
 
                                 </div>
                             </form>

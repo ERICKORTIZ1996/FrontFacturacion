@@ -127,6 +127,7 @@ export const productoStockSchema = z.object({
 
     codigo: z.string().min(1, "CÓDIGO: Es requerido"),
     nombre: z.string().min(1, "NOMBRE: Es requerido"),
+    descripcion: z.string().min(1, "DESCRIPCIÓN: Es requerido"),
     cantidad: z.preprocess(
         (val) => {
             if (typeof val === "string") return val;
