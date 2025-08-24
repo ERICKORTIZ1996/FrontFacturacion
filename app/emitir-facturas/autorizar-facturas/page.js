@@ -1,5 +1,4 @@
 import MainLayout from "@/components/layouts/MainLayout"
-import ModalEmitirFactura from "@/components/modals/ModalEmitirFactura"
 import Paginacion from "@/components/emitir_facturas_componentes/Paginacion"
 import TablaAutorizarFactura from "@/components/tables/TablaAutorizarFactura"
 import ComprobarAcceso from "@/components/others/ComprobarAcceso"

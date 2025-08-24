@@ -164,7 +164,7 @@ export default function ModalEmitirFactura() {
                 importeTotal: Number(totalFinal),
                 moneda: "DOLAR",
                 pagos: [{
-                    formaPago: metodoPago.descripcion, // Cambiado a un valor que coincida con las claves de FormasPago
+                    formaPago: metodoPago.descripcion,
                     total: Number(totalFinal),
                 }],
                 detalles: productosFormateados
@@ -192,7 +192,7 @@ export default function ModalEmitirFactura() {
             setVentanaResultadosRuc(false)
             toast.success(dataFactura.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
             queryClient.invalidateQueries({ queryKey: ['emitir_facturas'] }); // Traer los datos actualizados
-            // changeModalEmitirFactura()
+            changeModalEmitirFactura()
         },
         onError: (error) => {
             toast.error(error.message);
@@ -715,15 +715,20 @@ export default function ModalEmitirFactura() {
                             </form>
 
                             <form className='border-t border-t-[#486b8f]'>
-                                <div className='flex justify-between gap-5 items-center mt-5'>
+                                <div className='flex justify-between gap-5 items-end mt-5'>
 
-                                    <p className='font-semibold text-gray-800 text-xl bg-gray-100 rounded-xl px-3 py-1'>
-                                        Subtotal: {totalSinIVA.toFixed(2)} <br />
-                                        Descuento: {totalDescuento.toFixed(2)} <br />
-                                        Base imponible: {baseImponible.toFixed(2)} <br />
-                                        IVA (15%): {iva.toFixed(2)} <br />
-                                        Total a pagar: {totalFinal.toFixed(2)} <br />
-                                    </p>
+                                    <div className='font-semibold text-gray-800 text-sm bg-gray-100 rounded-xl px-3 py-1 flex gap-4'>
+                                        <div>
+                                            <p>Subtotal: {totalSinIVA.toFixed(2)}</p>
+                                            <p>Descuento: {totalDescuento.toFixed(2)}</p>
+                                            <p>Base imponible: {baseImponible.toFixed(2)}</p>
+                                        </div>
+
+                                        <div>
+                                            <p>IVA (15%): {iva.toFixed(2)}</p>
+                                            <p>Total a pagar: {totalFinal.toFixed(2)}</p>
+                                        </div>
+                                    </div>
 
                                     <div className='flex gap-3 items-center'>
                                         <Button

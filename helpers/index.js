@@ -43,3 +43,20 @@ export const consultarFechaEcuador = () => {
         })
     }
 }
+
+export const getStatusBill = (status) => {
+
+    switch (status) {
+        case "VALIDADA":
+            return "text-yellow-950 bg-yellow-200"
+        case "AUTORIZADA":
+            return "text-blue-950 bg-blue-200"
+        case "PENDIENTE":
+            return "text-green-950 bg-green-200"
+        case "ERROR":
+            return "text-red-950 bg-red-200"
+        default:
+            return "text-green-950 bg-green-200"
+    }
+
+}

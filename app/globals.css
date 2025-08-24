@@ -60,6 +60,51 @@
     background-position: center;
 }
 
+.fondoATS {
+    background: linear-gradient(
+            to top,
+            rgba(0, 0, 0, 0.918),
+            rgba(37, 37, 37, 0.283)
+        ),
+        url("/images/banner-login.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 120%;
+    transition: background-size 0.5s ease;
+}
+
+.fondoTributario {
+    background: linear-gradient(
+            to top,
+            rgba(0, 0, 0, 0.89),
+            rgba(37, 37, 37, 0.671)
+        ),
+        url("/images/modal-backgorud.webp");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 120%;
+    transition: background-size 0.5s ease;
+}
+
+.fondoOtros {
+    background: linear-gradient(
+            to top,
+            rgba(0, 0, 0, 0.89),
+            rgba(37, 37, 37, 0.671)
+        ),
+        url("/images/modal-backgorud.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 120%;
+    transition: background-size 0.5s ease;
+}
+
+.fondoATS:hover,
+.fondoTributario:hover,
+.fondoOtros:hover {
+    background-size: 100%;
+}
+
 /* ----------- ESTILOS PARA SWEETALERT ------------- */
 .mi-boton-ok {
     background-color: #1f2937;

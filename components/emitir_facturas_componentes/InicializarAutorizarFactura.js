@@ -43,9 +43,5 @@ export default function InicializarAutorizarFactura({ factura }) {
 
   }, [factura]);
 
-
-
-
-
   return null
 }

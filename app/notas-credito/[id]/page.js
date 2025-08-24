@@ -2,18 +2,18 @@ import axios from "axios";
 import MainLayout from "@/components/layouts/MainLayout";
 import ComprobarAcceso from "@/components/others/ComprobarAcceso";
 import { formatearFecha } from "@/helpers";
-import BotonReenviarFactura from "@/components/emitir_facturas_componentes/BotonReenviarFactura";
+import FormularioEmitirNotaCredito from "@/components/notas_credito_components/FormularioEmitirNotaCredito";
 import TotalFactura from "@/components/emitir_facturas_componentes/TotalFactura";
 import InicializarAutorizarFactura from "@/components/emitir_facturas_componentes/InicializarAutorizarFactura";
 import EditarFactura from "@/components/emitir_facturas_componentes/EditarFactura";
-import BotonRegresarAutorizarFactura from "@/components/emitir_facturas_componentes/BotonRegresarAutorizarFactura";
+import BotonRegresarNotasCredito from "@/components/notas_credito_components/BotonRegresarNotasCredito";
 
 async function obtenerFactura(nombreArchivo) {
     const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/nombre/${nombreArchivo}`);
     return data
 }
 
-export default async function FacturaPendiente({ params }) {
+export default async function NotaCredito({ params }) {
 
     const factura = await obtenerFactura(params.id);
     const nombresApellidosCliente = factura.data.cliente.razonSocialComprador.split(" ")
@@ -29,7 +29,7 @@ export default async function FacturaPendiente({ params }) {
 
                 <div className="flex items-center text-gray-800 gap-4">
 
-                    <BotonRegresarAutorizarFactura />
+                    <BotonRegresarNotasCredito />
 
                     <div className="flex items-center bg-gray-100 font-semibold rounded-full px-4 py-1 w-fit text-gray-800 gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -37,7 +37,7 @@ export default async function FacturaPendiente({ params }) {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
                         </svg>
 
-                        <p>Autorizar Factura: {factura?.nombreArchivo?.split('_')[4]}</p>
+                        <p>Emitir Nota de Crédito: {factura?.nombreArchivo?.split('_')[4]}</p>
 
                     </div>
 
@@ -159,29 +159,29 @@ export default async function FacturaPendiente({ params }) {
                             </div>
 
                             {/* <div className='flex flex-col gap-3'>
-
-                                         <div className='flex flex-col'>
-                                            <label htmlFor="telefono-cliente" className='mb-1'>Teléfono</label>
-                                            <input
-                                                id='telefono-cliente'
-                                                type="text"
-                                                name='telefono-cliente'
-                                                className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
-                                                placeholder='Ej: 0989486603'
-                                            />
-                                        </div>
-
-                                        <div className='flex flex-col'>
-                                            <label htmlFor="correo-cliente" className='mb-1'>Correo:</label>
-                                            <input
-                                                id='correo-cliente'
-                                                type="text"
-                                                name='correo-cliente'
-                                                className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
-                                                placeholder='Ej: cris@cris.com'
-                                            />
-                                        </div> 
-                                    </div> */}
+        
+                                                 <div className='flex flex-col'>
+                                                    <label htmlFor="telefono-cliente" className='mb-1'>Teléfono</label>
+                                                    <input
+                                                        id='telefono-cliente'
+                                                        type="text"
+                                                        name='telefono-cliente'
+                                                        className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                                        placeholder='Ej: 0989486603'
+                                                    />
+                                                </div>
+        
+                                                <div className='flex flex-col'>
+                                                    <label htmlFor="correo-cliente" className='mb-1'>Correo:</label>
+                                                    <input
+                                                        id='correo-cliente'
+                                                        type="text"
+                                                        name='correo-cliente'
+                                                        className='bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                                        placeholder='Ej: cris@cris.com'
+                                                    />
+                                                </div> 
+                                            </div> */}
 
                         </div>
 
@@ -204,17 +204,9 @@ export default async function FacturaPendiente({ params }) {
 
                     <div>
 
-                        <TotalFactura
-                            subtotal={factura.data.totalSinImpuestos}
-                            descuento={factura.data.totalDescuento}
-                            codigoImpuesto={factura.data.impuestos[0].codigo}
-                            porcentajeImpuesto={factura.data.impuestos[0].codigoPorcentaje}
-                            valorImpuesto={factura.data.impuestos[0].valor}
-                            total={factura.data.importeTotal}
-                        />
-
-                        <BotonReenviarFactura
-                            idFctura="1"
+                        <TotalFactura />
+                        <FormularioEmitirNotaCredito
+                            claveAcceso={factura?.nombreArchivo}
                         />
 
                     </div>

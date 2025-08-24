@@ -3,7 +3,7 @@ import Link from "next/link";
 import MainLayout from "@/components/layouts/MainLayout";
 import ComprobarAcceso from "@/components/others/ComprobarAcceso";
 import BotonImprimirFactura from "@/components/emitir_facturas_componentes/BotonImprimirFactura";
-import { formatearFecha } from "@/helpers";
+import { formatearFecha, getStatusBill } from "@/helpers";
 import { redirect } from "next/navigation";
 
 async function obtenerFactura(nombreArchivo) {
@@ -293,15 +293,14 @@ export default async function Factura({ params }) {
                                         IVA (15%): {iva.toFixed(2)} <br />
                                         Total a pagar: {totalFinal.toFixed(2)} <br /> */}
 
-                            <span className="block">SUBTOTAL: $ {totalSinIVA.toFixed(2)}</span>
-                            <span className="block">Descuento: $ {totalDescuento.toFixed(2)}</span>
-                            <span className="block">Base imponible: $ {baseImponible.toFixed(2)}</span>
-                            <span className="block">IVA 15%: $ {iva.toFixed(2)}</span>
+                            <span className="block">SUBTOTAL: $ {Number(factura.data.totalSinImpuestos).toFixed(2)}</span>
+                            <span className="block">Descuento: $ {Number(factura.data.totalDescuento).toFixed(2)}</span>
+                            <span className="block">{factura.data.impuestos[0].codigo} {factura.data.impuestos[0].codigoPorcentaje}: $ {factura.data.impuestos[0].valor.toFixed(2)}</span>
 
                             <div className="flex gap-3 items-center mt-5">
 
                                 <p className='font-semibold text-gray-800 bg-gray-100 rounded-xl px-3 py-1 w-fit'>
-                                    Total a Pagar: $ {totalFinal.toFixed(2)}
+                                    Total a Pagar: $ {Number(factura.data.importeTotal).toFixed(2)}
                                 </p>
 
                                 {factura.data.estado.toLowerCase() === 'validada' && (
@@ -313,7 +312,15 @@ export default async function Factura({ params }) {
                             </div>
 
                             {factura.data.estado.toLowerCase() !== 'validada' && (
-                                <p className="mt-3">Valida tu factura <br /> para poder imprimirla</p>
+                                <>
+
+                                    <span className={`${getStatusBill(factura.data.estado)} text-sm rounded-full px-2 py-1 inline-block mt-3`}>{factura.data.estado}</span>
+
+                                    <div className="border border-gray-200 rounded-xl mt-3 px-3 py-1">
+
+                                        <p>Valida tu factura <br /> para poder imprimirla</p>
+                                    </div>
+                                </>
                             )}
 
                         </div>
