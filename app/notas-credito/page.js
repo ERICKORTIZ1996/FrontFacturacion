@@ -2,11 +2,12 @@ import MainLayout from "@/components/layouts/MainLayout"
 import Paginacion from "@/components/emitir_facturas_componentes/Paginacion"
 import TablaNotasCredito from "@/components/tables/TablaNotasCredito"
 import ComprobarAcceso from "@/components/others/ComprobarAcceso"
+import { getStatusBill } from "@/helpers"
 import Link from "next/link"
 import axios from "axios"
 
 async function consultarFacturasValidadas() {
-    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/estado/VALIDADA`);
+    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/estado/AUTORIZADA`);
     return data
 }
 
@@ -40,16 +41,16 @@ export default async function NotasCredito() {
                 </div>
 
                 <p className="mt-3">
-                    En esta sección podras editar una factura en caso de devoluciones. Asegurate de ingresar la información correcta
+                    En esta sección podras editar una factura en caso de devoluciones. Asegurate de ingresar la información correcta. Solo se podran editar los productos existentes.
                 </p>
 
 
                 <div className="mt-5 flex items-center justify-between bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3">
 
                     <p
-                        className="px-3 py-1 rounded-xl transition-colors text-green-950 bg-green-200 shadow-xl"
+                        className={`${getStatusBill('AUTORIZADA')} px-3 py-1 rounded-xl transition-colors shadow-xl`}
                     >
-                        Facturas Validadas
+                        Facturas Autorizadas
                     </p>
 
                     <div className="w-1/3 relative">

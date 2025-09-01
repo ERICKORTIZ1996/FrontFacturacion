@@ -132,6 +132,8 @@ export default function ModalEmitirFactura() {
         const metodoPago = formasDePago[formData.get('forma-pago')]
 
         try {
+
+            // CREAR XML
             const { data: dataFactura } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/crearXML`, {
                 ambiente: "Pruebas", // Cambiado a "Pruebas" o "Produccion" según el diccionario CodigoAmbiente
                 tipoEmision: "EmisionNormal", // Cambiado a un valor que coincida con las claves de TipoEmision
@@ -156,7 +158,7 @@ export default function ModalEmitirFactura() {
                         baseImponible: Number(baseImponible),
                         tarifa: 15,
                         valor: Number(iva),
-                        valorDevolucionIva: 0.00 // -> Quemado
+                        valorDevolucionIva: 0.00 // -> QUEMADO
                     }
                 ],
                 propina: 0.00, // -> QUEMADO
@@ -169,6 +171,16 @@ export default function ModalEmitirFactura() {
                 }],
                 detalles: productosFormateados
             })
+
+            // FIRMAR XML
+            // const { data: dataFirma } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/crearXML`, {
+            //     "nombreArchivo": "Cristhian_Lorenzo_Velez_Zambrano_000000023",
+            //     "password": "647435Ss"
+            // })
+
+            // VALIDAR 
+
+            // AUTORIZAR
 
             console.log(dataFactura);
 

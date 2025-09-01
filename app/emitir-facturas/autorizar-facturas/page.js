@@ -41,7 +41,7 @@ export default async function AutorizarFacturas() {
         </div>
 
         <p className="mt-3">
-          En esta sección podras editar las facturas que tengan como estado 'Pendiente'. Asegurate de ingresar la información correcta.
+          En esta sección podras editar las facturas que tengan como estado 'Pendiente'. Asegurate de ingresar la información correcta. Solo se podran editar los productos existentes.
         </p>
 
 
@@ -81,7 +81,7 @@ export default async function AutorizarFacturas() {
                     <th className="text-start font-semibold p-2">Descuento</th>
                     <th className="text-start font-semibold p-2">Fecha</th>
                     <th className="text-start font-semibold p-2">Estado</th>
-                    <th className="text-start font-semibold p-2">Detalle</th>
+                    <th className="text-start font-semibold p-2">Acciones</th>
                   </tr>
                 </thead>
 

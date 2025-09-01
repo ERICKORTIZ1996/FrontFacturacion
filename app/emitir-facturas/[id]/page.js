@@ -11,7 +11,8 @@ async function obtenerFactura(nombreArchivo) {
         const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/nombre/${nombreArchivo}`);
         return data
     } catch (e) {
-        redirect("/facturas/no-encontrada"); // redirección automática
+        console.log(encodeURI);
+        return null
     }
 
 }
@@ -19,6 +20,36 @@ async function obtenerFactura(nombreArchivo) {
 export default async function Factura({ params }) {
 
     const factura = await obtenerFactura(params.id);
+
+    // Renderizado condicional
+    if (!factura) {
+        return (
+            <ComprobarAcceso>
+                <MainLayout>
+
+                    <div className="flex items-center text-gray-800 gap-4">
+
+                        <Link
+                            className="font-semibold text-gray-100 cursor-pointer rounded-full transition-colors px-4 py-1 border border-gray-100 flex gap-2 items-center hover:bg-gray-100 hover:text-gray-800"
+                            href={"/emitir-facturas"}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                            </svg>
+
+                            Regresar
+                        </Link>
+                    </div>
+
+                    <div>
+                        <p className="text-2xl text-center font-semibold">Busqueda no encontrada</p>
+                        <p className="text-center">Porfavor, prueba refrescando la página o comunicate con soporte técnico</p>
+                    </div>
+                </MainLayout>
+            </ComprobarAcceso>
+        );
+    }
+
     console.log(factura.data);
 
     const nombresApellidosCliente = factura.data.cliente.razonSocialComprador.split(" ")
@@ -303,7 +334,7 @@ export default async function Factura({ params }) {
                                     Total a Pagar: $ {Number(factura.data.importeTotal).toFixed(2)}
                                 </p>
 
-                                {factura.data.estado.toLowerCase() === 'validada' && (
+                                {factura.data.estado.toLowerCase() === 'firmada' && (
                                     <BotonImprimirFactura
                                         nombreArchivo={factura.nombreArchivo}
                                     />
@@ -311,7 +342,7 @@ export default async function Factura({ params }) {
 
                             </div>
 
-                            {factura.data.estado.toLowerCase() !== 'validada' && (
+                            {factura.data.estado.toLowerCase() !== 'firmada' && (
                                 <>
 
                                     <span className={`${getStatusBill(factura.data.estado)} text-sm rounded-full px-2 py-1 inline-block mt-3`}>{factura.data.estado}</span>

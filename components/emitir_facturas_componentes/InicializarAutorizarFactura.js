@@ -28,11 +28,11 @@ export default function InicializarAutorizarFactura({ factura }) {
           descuento: f.descuento,
           precioTotalSinImpuesto: f.precioUnitario,
           impuestos: [{
-            codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
-            codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
-            tarifa: 15,
-            baseImponible: 100.00,
-            valor: 15.00
+            codigo: f.impuestos[0].codigo,
+            codigoPorcentaje: f.impuestos[0].codigoPorcentaje,
+            tarifa: f.impuestos[0].tarifa,
+            baseImponible: f.impuestos[0].baseImponible,
+            valor: f.impuestos[0].valor
           }]
         })
       });

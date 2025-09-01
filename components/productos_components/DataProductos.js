@@ -10,10 +10,11 @@ export default function DataProductos() {
 
     const consultarProductos = async () => {
         try {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas`)
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/productos`)
             return data
         } catch (error) {
             console.log(error);
+            throw error
         }
     }
 
@@ -33,14 +34,21 @@ export default function DataProductos() {
                         <tr className="border-b-2 border-[#061727]">
                             <th className="text-start font-semibold p-2">Código</th>
                             <th className="text-start font-semibold p-2">Nombre</th>
-                            <th className="text-start font-semibold p-2">Cantidad</th>
-                            <th className="text-start font-semibold p-2">Pre. Unit. - Sin IVA</th>
+                            <th className="text-start font-semibold p-2">Stock</th>
+                            <th className="text-start font-semibold p-2">Pre. Unit.</th>
+                            <th className="text-start font-semibold p-2">Descuento</th>
+                            <th className="text-start font-semibold p-2">Estado</th>
                             <th className="text-start font-semibold p-2">Detalle</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        <TablaProductos />
+                        {data.data.map(producto => (
+                            <TablaProductos
+                                key={producto.id}
+                                producto={producto}
+                            />
+                        ))}
                     </tbody>
                 </table>
 

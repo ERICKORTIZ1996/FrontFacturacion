@@ -4,7 +4,6 @@ import ModalEmitirFactura from "@/components/modals/ModalEmitirFactura"
 import ComprobarAcceso from "@/components/others/ComprobarAcceso"
 import Link from "next/link"
 import DataFactura from "@/components/emitir_facturas_componentes/DataFactura"
-import { getStatusBill } from "@/helpers"
 
 export default function EmitirFacturas() {
 
@@ -94,36 +93,6 @@ export default function EmitirFacturas() {
                 </div>
 
                 <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
-
-                    <div className="flex gap-3 items-center">
-
-                        <button
-                            type="button"
-                            className={`${getStatusBill("VALIDADA")} text-sm rounded-full px-2 py-1 hover:bg-yellow-300 transition-colors cursor-pointer`}
-                        >
-                            Validadas
-                        </button>
-                        <button
-                            type="button"
-                            className={`${getStatusBill("AUTORIZADA")} text-blue-950 bg-blue-200 text-sm rounded-full px-2 py-1 hover:bg-blue-300 transition-colors cursor-pointer`}
-                        >
-                            Autorizadas
-                        </button>
-                        <button
-                            type="button"
-                            className={`${getStatusBill("PENDIENTE")} text-green-950 bg-green-200 text-sm rounded-full px-2 py-1 hover:bg-green-300 transition-colors cursor-pointer`}
-                        >
-                            Pendientes
-                        </button>
-                        <button
-                            type="button"
-                            className={`${getStatusBill("ERROR")} text-red-950 bg-red-200 text-sm rounded-full px-2 py-1 hover:bg-red-300 transition-colors cursor-pointer`}
-                        >
-                            Error
-                        </button>
-
-                    </div>
-
 
                     <DataFactura />
 

@@ -13,7 +13,7 @@ export default function TotalFactura({
 }) {
 
     const productos = useMainStore((state) => state.productos)
-    console.log(productos);
+    // console.log(productos);
 
 
     const totalSinIVA = useMemo(() => {
@@ -25,8 +25,8 @@ export default function TotalFactura({
         <div className="rounded-3xl bg-gradient-to-b from-[#153350]/60 to-[#1f3850]/60 px-6 py-4">
 
             <span className="block">SUBTOTAL: $ {Number(subtotal).toFixed(2)}</span>
-            <span className="block">{codigoImpuesto} {porcentajeImpuesto}: $ {Number(valorImpuesto).toFixed(2)}</span>
             <span className="block">DESCUENTO: $ {Number(descuento).toFixed(2)}</span>
+            <span className="block">{codigoImpuesto} {porcentajeImpuesto}: $ {Number(valorImpuesto).toFixed(2)}</span>
 
             <div className="flex gap-3 items-center mt-5">
 

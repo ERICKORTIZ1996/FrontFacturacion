@@ -48,11 +48,13 @@ export const getStatusBill = (status) => {
 
     switch (status) {
         case "VALIDADA":
-            return "text-yellow-950 bg-yellow-200"
+            return "text-green-950 bg-green-200"
         case "AUTORIZADA":
             return "text-blue-950 bg-blue-200"
         case "PENDIENTE":
-            return "text-green-950 bg-green-200"
+            return "text-yellow-950 bg-yellow-200"
+        case "RECHAZADA":
+            return "text-purple-950 bg-purple-200"
         case "ERROR":
             return "text-red-950 bg-red-200"
         default:

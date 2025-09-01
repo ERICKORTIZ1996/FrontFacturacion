@@ -17,7 +17,6 @@ export default async function NotaCredito({ params }) {
 
     const factura = await obtenerFactura(params.id);
     const nombresApellidosCliente = factura.data.cliente.razonSocialComprador.split(" ")
-    console.log(factura);
 
     return (
         <ComprobarAcceso>
@@ -204,9 +203,17 @@ export default async function NotaCredito({ params }) {
 
                     <div>
 
-                        <TotalFactura />
+                        <TotalFactura
+                            subtotal={factura.data.totalSinImpuestos}
+                            descuento={factura.data.totalDescuento}
+                            codigoImpuesto={factura.data.impuestos[0].codigo}
+                            porcentajeImpuesto={factura.data.impuestos[0].codigoPorcentaje}
+                            valorImpuesto={factura.data.impuestos[0].valor}
+                            total={factura.data.importeTotal}
+                        />
+
                         <FormularioEmitirNotaCredito
-                            claveAcceso={factura?.nombreArchivo}
+                            claveAcceso={factura.data.claveAcceso}
                         />
 
                     </div>

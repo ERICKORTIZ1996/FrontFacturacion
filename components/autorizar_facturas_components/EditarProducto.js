@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 
 export const EditarProducto = ({ id, detalle }) => {
 
-    const formulariosFactura = useMainStore((state) => state.formulariosFactura)
+    const changeItemNotaCredito = useMainStore((state) => state.changeItemNotaCredito)
 
     const editar = useMainStore((state) => state.editar)
     const setEditar = useMainStore((state) => state.setEditar)
@@ -17,43 +17,33 @@ export const EditarProducto = ({ id, detalle }) => {
     const productos = useMainStore((state) => state.productos)
     const setProductos = useMainStore((state) => state.setProductos)
 
-    const [alerta, setAlerta] = useState(false);
     const [agrePro, setAgrePro] = useState(true)
     const [editarPro, setEditarPro] = useState(false)
-    const isEditable = !(editar || agrePro) || editarPro;
+
+    console.log(editar || agrePro ? !editarPro : null);
+
 
     // detalle
-    const [codigoPrincipal, setcodigoPrincipal] = useState('')
-    const [descripcionProducto, setDescripcionProducto] = useState(detalle?.descripcion || "")
-    const [cantidadProducto, setCantidadProducto] = useState(detalle?.cantidad || 0)
-    const [precioUnitario, setPrecioUnitario] = useState(detalle.precioUnitario || 0)
-    const [descuento, setDescuento] = useState(detalle?.descuento || 0)
-    // impuestos - impuesto
-    const [codigo, setcodigo] = useState(0)
-    const [codigoPorcentaje, setcodigoPorcentaje] = useState(0)
-    const [tarifa, settarifa] = useState(0)
-    const [baseImponible, setbaseImponible] = useState(0)
-    const [precioTotalSinImpuestos, setPrecioTotalSinImpuestos] = useState(0)
-    const [valor, setvalor] = useState(0)
+    const [codigoPrincipal, setcodigoPrincipal] = useState(detalle?.codigoPrincipal)
+    const [descripcionProducto, setDescripcionProducto] = useState(detalle?.descripcion)
+    const [cantidadProducto, setCantidadProducto] = useState(detalle?.cantidad)
+    const [precioUnitario, setPrecioUnitario] = useState(detalle.precioUnitario)
+    const [descuento, setDescuento] = useState(detalle?.descuento)
+    const [precioTotalSinImpuestos, setPrecioTotalSinImpuestos] = useState(detalle?.precioTotalSinImpuesto)
+
+    // console.log(detalle);
 
     const total = useMemo(() => (cantidadProducto * precioUnitario), [cantidadProducto, precioUnitario])
 
     const editarProducto = async () => {
 
         const data = {
-            codigoPrincipal: "001",
+            codigoPrincipal: codigoPrincipal,
             descripcion: descripcionProducto,
             cantidad: Number(cantidadProducto),
             precioUnitario: Number(precioUnitario),
             descuento: Number(descuento),
-            precioTotalSinImpuesto: Number(precioUnitario),
-            impuestos: [{
-                codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
-                codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
-                tarifa: 15,
-                baseImponible: 100.00,
-                valor: 15.00
-            }]
+            precioTotalSinImpuesto: Number(precioTotalSinImpuestos)
         }
 
         const result = productoSchema.safeParse(data)
@@ -69,18 +59,18 @@ export const EditarProducto = ({ id, detalle }) => {
             if (p.id === detalle.id) {
                 return {
                     ...p,
-                    codigoPrincipal: "001",
+                    codigoPrincipal: codigoPrincipal,
                     descripcion: descripcionProducto,
                     cantidad: Number(cantidadProducto),
                     precioUnitario: Number(precioUnitario),
                     descuento: Number(descuento),
                     precioTotalSinImpuesto: Number(precioUnitario),
                     impuestos: [{
-                        codigo: "IVA", // Cambiado a un valor que coincida con las claves de ImpuestosCod
-                        codigoPorcentaje: "15%", // Cambiado a un valor que coincida con las claves de TarifaIVA
-                        tarifa: 15,
-                        baseImponible: 100.00,
-                        valor: 15.00
+                        codigo: detalle?.impuestos[0].codigo,
+                        codigoPorcentaje: detalle?.impuestos[0].codigoPorcentaje,
+                        tarifa: detalle?.impuestos[0].tarifa,
+                        baseImponible: detalle?.impuestos[0].baseImponible,
+                        valor: detalle?.impuestos[0].valor
                     }]
                 };
             }
@@ -91,6 +81,7 @@ export const EditarProducto = ({ id, detalle }) => {
         setAgrePro(true)
         setEditarPro(false)
         setEditar(false)
+        changeItemNotaCredito()
     }
 
     const eliminarFormStock = async (id) => {
@@ -134,8 +125,8 @@ export const EditarProducto = ({ id, detalle }) => {
                         className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 disabled:cursor-not-allowed'
                         placeholder='Ej: Pantalones baqueros gris'
                         value={descripcionProducto}
-                        onChange={(e) => setDescripcionProducto(e.target.value)}
-                        disabled={editar || agrePro ? !editarPro : null}
+                        disabled
+                        readOnly
                     />
                 </div>
 
@@ -159,9 +150,9 @@ export const EditarProducto = ({ id, detalle }) => {
                         type="text"
                         className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-24 disabled:cursor-not-allowed'
                         placeholder='Ej: 22.50'
-                        onChange={(e) => setPrecioUnitario(e.target.value)}
                         value={precioUnitario}
-                        disabled={editar || agrePro ? !editarPro : null}
+                        disabled
+                        readOnly
                     />
                 </div>
 
@@ -173,8 +164,8 @@ export const EditarProducto = ({ id, detalle }) => {
                         className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-24 disabled:cursor-not-allowed'
                         placeholder='Ej: 5%'
                         value={descuento}
-                        onChange={(e) => setDescuento(e.target.value)}
-                        disabled={editar || agrePro ? !editarPro : null}
+                        disabled
+                        readOnly
                     />
                 </div>
 
@@ -187,6 +178,7 @@ export const EditarProducto = ({ id, detalle }) => {
                         placeholder='Ej: 23.00'
                         value={total.toString()}
                         disabled
+                        readOnly
                     />
                 </div>
             </div>
@@ -212,6 +204,7 @@ export const EditarProducto = ({ id, detalle }) => {
                     onClick={() => {
                         setEditarPro(true)
                         setEditar(true)
+                        changeItemNotaCredito()
                     }}
                     disabled={editar}
                 >

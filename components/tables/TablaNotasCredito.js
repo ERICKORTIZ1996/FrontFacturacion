@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { formatearFecha } from "@/helpers"
+import { getStatusBill } from "@/helpers"
 
 export default function TablaNotasCredito({ factura }) {
     return (
@@ -10,7 +11,7 @@ export default function TablaNotasCredito({ factura }) {
             <td className="p-2">{factura.totalDescuento}</td>
             <td className="p-2 text-sm">{formatearFecha(factura.fechaEmision)}</td>
             <td className="p-2">
-                <span className={`bg-yellow-200 text-yellow-950 text-sm rounded-full px-2 py-1 lowercase`}>
+                <span className={`${getStatusBill('AUTORIZADA')} text-sm rounded-full px-2 py-1 lowercase`}>
                     {factura?.estado}
                 </span>
             </td>

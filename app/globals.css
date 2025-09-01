@@ -69,8 +69,7 @@
         url("/images/banner-login.png");
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 120%;
-    transition: background-size 0.5s ease;
+    background-size: cover;
 }
 
 .fondoTributario {
@@ -82,8 +81,7 @@
         url("/images/modal-backgorud.webp");
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 120%;
-    transition: background-size 0.5s ease;
+    background-size: cover;
 }
 
 .fondoOtros {
@@ -95,14 +93,7 @@
         url("/images/modal-backgorud.jpg");
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 120%;
-    transition: background-size 0.5s ease;
-}
-
-.fondoATS:hover,
-.fondoTributario:hover,
-.fondoOtros:hover {
-    background-size: 100%;
+    background-size: cover;
 }
 
 /* ----------- ESTILOS PARA SWEETALERT ------------- */
