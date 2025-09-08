@@ -13,6 +13,8 @@ export const useMainStore = create((set, get) => ({
     modalCrearProducto: false,
     modalCrearUsuario: false,
     modalCrearAdministrador: false,
+    modalPrimerReporteATS: false,
+    modalPrimerReporteTributario: false,
     productos: [],
     formulariosFactura: [],
     editar: false,
@@ -38,6 +40,8 @@ export const useMainStore = create((set, get) => ({
     changeModalCrearProducto: () => set((state) => ({ modalCrearProducto: !state.modalCrearProducto })),
     changeModalCrearUsuario: () => set((state) => ({ modalCrearUsuario: !state.modalCrearUsuario })),
     changeModalCrearAdministrador: () => set((state) => ({ modalCrearAdministrador: !state.modalCrearAdministrador })),
+    changeModalPrimerReporteATS: () => set((state) => ({ modalPrimerReporteATS: !state.modalPrimerReporteATS })),
+    changeModalPrimerReporteTributario: () => set((state) => ({ modalPrimerReporteTributario: !state.modalPrimerReporteTributario })),
     crearFormProducto: (producto) => set((state) => ({
         productos: [...state.productos, producto],
         formulariosFactura: [...state.formulariosFactura, generarId()]

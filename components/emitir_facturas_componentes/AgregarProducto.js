@@ -161,6 +161,8 @@ export const AgregarProducto = ({ id }) => {
             baseImponible: articulo.impuestos[0].baseImponible,
             valor: articulo.impuestos[0].valor,
         }));
+
+        setventanaResultadoProductos(false)
     }
 
     // Debounce para evitar ejecutar en cada tecla
@@ -191,9 +193,6 @@ export const AgregarProducto = ({ id }) => {
                         }}
                         disabled={!isEditable}
                         onFocus={() => setventanaResultadoProductos(true)}
-                        onBlur={() => {
-                            setTimeout(() => setventanaResultadoProductos(false), 500);
-                        }}
                         autoComplete="off"
                     />
                 </div>
@@ -229,7 +228,7 @@ export const AgregarProducto = ({ id }) => {
                 </div>
 
                 <div className='flex flex-col'>
-                    <label htmlFor={`descuento-${id}`} className='mb-1'>Descuento {'%'}</label>
+                    <label htmlFor={`descuento-${id}`} className='mb-1'>Descuento %</label>
                     <input
                         id={`descuento-${id}`}
                         type="text"
@@ -255,15 +254,50 @@ export const AgregarProducto = ({ id }) => {
                 </div>
 
                 {ventanaResultadoProductos && dataProducto?.length > 0 && (
-                    <div className="bg-gradient-to-t from-[#102940] to-[#182a3b] w-full h-40 absolute rounded-xl p-2 bottom-[110%] text-gray-200">
-                        <ul className="overflow-auto barra h-full w-full">
+                    <div className="bg-gradient-to-t from-[#102940] to-[#182a3b] w-full h-72 absolute rounded-xl p-2 bottom-[110%] text-gray-200">
+
+                        <div className='flex items-center justify-between px-3 mb-3'>
+
+                            <h2 className=''>RESULTADOS:</h2>
+
+                            <button
+                                type='button'
+                                onClick={() => setventanaResultadoProductos(false)}
+                                className="font-semibold text-gray-100 cursor-pointer rounded-xl transition-colors px-4 py-1 border border-gray-100 flex gap-2 items-center hover:bg-[#d24148] hover:text-gray-200 hover:border-[#d24148]"
+                            >
+                                Cerrar
+                            </button>
+                        </div>
+
+                        <ul className="overflow-auto barra h-[calc(13.5rem)] w-full pr-3">
                             {dataProducto.map((p) => (
                                 <li
                                     key={p.codigoPrincipal}
-                                    className="text-nowrap px-3 py-1 hover:bg-[#2e4760] cursor-pointer rounded-lg w-full transition-colors"
+                                    className="text-nowrap px-3 py-1 hover:bg-[#2e4760] cursor-pointer rounded-lg w-full transition-colors bg-[#1c364f] my-3"
                                     onClick={() => llenarInputsArticulo(p)}
                                 >
-                                    <span className='font-bold'>ITEM:</span> {p.descripcion} - <span className='font-bold'>CÓDIGO:</span> {p.codigoPrincipal} - <span className='font-bold'>DESCUENTO:</span> {p.descuento.porcentaje}%
+
+                                    <div className='flex gap-10'>
+                                        <div className="flex flex-col">
+                                            <span className='font-bold text-[12px]'>Item</span>
+                                            <p className="-mt-1">{p.descripcion}</p>
+                                        </div>
+
+                                        <div className="flex flex-col">
+                                            <span className='font-bold text-[12px]'>Código</span>
+                                            <p className="-mt-1">{p.codigoPrincipal}</p>
+                                        </div>
+
+                                        <div className="flex flex-col">
+                                            <span className='font-bold text-[12px]'>Descuento</span>
+                                            <p className="-mt-1">{p.descuento.porcentaje} %</p>
+                                        </div>
+
+                                        <div className="flex flex-col">
+                                            <span className='font-bold text-[12px]'>Stock</span>
+                                            <p className="-mt-1">{p.cantidad}</p>
+                                        </div>
+                                    </div>
                                 </li>
                             ))}
                         </ul>

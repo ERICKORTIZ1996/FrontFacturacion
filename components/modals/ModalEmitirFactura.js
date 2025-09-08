@@ -172,23 +172,62 @@ export default function ModalEmitirFactura() {
                 detalles: productosFormateados
             })
 
+            console.log(dataFactura);
+
             // FIRMAR XML
-            // const { data: dataFirma } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/crearXML`, {
-            //     "nombreArchivo": "Cristhian_Lorenzo_Velez_Zambrano_000000023",
-            //     "password": "647435Ss"
-            // })
+            const { data: dataFirma } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/firmarXML3`, {
+                "nombreArchivo": dataFactura.data.nombreArchivo,
+                "password": "647435Ss" // Clave de la firma de usuario
+            })
+
+            console.log(dataFirma);
 
             // VALIDAR 
+            const { data: dataValidar } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/validar`, {
+                "nombreArchivo": dataFactura.data.nombreArchivo,
+            })
+
+            console.log(dataValidar);
+
+            return
+
+            // VERIFICAR
+            // const { data: dataVerificar } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/verificarFactura`, {
+            //     "nombreArchivo": dataFactura.data.nombreArchivo,
+            //    "claveAccesoComprobante": dataFactura.data.claveAcceso
+            // })
 
             // AUTORIZAR
 
-            console.log(dataFactura);
+            // const xmlBody = `
+            //     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ec="http://ec.gob.sri.ws.consulta">
+            //         <soapenv:Header/>
+            //         <soapenv:Body>
+            //             <ec:consultarComprobante>
+            //                 <claveAccesoComprobante>${dataFactura.data.claveAcceso}</claveAccesoComprobante>
+            //             </ec:consultarComprobante>
+            //         </soapenv:Body>
+            //         </soapenv:Envelope>
+            // `
+
+            // const { data: autorizar } = await axios.post(
+            //     'https://celcer.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl',
+            //     xmlBody,
+            //     {
+            //         headers: {
+            //             'Content-Type': 'text/xml;charset=UTF-8',
+            //             'SOAPAction': 'http://ec.gob.sri.ws.consulta/AutorizacionComprobantesOffline/consultarComprobante'
+            //         }
+            //     }
+            // );
+
+            // console.log(dataFactura);
 
             return dataFactura
 
         } catch (e) {
             console.log(e);
-            throw new Error(e.response.data.mensaje)
+            throw new Error(e.response.data.mensaje || e.response.data.estado)
         }
     };
 
@@ -207,6 +246,8 @@ export default function ModalEmitirFactura() {
             changeModalEmitirFactura()
         },
         onError: (error) => {
+            console.log(error);
+
             toast.error(error.message);
         }
     })
@@ -484,9 +525,9 @@ export default function ModalEmitirFactura() {
                                     {/* ================ */}
 
                                     {ventanaResultadosRuc && dataEmpresa?.ruc > 0 && (
-                                        <div className="bg-gradient-to-t from-[#102940] to-[#182a3b] w-full h-60 absolute rounded-xl p-2 top-[110%] text-gray-200">
+                                        <div className="bg-gradient-to-t from-[#102940] to-[#182a3b] w-full h-60 absolute rounded-xl p-2 top-[110%] text-gray-200 mb-3">
 
-                                            <div className='flex justify-between px-3'>
+                                            <div className='flex items-center justify-between px-3'>
 
                                                 <h2 className=''>RESULTADOS:</h2>
 
@@ -499,16 +540,35 @@ export default function ModalEmitirFactura() {
                                                 </button>
                                             </div>
 
-                                            <ul className="overflow-auto barra h-full w-full">
+                                            <ul className="overflow-auto barra h-[calc(11rem)] pr-3">
                                                 {dataEmpresa.sucursales.map((s) => (
                                                     s.puntosEmision.map((pe) => (
                                                         <li
                                                             key={pe.id}
-                                                            className="text-nowrap px-3 py-1 hover:bg-[#2e4760] cursor-pointer rounded-lg w-full transition-colors"
+                                                            className="text-nowrap px-3 py-1 bg-[#1c364f] my-3 hover:bg-[#2e4760] cursor-pointer rounded-lg w-full transition-colors"
                                                             onClick={() => llenarInputsRuc(dataEmpresa.ruc, dataEmpresa.razonSocial, dataEmpresa.dirMatriz, s.dirEstablecimiento, s.estab, pe?.ptoEmi, dataEmpresa.obligadoContabilidad)}
 
                                                         >
-                                                            <span className='font-bold'>Ruc:</span> {dataEmpresa.ruc} - <span className='font-bold'>Matriz:</span> {dataEmpresa.dirMatriz} - <span className='font-bold'>Dirección:</span> {s.dirEstablecimiento} - <span className='font-bold'> Pto. Emisión: </span> {pe?.ptoEmi}
+
+                                                            {/* <p>
+                                                                    <span className='font-bold'>Ruc:</span> {dataEmpresa.ruc}
+                                                            </p> */}
+
+                                                            <div className='flex gap-5'>
+                                                                <div className="flex flex-col">
+                                                                    <span className='font-bold text-[12px]'>Pto. Emisión</span>
+                                                                    <p className="-mt-1">{pe?.ptoEmi}</p>
+                                                                </div>
+                                                                <div className="flex flex-col">
+                                                                    <span className='font-bold text-[12px]'>Matriz</span>
+                                                                    <p className="-mt-1">{dataEmpresa.dirMatriz}</p>
+                                                                </div>
+
+                                                                <div className="flex flex-col">
+                                                                    <span className='font-bold text-[12px]'>Dirección</span>
+                                                                    <p className="-mt-1">{s.dirEstablecimiento}</p>
+                                                                </div>
+                                                            </div>
                                                         </li>
                                                     ))
                                                 ))}

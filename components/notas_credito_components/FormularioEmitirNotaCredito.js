@@ -20,6 +20,7 @@ export default function FormularioEmitirNotaCredito({ claveAcceso }) {
                 return
             }
 
+            // Crear XML
             const { data } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/notas-credito`,
                 {
                     claveAcceso: claveAcceso,
@@ -27,6 +28,32 @@ export default function FormularioEmitirNotaCredito({ claveAcceso }) {
                     ...(formData.get('accion') === 'parcial' && { detalles: productos })
                 }
             )
+
+            // console.log("CLAVE ACCESO ACTUAL: ", claveAcceso);
+            // console.log(data);
+            // console.log("CLAVE ACCESO ACTUALIZADA: ", data.notaCredito.claveAcceso);
+
+            // FIRMAR Nota Crédito
+            // const { data: dataFirma } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/notas-credito/firmar`, {
+            //     claveAcceso: data.notaCredito.claveAcceso
+            // })
+
+            // console.log(dataFirma);
+
+            // VALIDAR 
+            const { data: dataValidar } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/notas-credito/validar`, {
+                claveAcceso: data.notaCredito.claveAcceso
+            })
+
+            console.log(dataValidar);
+            return
+
+
+            // VERIFICAR
+            // const { data: dataVerificar } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/notas-credito/verificar`, {
+            //     claveAcceso: claveAcceso
+            // })
+
 
             toast.success(data.mensaje)
 

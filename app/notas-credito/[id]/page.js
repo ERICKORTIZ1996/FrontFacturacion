@@ -9,13 +9,37 @@ import EditarFactura from "@/components/emitir_facturas_componentes/EditarFactur
 import BotonRegresarNotasCredito from "@/components/notas_credito_components/BotonRegresarNotasCredito";
 
 async function obtenerFactura(nombreArchivo) {
-    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/nombre/${nombreArchivo}`);
-    return data
+    try {
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/nombre/${nombreArchivo}`);
+        return data
+    } catch (error) {
+        return null
+    }
 }
 
 export default async function NotaCredito({ params }) {
 
     const factura = await obtenerFactura(params.id);
+
+    // Renderizado condicional
+    if (!factura) {
+        return (
+            <ComprobarAcceso>
+                <MainLayout>
+
+                    <div className="flex items-center text-gray-800 gap-4">
+                        <BotonRegresarNotasCredito />
+                    </div>
+
+                    <div>
+                        <p className="text-2xl text-center font-semibold">Busqueda no encontrada</p>
+                        <p className="text-center">Porfavor, prueba refrescando la página o comunicate con soporte técnico</p>
+                    </div>
+                </MainLayout>
+            </ComprobarAcceso>
+        );
+    }
+
     const nombresApellidosCliente = factura.data.cliente.razonSocialComprador.split(" ")
 
     return (
@@ -194,6 +218,12 @@ export default async function NotaCredito({ params }) {
                             </span>
 
                             Artículos
+
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-[#478bb3]">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5" />
+                            </svg>
+
+                            <p className="text-sm flex gap-2 items-center font-semibold">Solo se podrá editar la cantidad</p>
 
                         </h2>
 

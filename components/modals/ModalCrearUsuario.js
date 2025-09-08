@@ -1,9 +1,10 @@
 'use client'
 
+import { useState } from 'react';
 import { Dialog, DialogPanel, DialogTitle, Button } from '@headlessui/react'
 import { useMainStore } from '@/store/mainStore'
 import { toast } from 'react-toastify';
-import { productoStockSchema } from '@/schema';
+import { quitarEmojing } from '@/helpers';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios'
 
@@ -12,32 +13,13 @@ export default function ModalCrearUsuario() {
     const modalCrearUsuario = useMainStore((state) => state.modalCrearUsuario)
     const changeModalCrearUsuario = useMainStore((state) => state.changeModalCrearUsuario)
 
+    const [viewPass, setViewPass] = useState(false)
+    const [viewConfirmPass, setViewConfirmPass] = useState(false)
+
     const queryClient = useQueryClient();
 
     const handleSubmit = async (formData) => {
-
-        const data = {
-            nombreUsuario: formData.get('nombre-usuario'),
-            emailUsuario: formData.get('email-usuario'),
-            password: formData.get('password'),
-            confirmarPassword: formData.get('confirmar-password'),
-            rol: formData.get('rol'),
-            empresa: formData.get('empresa'),
-            tipoIdentificacion: formData.get('tipo-identificacion'),
-            identificacion: formData.get('identificacion')
-        }
-
-        // const result = productoStockSchema.safeParse(data)
-
-        // if (!result.success) {
-        //     result.error.issues.forEach((issue) => {
-        //         toast.error(issue.message)
-        //     })
-        //     return
-        // }
-
         mutate(formData)
-
     }
 
     const crearUsuario = async (formData) => {
@@ -57,8 +39,14 @@ export default function ModalCrearUsuario() {
             return dataUsuario
 
         } catch (e) {
-            console.log(e);
-            throw new Error(e?.response?.data?.mensaje || e?.response?.data?.message?.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim());
+
+            if (e?.response?.data?.errores) {
+                const errorConArray = new Error();
+                errorConArray.message = e.response.data.errores;
+                throw errorConArray;
+            } else {
+                throw new Error(quitarEmojing(e?.response?.data?.message));
+            }
         }
     };
 
@@ -66,13 +54,18 @@ export default function ModalCrearUsuario() {
         mutationFn: crearUsuario, // Funcion a consultar
         onSuccess: (dataUsuario) => { // Petición exitosa
 
-            toast.success(dataUsuario.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
-            // queryClient.invalidateQueries({ queryKey: ['crear_producto'] });
-            // changeModalCrearUsuario()
+            toast.success(quitarEmojing(dataUsuario.message))
+            queryClient.invalidateQueries({ queryKey: ['crear_usuario'] });
+            changeModalCrearUsuario()
 
         },
         onError: (error) => {
-            toast.error(error.message);
+
+            if (Array.isArray(error.message)) {
+                error.message.forEach(e => toast.error(`${e.campo.toUpperCase()}: ${e.mensaje}`))
+            } else {
+                toast.error(error.message)
+            }
         }
     })
 
@@ -124,7 +117,7 @@ export default function ModalCrearUsuario() {
                                         <label htmlFor="email-usuario" className='mb-1'>Email</label>
                                         <input
                                             id='email-usuario'
-                                            type="text"
+                                            type="email"
                                             name='email-usuario'
                                             className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
                                             placeholder='Ej: Pantalones Jeans para Hombre, talla XL'
@@ -132,28 +125,50 @@ export default function ModalCrearUsuario() {
                                     </div>
 
                                     <div className='flex gap-5 w-full'>
-                                        <div className='flex-1 flex flex-col'>
+                                        <div className='flex-1 flex flex-col relative'>
 
                                             <label htmlFor="password" className='mb-1'>Contraseña</label>
                                             <input
                                                 id='password'
-                                                type="text"
+                                                type={`${viewPass ? 'text' : 'password'}`}
                                                 name='password'
-                                                className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                                className='outline-none bg-[#2e4760] rounded-lg pl-3 pr-10 py-1 border border-[#2e4760] focus:border-gray-300'
                                                 placeholder='Ej: Pantalones Jeans para Hombre, talla XL'
                                             />
+
+                                            <button
+                                                type="button"
+                                                className="absolute top-[30px] right-[5px] cursor-pointer hover:bg-[#102940] rounded-full transition-colors p-1"
+                                                onClick={() => setViewPass(!viewPass)}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 text-gray-400">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                </svg>
+                                            </button>
                                         </div>
 
-                                        <div className='flex-1 flex flex-col'>
+                                        <div className='flex-1 flex flex-col relative'>
 
                                             <label htmlFor="confirmar-password" className='mb-1'>Confirmar Contraseña</label>
                                             <input
                                                 id='confirmar-password'
-                                                type="text"
+                                                type={`${viewConfirmPass ? 'text' : 'password'}`}
                                                 name='confirmar-password'
-                                                className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                                className='outline-none bg-[#2e4760] rounded-lg pl-3 py-1 pr-10 border border-[#2e4760] focus:border-gray-300'
                                                 placeholder='Ej: Pantalones Jeans para Hombre, talla XL'
                                             />
+
+                                            <button
+                                                type="button"
+                                                className="absolute top-[30px] right-[5px] cursor-pointer hover:bg-[#102940] rounded-full transition-colors p-1"
+                                                onClick={() => setViewConfirmPass(!viewConfirmPass)}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 text-gray-400">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                </svg>
+                                            </button>
                                         </div>
                                     </div>
 
@@ -165,12 +180,12 @@ export default function ModalCrearUsuario() {
                                                 id="rol"
                                                 name="rol"
                                                 className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-full'
-                                                defaultValue="USUARIO"
                                             >
-                                                <option value="USUARIO">USUARIO</option>
-                                                <option value="iva2">ICE</option>
-                                                <option value="iva3">IRBPNR</option>
-                                                <option value="iva4">IEPS</option>
+                                                <option value="">-- Seleccionar --</option>
+                                                <option value="USUARIO">Usuario</option>
+                                                <option value="SUPER_ADMINISTRADOR">Super Administrador</option>
+                                                <option value="ADMINISTRADOR">Administrador</option>
+                                                <option value="AUDITOR">Auditor</option>
                                             </select>
                                         </div>
 
@@ -181,12 +196,9 @@ export default function ModalCrearUsuario() {
                                                 id="empresa"
                                                 name="empresa"
                                                 className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-full'
-                                                defaultValue="ffbcf58d-2043-4256-8477-68845e615972"
                                             >
-                                                <option value="ffbcf58d-2043-4256-8477-68845e615972">ffbcf58d-2043-4256-8477-68845e615972</option>
-                                                <option value="iva2">ICE</option>
-                                                <option value="iva3">IRBPNR</option>
-                                                <option value="iva4">IEPS</option>
+                                                <option value="">-- Seleccionar --</option>
+                                                <option value="5852cc6d-7139-4a9e-a300-159f28bdd4e6">DATASMART S.A.S.</option>
                                             </select>
                                         </div>
                                     </div>
@@ -200,12 +212,9 @@ export default function ModalCrearUsuario() {
                                                 id="tipo-identificacion"
                                                 name="tipo-identificacion"
                                                 className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-full'
-                                                defaultValue="CEDULA"
                                             >
+                                                <option value="">-- Seleccionar --</option>
                                                 <option value="CEDULA">CEDULA</option>
-                                                <option value="iva2">ICE</option>
-                                                <option value="iva3">IRBPNR</option>
-                                                <option value="iva4">IEPS</option>
                                             </select>
                                         </div>
 
@@ -218,6 +227,7 @@ export default function ModalCrearUsuario() {
                                                 name='identificacion'
                                                 className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
                                                 placeholder='Ej: Pantalones Jeans para Hombre, talla XL'
+                                                maxLength={10}
                                             />
                                         </div>
                                     </div>
@@ -247,7 +257,7 @@ export default function ModalCrearUsuario() {
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                     </svg>
-                                    Crear Producto
+                                    Crear Usuario
                                 </Button>
                             </form>
                         </div>

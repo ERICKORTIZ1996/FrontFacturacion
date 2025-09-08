@@ -2,10 +2,15 @@
 
 import { useState } from "react"
 import MainLayout from "@/components/layouts/MainLayout"
+import { useMainStore } from "@/store/mainStore"
 import ComprobarAcceso from "@/components/others/ComprobarAcceso"
-import axios from "axios"
+import MoldalPrimerReporteATS from "@/components/modals/MoldalPrimerReporteATS"
+import MoldalPrimerReporteTributario from "@/components/modals/MoldalPrimerReporteTributario"
 
 export default function Reportes() {
+
+    const changeModalPrimerReporteATS = useMainStore((state) => state.changeModalPrimerReporteATS)
+    const changeModalPrimerReporteTributario = useMainStore((state) => state.changeModalPrimerReporteTributario)
 
     const [ventanaATS, setVentanaATS] = useState(true)
     const [ventanaTributaria, setVentanaTributaria] = useState(false)
@@ -113,13 +118,14 @@ export default function Reportes() {
                                 <div>
                                     <h2 className="font-bold text-lg mb-3">Tasa de Conversión de Presupuestos</h2>
                                     <p>
-                                        El sistema podría mostrarte que el 80% de los presupuestos enviados a clientes se convierten en facturas pagadas. Esto te ayuda a saber qué tan efectivos son tus presupuestos.
+                                        El sistema podrá mostrarte los presupuestos enviados a clientes que se convierten en facturas pagadas. Esto te ayuda a saber qué tan efectivos son tus presupuestos.
                                     </p>
                                 </div>
 
                                 <button
                                     type="button"
                                     className="flex items-center bg-gray-100 font-semibold rounded-full px-4 py-1 w-fit text-gray-800 gap-2 mt-3 cursor-pointer"
+                                    onClick={() => changeModalPrimerReporteATS()}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
@@ -128,10 +134,9 @@ export default function Reportes() {
 
                                     Visualizar
                                 </button>
-
                             </div>
 
-                            <div className="fondoATS flex flex-col justify-between rounded-3xl px-8 py-5">
+                            {/* <div className="fondoATS flex flex-col justify-between rounded-3xl px-8 py-5">
 
                                 <div>
                                     <h2 className="font-bold text-lg mb-3">Tiempo Promedio de Cobro</h2>
@@ -175,7 +180,7 @@ export default function Reportes() {
                                     Visualizar
                                 </button>
 
-                            </div>
+                            </div> */}
 
                         </div>
 
@@ -213,13 +218,15 @@ export default function Reportes() {
                                 <div>
                                     <h2 className="font-bold text-lg mb-3">Reporte de Ventas por IVA {"("}Impuesto al Valor Agregado{")"}</h2>
                                     <p>
-                                        Este reporte desglosa las ventas de la empresa según las tasas de IVA aplicables (por ejemplo, 12% o 0%). Muestra el monto total de ventas, el IVA cobrado y el IVA pagado, lo que te permite determinar el monto exacto que debes declarar al ente regulador.
+                                        El reporte de ventas por IVA desglosa las ventas de la empresa según la tasa de impuesto aplicada.
+
                                     </p>
                                 </div>
 
                                 <button
                                     type="button"
                                     className="flex items-center bg-gray-100 font-semibold rounded-full px-4 py-1 w-fit text-gray-800 gap-2 mt-3 cursor-pointer"
+                                    onClick={() => changeModalPrimerReporteTributario()}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
@@ -231,7 +238,7 @@ export default function Reportes() {
 
                             </div>
 
-                            <div className="fondoTributario flex flex-col justify-between rounded-3xl px-8 py-5">
+                            {/* <div className="fondoTributario flex flex-col justify-between rounded-3xl px-8 py-5">
 
                                 <div>
                                     <h2 className="font-bold text-lg mb-3">Reporte de Ingresos por Periodo Fiscal</h2>
@@ -252,7 +259,7 @@ export default function Reportes() {
                                     Visualizar
                                 </button>
 
-                            </div>
+                            </div> */}
 
                         </div>
 
@@ -302,6 +309,29 @@ export default function Reportes() {
                             <div className="fondoOtros flex flex-col justify-between rounded-3xl px-8 py-5">
 
                                 <div>
+                                    <h2 className="font-bold text-lg mb-3">En construcción</h2>
+                                    <p>
+                                        En construcción...
+                                    </p>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    className="flex items-center bg-gray-100 font-semibold rounded-full px-4 py-1 w-fit text-gray-800 gap-2 mt-3 cursor-pointer"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                    </svg>
+
+                                    En construcción
+                                </button>
+
+                            </div>
+
+                            {/* <div className="fondoOtros flex flex-col justify-between rounded-3xl px-8 py-5">
+
+                                <div>
                                     <h2 className="font-bold text-lg mb-3">Ingresos obtenidos del último mes</h2>
                                     <p>
                                         Este reporte desglosa las ganancias obtenidas en el últmo mes, el cual incluye los siguientes parámetros: total importe, promedio importe, ganancias diarias, ganancias semenanles, ganancia quincenal, facturas ingresadas, etc.
@@ -320,36 +350,15 @@ export default function Reportes() {
                                     Visualizar
                                 </button>
 
-                            </div>
-
-                            <div className="fondoOtros flex flex-col justify-between rounded-3xl px-8 py-5">
-
-                                <div>
-                                    <h2 className="font-bold text-lg mb-3">Productos en aumento</h2>
-                                    <p>
-                                        Ten una referencia de los artículos mas vendidos para realizar tu proximo importe, esto te ayuda a tener una mejor idea de lo que puedes seguir ofreciendo a tu cliente
-                                    </p>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    className="flex items-center bg-gray-100 font-semibold rounded-full px-4 py-1 w-fit text-gray-800 gap-2 mt-3 cursor-pointer"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                    </svg>
-
-                                    Visualizar
-                                </button>
-
-                            </div>
+                            </div> */}
 
                         </div>
 
                     </div>
                 )}
 
+                <MoldalPrimerReporteATS />
+                <MoldalPrimerReporteTributario />
             </MainLayout >
         </ComprobarAcceso>
     )

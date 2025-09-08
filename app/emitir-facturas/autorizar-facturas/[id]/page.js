@@ -1,23 +1,44 @@
 import axios from "axios";
 import MainLayout from "@/components/layouts/MainLayout";
 import ComprobarAcceso from "@/components/others/ComprobarAcceso";
-import { formatearFecha } from "@/helpers";
+import { formatearFecha, getStatusBill } from "@/helpers";
 import BotonReenviarFactura from "@/components/emitir_facturas_componentes/BotonReenviarFactura";
-import TotalFactura from "@/components/emitir_facturas_componentes/TotalFactura";
 import InicializarAutorizarFactura from "@/components/emitir_facturas_componentes/InicializarAutorizarFactura";
-import EditarFactura from "@/components/emitir_facturas_componentes/EditarFactura";
 import BotonRegresarAutorizarFactura from "@/components/emitir_facturas_componentes/BotonRegresarAutorizarFactura";
 
 async function obtenerFactura(nombreArchivo) {
-    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/nombre/${nombreArchivo}`);
-    return data
+    try {
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/nombre/${nombreArchivo}`);
+        return data
+    } catch (error) {
+        return null
+    }
 }
 
 export default async function FacturaPendiente({ params }) {
 
     const factura = await obtenerFactura(params.id);
+
+    // Renderizado condicional
+    if (!factura) {
+        return (
+            <ComprobarAcceso>
+                <MainLayout>
+
+                    <div className="flex items-center text-gray-800 gap-4">
+                        <BotonRegresarAutorizarFactura />
+                    </div>
+
+                    <div>
+                        <p className="text-2xl text-center font-semibold">Busqueda no encontrada</p>
+                        <p className="text-center">Porfavor, prueba refrescando la página o comunicate con soporte técnico</p>
+                    </div>
+                </MainLayout>
+            </ComprobarAcceso>
+        );
+    }
+
     const nombresApellidosCliente = factura.data.cliente.razonSocialComprador.split(" ")
-    console.log(factura);
 
     return (
         <ComprobarAcceso>
@@ -198,23 +219,89 @@ export default async function FacturaPendiente({ params }) {
 
                         </h2>
 
-                        <EditarFactura />
+                        {factura.data.detalles.map(detalle => {
+
+                            const subtotal = detalle.cantidad * detalle.precioUnitario;
+                            const total = subtotal - (subtotal * detalle.descuento) / 100;
+
+                            return (
+                                <div
+                                    className='flex gap-3 mt-4 border-b pb-5 border-b-[#486b8f] last-of-type:border-none'
+                                    key={detalle.id}
+                                >
+
+                                    <div className='flex-1 flex flex-col'>
+                                        <span className="">Descrispanción</span>
+                                        <p
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 disabled:cursor-not-allowed'
+                                        >
+                                            {detalle.descripcion}
+                                        </p>
+
+                                    </div>
+
+                                    <div className='flex-1 flex flex-col'>
+                                        <span>Cantidad</span>
+                                        <p
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 disabled:cursor-not-allowed'
+                                        >
+                                            {detalle.cantidad}
+                                        </p>
+                                    </div>
+
+                                    <div className='flex-1 flex flex-col'>
+                                        <span>Precio Unitario</span>
+                                        <p
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 disabled:cursor-not-allowed'
+                                        >
+                                            {detalle.precioUnitario}
+                                        </p>
+                                    </div>
+
+                                    <div className='flex-1 flex flex-col'>
+                                        <span>Descuento</span>
+                                        <p
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 disabled:cursor-not-allowed'
+                                        >
+                                            {detalle.descuento}
+                                        </p>
+                                    </div>
+
+                                    <div className='flex-1 flex flex-col'>
+                                        <span>Total - Con IVA</span>
+
+                                        <p
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 disabled:cursor-not-allowed'
+                                        >
+                                            $ {total}
+                                        </p>
+                                    </div>
+                                </div>)
+                        })}
 
                     </div>
 
                     <div>
 
-                        <TotalFactura
-                            subtotal={factura.data.totalSinImpuestos}
-                            descuento={factura.data.totalDescuento}
-                            codigoImpuesto={factura.data.impuestos[0].codigo}
-                            porcentajeImpuesto={factura.data.impuestos[0].codigoPorcentaje}
-                            valorImpuesto={factura.data.impuestos[0].valor}
-                            total={factura.data.importeTotal}
-                        />
+                        <div className="rounded-3xl bg-gradient-to-b from-[#153350]/60 to-[#1f3850]/60 px-6 py-4">
+
+                            <span className="block">SUBTOTAL: $ {Number(factura.data.totalSinImpuestos).toFixed(2)}</span>
+                            <span className="block">DESCUENTO: $ {Number(factura.data.totalDescuento).toFixed(2)}</span>
+                            <span className="block">{factura.data.impuestos[0].codigo} {factura.data.impuestos[0].codigoPorcentaje}: $ {Number(factura.data.impuestos[0].valor).toFixed(2)}</span>
+
+                            <div className="flex gap-3 items-center mt-5">
+
+                                <p className='font-semibold text-gray-200 border border-gray-200 rounded-xl px-3 py-1 w-fit'>
+                                    Total a Pagar: $ {Number(factura.data.importeTotal).toFixed(2)}
+                                </p>
+                            </div>
+
+                            <p className={`${getStatusBill(factura.data.estado)} text-sm rounded-full px-2 py-1 inline-block mt-3`}>{factura.data.estado}</p>
+                        </div>
 
                         <BotonReenviarFactura
-                            idFctura="1"
+                            nombreArchivo={factura.data.nombreArchivo}
+                            claveAcceso={factura.data.claveAcceso}
                         />
 
                     </div>

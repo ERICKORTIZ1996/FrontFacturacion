@@ -2,7 +2,7 @@ import MainLayout from "@/components/layouts/MainLayout"
 import Image from "next/image"
 import ModalNotificacionesGlobales from "@/components/modals/ModalNotificacionesGlobales"
 import Link from "next/link"
-import BotonNotificacionesGlobales from "@/components/emitir_facturas_componentes/BotonNotificacionesGlobales"
+import Header from "@/components/emitir_facturas_componentes/Header"
 import GraficoFacturas from "@/components/emitir_facturas_componentes/GraficoFacturas"
 import ComprobarAcceso from "@/components/others/ComprobarAcceso"
 
@@ -12,15 +12,7 @@ export default function Inicio() {
         <ComprobarAcceso>
             <MainLayout>
 
-                <div className="flex justify-between items-start">
-
-                    <div>
-                        <p className="text-xl">Bienvenido, <span className="font-semibold text-gray-200">DEMO</span></p>
-                        <p>Aquí esta el resumen de tu negocio</p>
-                    </div>
-
-                    <BotonNotificacionesGlobales />
-                </div>
+                <Header />
 
                 <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5">
                     <div className="min-w-0">

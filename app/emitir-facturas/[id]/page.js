@@ -11,7 +11,6 @@ async function obtenerFactura(nombreArchivo) {
         const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/nombre/${nombreArchivo}`);
         return data
     } catch (e) {
-        console.log(encodeURI);
         return null
     }
 
@@ -49,8 +48,6 @@ export default async function Factura({ params }) {
             </ComprobarAcceso>
         );
     }
-
-    console.log(factura.data);
 
     const nombresApellidosCliente = factura.data.cliente.razonSocialComprador.split(" ")
 
@@ -309,9 +306,7 @@ export default async function Factura({ params }) {
                                             </span>
                                         </div>
                                     </div>)
-                            })
-                        }
-
+                            })}
                     </div>
 
                     <div>
@@ -349,7 +344,7 @@ export default async function Factura({ params }) {
 
                                     <div className="border border-gray-200 rounded-xl mt-3 px-3 py-1">
 
-                                        <p>Valida tu factura <br /> para poder imprimirla</p>
+                                        <p>Firma tu factura <br /> para poder imprimirla</p>
                                     </div>
                                 </>
                             )}

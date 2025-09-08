@@ -87,11 +87,6 @@ export const productoSchema = z.object({
             .refine((val) => val >= 0, { message: "DESCUENTO: debe ser mayor o igual a 0" })),
 })
 
-export const loginSchema = z.object({
-    user: z.email({ message: 'Porfavor, Ingresa un correo válido.' }),
-    pass: z.string()
-})
-
 export const crearEmpresaSchema = z.object({
     ruc: z.string().min(13, 'RUC: Debe tener al menos 13 caracteres').regex(/^\d+$/, "RUC: No permite carácteres especiales"),
     razonSocial: z.string().min(1, 'RAZÓN SOCIALl: Es requerida'),

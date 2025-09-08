@@ -2,17 +2,57 @@
 
 import axios from "axios";
 
-export default function BotonReenviarFactura({ idFctura }) {
-
+export default function BotonReenviarFactura({ nombreArchivo, claveAcceso }) {
 
     const reenviarFactura = async () => {
-        try {
-            console.log(idFctura);
 
-        } catch (error) {
-            console.log(error);
+        // FIRMAR XML
+        const { data: dataFirma } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/firmarXML3`, {
+            "nombreArchivo": nombreArchivo,
+            "password": "647435Ss" // Clave de la firma de usuario
+        })
 
-        }
+        console.log(dataFirma);
+
+        // VALIDAR 
+        const { data: dataValidar } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/validar`, {
+            "nombreArchivo": nombreArchivo,
+        })
+
+        console.log(dataValidar);
+
+        return
+
+        // VERIFICAR
+        // const { data: dataVerificar } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/verificarFactura`, {
+        //     "nombreArchivo": nombreArchivo,
+        //    "claveAccesoComprobante": claveAcceso
+        // })
+
+        // AUTORIZAR
+        // const xmlBody = `
+        //     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ec="http://ec.gob.sri.ws.consulta">
+        //         <soapenv:Header/>
+        //         <soapenv:Body>
+        //             <ec:consultarComprobante>
+        //                 <claveAccesoComprobante>${claveAcceso}</claveAccesoComprobante>
+        //             </ec:consultarComprobante>
+        //         </soapenv:Body>
+        //         </soapenv:Envelope>
+        // `
+
+        // const { data: autorizar } = await axios.post(
+        //     'https://celcer.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl',
+        //     xmlBody,
+        //     {
+        //         headers: {
+        //             'Content-Type': 'text/xml;charset=UTF-8',
+        //             'SOAPAction': 'http://ec.gob.sri.ws.consulta/AutorizacionComprobantesOffline/consultarComprobante'
+        //         }
+        //     }
+        // );
+
+        // console.log(dataFactura);
     }
 
     return (

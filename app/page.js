@@ -3,15 +3,15 @@
 import CryptoJS from "crypto-js";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { loginSchema } from "@/schema";
+import axios from "axios";
 import { toast } from "react-toastify";
 import { useMainStore } from "@/store/mainStore";
+import { quitarEmojing } from "@/helpers";
 
 export default function Home() {
 
   const setDataUser = useMainStore((state) => state.setDataUser);
   const dataUser = useMainStore((state) => state.dataUser)
-
 
   const [viewPass, setViewPass] = useState(false)
   const router = useRouter();
@@ -19,65 +19,52 @@ export default function Home() {
   const encryptData = (data) => {
 
     return CryptoJS.AES.encrypt(JSON.stringify({
-      id: data.id,
-      active: data.active,
-      phone: data.phone,
-      token: data.token,
+      tokenAcceso: data.tokenAcceso,
+      tokenRenovacion: data.tokenRenovacion,
       email: data.email,
-      name: data.name
+      id: data.id,
+      nombre: data.nombre,
+      rol: data.rol
     }), process.env.NEXT_PUBLIC_KEY_CRYPTO).toString();
   };
 
   const handleSubmitIniciarSesion = async (formData) => {
 
-    const data = {
-      user: formData.get('user'),
-      pass: formData.get('pass')
-    }
-
-    const result = loginSchema.safeParse(data)
-
-    if (!result.success) {
-      result.error.issues.forEach(issue => {
-        toast.error(issue.message)
-      })
-      return
-    }
-
-    if (formData.get('user') !== "demo@demo.com") {
-      toast.error("Este usuario no existe")
-      return
-    }
-
-    if (formData.get('pass') !== "demo") {
-      toast.error("Contraseña incorrecta")
-      return
-    }
-
     try {
+      const { data } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/auth/login`, {
+        email: formData.get('user'),
+        contraseña: formData.get('pass')
+      })
+
+      console.log(data);
 
       setDataUser({
-        id: "aefae-45tasfdga-erasdfasd",
-        active: true,
-        phone: "0989485560",
-        token: "asdfafd-aerasdtreg-afhadfaadsf*adsfa-asdfasdf",
-        email: "demo@demo.com",
-        name: "demo"
+        tokenAcceso: data.data.tokens.tokenAcceso,
+        tokenRenovacion: data.data.tokens.tokenRenovacion,
+        email: data.data.usuario.email,
+        id: data.data.usuario.id,
+        nombre: data.data.usuario.nombre,
+        rol: data.data.usuario.rol
       })
 
       localStorage.setItem('dataUser', encryptData({
-        id: "aefae-45tasfdga-erasdfasd",
-        active: true,
-        phone: "0989485560",
-        token: "asdfafd-aerasdtreg-afhadfaadsf*adsfa-asdfasdf",
-        email: "demo@demo.com",
-        name: "demo"
+        tokenAcceso: data.data.tokens.tokenAcceso,
+        tokenRenovacion: data.data.tokens.tokenRenovacion,
+        email: data.data.usuario.email,
+        id: data.data.usuario.id,
+        nombre: data.data.usuario.nombre,
+        rol: data.data.usuario.rol
       }))
 
       router.push('/inicio')
 
     } catch (e) {
-      console.log(e);
+
+      if (e?.response?.data?.errores?.length) {
+        e.response.data.errores.map(error => toast.error(`${error.campo.toUpperCase()}: ${error.mensaje}`))
+      } else {
+        toast.error(quitarEmojing(e?.response?.data?.message))
+      }
     }
 
   }

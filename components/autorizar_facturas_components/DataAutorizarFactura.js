@@ -2,13 +2,13 @@
 
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import TablaEmitirFacturas from "../tables/TablaEmitirFacturas"
+import TablaAutorizarFactura from "../tables/TablaAutorizarFactura"
 import SmallSpinner from "../layouts/SmallSpinner"
-import Paginacion from "./Paginacion"
+import Paginacion from "../emitir_facturas_componentes/Paginacion"
 import axios from "axios"
 import { getStatusBill } from "@/helpers"
 
-export default function DataFactura() {
+export default function DataAutorizarFactura() {
 
     const [filtroEstado, setfiltroEstado] = useState(null)
 
@@ -23,17 +23,11 @@ export default function DataFactura() {
                 case 'ERROR':
                     url = `${baseUrl}/estado/ERROR`;
                     break;
-                case 'FIRMADA':
-                    url = `${baseUrl}/estado/FIRMADA`;
-                    break;
                 case 'AUTORIZADA':
                     url = `${baseUrl}/estado/AUTORIZADA`;
                     break;
                 case 'PENDIENTE':
                     url = `${baseUrl}/estado/PENDIENTE`;
-                    break;
-                case 'RECHAZADA':
-                    url = `${baseUrl}/estado/RECHAZADA`;
                     break;
                 default:
                     url = baseUrl;
@@ -57,8 +51,8 @@ export default function DataFactura() {
     })
 
     return (
-
         <>
+
             <div className="flex gap-3 items-center">
 
                 <button
@@ -67,13 +61,6 @@ export default function DataFactura() {
                     onClick={() => setfiltroEstado()}
                 >
                     Todas
-                </button>
-                <button
-                    type="button"
-                    className={`${getStatusBill("FIRMADA")} text-sm rounded-full px-2 py-1 hover:bg-green-300 transition-colors cursor-pointer`}
-                    onClick={() => setfiltroEstado('FIRMADA')}
-                >
-                    Firmadas
                 </button>
                 <button
                     type="button"
@@ -88,13 +75,6 @@ export default function DataFactura() {
                     onClick={() => setfiltroEstado('PENDIENTE')}
                 >
                     Pendientes
-                </button>
-                <button
-                    type="button"
-                    className={`${getStatusBill("RECHAZADA")} text-sm rounded-full px-2 py-1 hover:bg-purple-300 transition-colors cursor-pointer`}
-                    onClick={() => setfiltroEstado('RECHAZADA')}
-                >
-                    Rechazadas
                 </button>
                 <button
                     type="button"
@@ -125,7 +105,7 @@ export default function DataFactura() {
 
                         <tbody>
                             {data.data.map(factura => (
-                                <TablaEmitirFacturas
+                                <TablaAutorizarFactura
                                     key={factura.id}
                                     factura={factura}
                                 />

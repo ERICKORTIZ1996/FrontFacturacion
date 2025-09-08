@@ -47,7 +47,7 @@ export const consultarFechaEcuador = () => {
 export const getStatusBill = (status) => {
 
     switch (status) {
-        case "VALIDADA":
+        case "FIRMADA":
             return "text-green-950 bg-green-200"
         case "AUTORIZADA":
             return "text-blue-950 bg-blue-200"
@@ -61,4 +61,8 @@ export const getStatusBill = (status) => {
             return "text-green-950 bg-green-200"
     }
 
+}
+
+export const quitarEmojing = (texto) => {
+    return texto.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim()
 }

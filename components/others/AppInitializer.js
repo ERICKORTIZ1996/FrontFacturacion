@@ -12,7 +12,8 @@ export default function AppInitializer() {
 
     useEffect(() => {
 
-        const tieneAcceso = !!dataUser?.token && !!dataUser?.active;
+        // const tieneAcceso = !!dataUser?.tokenAcceso && !!dataUser?.active; -> En caso de que exista el campo active (agregarlo al momento de hacer login)
+        const tieneAcceso = !!dataUser?.tokenAcceso;
         setAcceso(tieneAcceso);
         setIsLoading(false);
 

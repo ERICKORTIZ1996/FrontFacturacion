@@ -1,18 +1,9 @@
 import MainLayout from "@/components/layouts/MainLayout"
-import Paginacion from "@/components/emitir_facturas_componentes/Paginacion"
-import TablaAutorizarFactura from "@/components/tables/TablaAutorizarFactura"
 import ComprobarAcceso from "@/components/others/ComprobarAcceso"
 import Link from "next/link"
-import axios from "axios"
-
-async function consultarFacturas() {
-  const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/estado/PENDIENTE`);
-  return data
-}
+import DataAutorizarFactura from "@/components/autorizar_facturas_components/DataAutorizarFactura"
 
 export default async function AutorizarFacturas() {
-
-  const facturas = await consultarFacturas()
 
   return (
     <ComprobarAcceso>
@@ -41,17 +32,11 @@ export default async function AutorizarFacturas() {
         </div>
 
         <p className="mt-3">
-          En esta sección podras editar las facturas que tengan como estado 'Pendiente'. Asegurate de ingresar la información correcta. Solo se podran editar los productos existentes.
+          En esta sección podras reenviar las facturas que hayan tenido algun problema en el proceso en envio al SRI
         </p>
 
 
-        <div className="mt-5 flex items-center justify-between bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3">
-
-          <p
-            className="px-3 py-1 rounded-xl transition-colors text-yellow-950 bg-yellow-200 shadow-xl"
-          >
-            Facturas Pendientes
-          </p>
+        <div className="mt-5 flex items-center justify-end bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3">
 
           <div className="w-1/3 relative">
 
@@ -70,38 +55,7 @@ export default async function AutorizarFacturas() {
 
         <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
 
-          {facturas.data && facturas.data.length ? (
-            <>
-              <table className="w-full mt-5">
-                <thead className="bg-[#05121f]/60">
-                  <tr className="border-b-2 border-[#061727]">
-                    <th className="text-start font-semibold p-2">Número de Factura</th>
-                    <th className="text-start font-semibold p-2">Total</th>
-                    <th className="text-start font-semibold p-2">Subtotal</th>
-                    <th className="text-start font-semibold p-2">Descuento</th>
-                    <th className="text-start font-semibold p-2">Fecha</th>
-                    <th className="text-start font-semibold p-2">Estado</th>
-                    <th className="text-start font-semibold p-2">Acciones</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {facturas.data.map(factura => (
-                    <TablaAutorizarFactura
-                      key={factura.id}
-                      factura={factura}
-                    />
-                  ))}
-                </tbody>
-              </table>
-
-              <Paginacion
-              // data={bills}
-              />
-            </>
-          ) : (
-            <p className="text-center uppercase">Sin datos</p>
-          )}
+          <DataAutorizarFactura />
 
         </div>
 

@@ -29,7 +29,7 @@ export default function NavBar() {
                         />
                     </div>
 
-                    <ul className="px-5 pt-8 space-y-3">
+                    <ul className="px-5 pt-3 space-y-2">
                         <li>
                             <Link
                                 href={'/inicio'}
@@ -118,7 +118,17 @@ export default function NavBar() {
                 </div>
 
                 <ul className="px-5 mb-5">
-                    {/* 077eeb - azul*/}
+                    <li>
+                        <Link
+                            href={'/mis-datos'}
+                            className={`${pathname === '/mis-datos' ? ' shadow-lg text-white  shadow-[#03284b] bg-[#077eeb]' : ''} block rounded-full hover:bg-[#077eeb] hover:shadow-lg hover:shadow-[#03284b] text-white p-2 w-fit transition-all`}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                            </svg>
+
+                        </Link>
+                    </li>
                     <li>
                         <Link
                             href={'/'}

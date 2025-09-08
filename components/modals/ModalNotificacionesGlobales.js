@@ -2,9 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { useMainStore } from "@/store/mainStore"
-import { Dialog, DialogPanel, DialogTitle, Button } from '@headlessui/react'
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import Link from "next/link"
 import SmallSpinner from "../layouts/SmallSpinner"
+import { getStatusBill } from "@/helpers"
 import axios from "axios"
 
 export default function ModalNotificacionesGlobales() {
@@ -14,7 +15,7 @@ export default function ModalNotificacionesGlobales() {
 
     const consultarFacturasPendientes = async () => {
         try {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/estado/PENDIENTE`);
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas`);
             return data
         } catch (error) {
             console.log(error);
@@ -33,7 +34,7 @@ export default function ModalNotificacionesGlobales() {
             <Dialog open={modalNotificacionesGlobales} onClose={() => { changeModalNotificacionesGlobales() }} className="relative z-50">
                 <div className="fixed inset-0 flex w-screen items-start justify-end p-4 bg-transparent">
 
-                    <DialogPanel className="w-[22rem] h-80  space-y-4 p-3 rounded-3xl shadow shadow-[#245e95] bg-gradient-to-b from-[#153350] to-[#1f3850] mr-20">
+                    <DialogPanel className="w-[22rem] h-96  space-y-4 p-3 rounded-3xl shadow shadow-[#245e95] bg-gradient-to-b from-[#153350] to-[#1f3850] mr-20">
 
                         <div
                             className='flex justify-between items-center border-b border-b-[#486b8f] p-1'
@@ -45,7 +46,7 @@ export default function ModalNotificacionesGlobales() {
                         {isLoading ? (
                             <SmallSpinner />
                         ) : data?.data && data?.data?.length ? (
-                            <ul className="flex flex-col gap-2 pr-3 overflow-y-auto h-[calc(15rem)] barra">
+                            <ul className="flex flex-col gap-2 pr-3 overflow-y-auto h-[calc(19rem)] barra">
                                 {data?.data?.map(factura => (
                                     <li
                                         key={factura.id}
@@ -55,7 +56,7 @@ export default function ModalNotificacionesGlobales() {
                                         <div className="flex flex-col gap-0">
                                             <p className="font-semibold">Factura: {factura.nombreArchivo.split("_")[4]}</p>
 
-                                            <p className="px-1 rounded-xl transition-colors text-yellow-950 bg-yellow-200 shadow-xl text-[12px] w-fit lowercase">
+                                            <p className={`${getStatusBill(factura.estado)} px-1 rounded-xl shadow-xl text-[12px] w-fit lowercase`}>
                                                 {factura.estado}
                                             </p>
 

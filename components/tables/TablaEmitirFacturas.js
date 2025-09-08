@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { formatearFecha, getStatusBill } from "@/helpers"
+import { getStatusBill, formatearFechaFactura } from "@/helpers"
 
 export default function TablaEmitirFacturas({ factura }) {
 
@@ -9,7 +9,7 @@ export default function TablaEmitirFacturas({ factura }) {
             <td className="p-2">$ {factura.importeTotal}</td>
             <td className="p-2">$ {factura.totalSinImpuestos}</td>
             <td className="p-2">{factura.totalDescuento}</td>
-            <td className="p-2 text-sm">{formatearFecha(factura.fechaEmision)}</td>
+            <td className="p-2 text-sm">{formatearFechaFactura(factura.fechaEmision)}</td>
             <td className="p-2">
                 <span
                     className={`${getStatusBill(factura?.estado)} text-sm rounded-full px-2 py-1 lowercase`}

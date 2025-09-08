@@ -12,14 +12,13 @@ export default function TotalFactura({
     total
 }) {
 
-    const productos = useMainStore((state) => state.productos)
+    // const productos = useMainStore((state) => state.productos)
     // console.log(productos);
 
-
-    const totalSinIVA = useMemo(() => {
-        const lista = Array.isArray(productos) ? productos : [];
-        return lista.reduce((total, p) => total + (Number(p?.precioUnitario) || 0), 0);
-    }, [productos]);
+    // const totalSinIVA = useMemo(() => {
+    //     const lista = Array.isArray(productos) ? productos : [];
+    //     return lista.reduce((total, p) => total + (Number(p?.precioUnitario) || 0), 0);
+    // }, [productos]);
 
     return (
         <div className="rounded-3xl bg-gradient-to-b from-[#153350]/60 to-[#1f3850]/60 px-6 py-4">

@@ -1,7 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import { useMemo, useState } from "react";
 import { toast } from 'react-toastify';
 import { productoSchema } from "@/schema";
 import { useMainStore } from "@/store/mainStore";
@@ -20,9 +19,6 @@ export const EditarProducto = ({ id, detalle }) => {
     const [agrePro, setAgrePro] = useState(true)
     const [editarPro, setEditarPro] = useState(false)
 
-    console.log(editar || agrePro ? !editarPro : null);
-
-
     // detalle
     const [codigoPrincipal, setcodigoPrincipal] = useState(detalle?.codigoPrincipal)
     const [descripcionProducto, setDescripcionProducto] = useState(detalle?.descripcion)
@@ -33,7 +29,10 @@ export const EditarProducto = ({ id, detalle }) => {
 
     // console.log(detalle);
 
-    const total = useMemo(() => (cantidadProducto * precioUnitario), [cantidadProducto, precioUnitario])
+    const subtotal = detalle?.cantidad * detalle?.precioUnitario;
+    const total = subtotal - (subtotal * detalle?.descuento) / 100;
+
+    // const total = useMemo(() => (cantidadProducto * precioUnitario), [cantidadProducto, precioUnitario])
 
     const editarProducto = async () => {
 
@@ -144,7 +143,7 @@ export const EditarProducto = ({ id, detalle }) => {
                 </div>
 
                 <div className='flex flex-col'>
-                    <label htmlFor={`precio-unitario-${id}`} className='mb-1'>Precio Unitario - Sin IVA</label>
+                    <label htmlFor={`precio-unitario-${id}`} className='mb-1'>Precio Unitario</label>
                     <input
                         id={`precio-unitario-${id}`}
                         type="text"
@@ -157,7 +156,7 @@ export const EditarProducto = ({ id, detalle }) => {
                 </div>
 
                 <div className='flex flex-col'>
-                    <label htmlFor={`descuento-${id}`} className='mb-1'>Descuento</label>
+                    <label htmlFor={`descuento-${id}`} className='mb-1'>Descuento %</label>
                     <input
                         id={`descuento-${id}`}
                         type="text"
@@ -170,7 +169,7 @@ export const EditarProducto = ({ id, detalle }) => {
                 </div>
 
                 <div className='flex flex-col'>
-                    <label htmlFor={`total-${id}`} className='mb-1'>Total - Con IVA</label>
+                    <label htmlFor={`total-${id}`} className='mb-1'>Total</label>
                     <input
                         id={`total-${id}`}
                         type="text"

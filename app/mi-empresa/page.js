@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import MainLayout from "@/components/layouts/MainLayout"
 import ComprobarAcceso from "@/components/others/ComprobarAcceso"
 import TablaEmpresas from "@/components/tables/TablaEmpresas"
