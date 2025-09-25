@@ -131,9 +131,6 @@ export const AgregarProducto = ({ id }) => {
             { signal } // <-- Cancelación automática aquí
         );
 
-        console.log(data.data);
-
-
         return data?.data ?? [];
     };
 

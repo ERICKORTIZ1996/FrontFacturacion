@@ -145,7 +145,7 @@ export default function ModalEmitirFactura() {
                 dirMatriz: formData.get('matriz'),
                 dirEstablecimiento: formData.get('direccion'),
                 obligadoContabilidad: formData.get('obligadoContabilidad'),
-                tipoIdentificacionComprador: formData.get('tipo-identificacion'),
+                tipoIdentificacionComprador: formData.get('tipo-identificacion'), // Solo funciona con RUC. formData.get('tipo-identificacion'),
                 razonSocialComprador: `${formData.get('nombres-cliente')} ${formData.get('apellidos-cliente')}`,
                 identificacionComprador: formData.get('identificacion-cliente'),
                 direccionComprador: formData.get('direccion-comprador'),
@@ -173,6 +173,7 @@ export default function ModalEmitirFactura() {
             })
 
             console.log(dataFactura);
+            toast.success(dataFactura.data.mensaje)
 
             // FIRMAR XML
             const { data: dataFirma } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/firmarXML3`, {
@@ -181,6 +182,7 @@ export default function ModalEmitirFactura() {
             })
 
             console.log(dataFirma);
+            toast.success(dataFirma.data.message)
 
             // VALIDAR 
             const { data: dataValidar } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/validar`, {
@@ -188,17 +190,19 @@ export default function ModalEmitirFactura() {
             })
 
             console.log(dataValidar);
+            toast.success(dataValidar.data.estado)
 
-            return
 
             // VERIFICAR
-            // const { data: dataVerificar } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/verificarFactura`, {
-            //     "nombreArchivo": dataFactura.data.nombreArchivo,
-            //    "claveAccesoComprobante": dataFactura.data.claveAcceso
-            // })
+            const { data: dataVerificar } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/verificarFactura`, {
+                "nombreArchivo": dataFactura.data.nombreArchivo,
+                "claveAccesoComprobante": dataFactura.data.claveAcceso
+            })
+
+            console.log(dataVerificar);
+            toast.success(dataVerificar.data.estado)
 
             // AUTORIZAR
-
             // const xmlBody = `
             //     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ec="http://ec.gob.sri.ws.consulta">
             //         <soapenv:Header/>
@@ -210,7 +214,7 @@ export default function ModalEmitirFactura() {
             //         </soapenv:Envelope>
             // `
 
-            // const { data: autorizar } = await axios.post(
+            // const { data: dataAutorizar } = await axios.post(
             //     'https://celcer.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl',
             //     xmlBody,
             //     {
@@ -221,13 +225,13 @@ export default function ModalEmitirFactura() {
             //     }
             // );
 
-            // console.log(dataFactura);
+            // console.log(dataAutorizar);
 
             return dataFactura
 
         } catch (e) {
             console.log(e);
-            throw new Error(e.response.data.mensaje || e.response.data.estado)
+            throw new Error(e?.response?.data?.mensaje || e?.response?.data?.estado || 'Error Inesperado')
         }
     };
 
@@ -381,7 +385,6 @@ export default function ModalEmitirFactura() {
     }
 
     // console.log(productos);
-
 
     useEffect(() => {
         setFechaEcuador(consultarFechaEcuador())

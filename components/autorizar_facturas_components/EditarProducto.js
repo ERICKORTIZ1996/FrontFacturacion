@@ -27,8 +27,6 @@ export const EditarProducto = ({ id, detalle }) => {
     const [descuento, setDescuento] = useState(detalle?.descuento)
     const [precioTotalSinImpuestos, setPrecioTotalSinImpuestos] = useState(detalle?.precioTotalSinImpuesto)
 
-    // console.log(detalle);
-
     const subtotal = detalle?.cantidad * detalle?.precioUnitario;
     const total = subtotal - (subtotal * detalle?.descuento) / 100;
 

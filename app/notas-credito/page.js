@@ -7,8 +7,13 @@ import Link from "next/link"
 import axios from "axios"
 
 async function consultarFacturasValidadas() {
-    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/estado/AUTORIZADA`);
-    return data
+    try {
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/estado/AUTORIZADA`);
+        return data
+    } catch (error) {
+        return null
+    }
+
 }
 
 export default async function NotasCredito() {
@@ -70,7 +75,7 @@ export default async function NotasCredito() {
 
                 <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
 
-                    {facturas.data && facturas.data.length ? (
+                    {facturas?.data && facturas?.data?.length ? (
                         <>
                             <table className="w-full mt-5">
                                 <thead className="bg-[#05121f]/60">

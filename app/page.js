@@ -36,8 +36,6 @@ export default function Home() {
         contraseña: formData.get('pass')
       })
 
-      console.log(data);
-
       setDataUser({
         tokenAcceso: data.data.tokens.tokenAcceso,
         tokenRenovacion: data.data.tokens.tokenRenovacion,

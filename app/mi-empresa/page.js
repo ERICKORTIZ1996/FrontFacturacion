@@ -32,7 +32,7 @@ export default function MiEmpresa() {
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/empresas`)
             return data
         } catch (error) {
-            console.log(error);
+            return null
         }
     }
 
@@ -41,7 +41,7 @@ export default function MiEmpresa() {
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/sucursales`)
             return data
         } catch (error) {
-            console.log(error);
+            return null
         }
     }
 
@@ -50,7 +50,7 @@ export default function MiEmpresa() {
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/puntos-emision`)
             return data
         } catch (error) {
-            console.log(error);
+            return null
         }
     }
 
@@ -204,7 +204,7 @@ export default function MiEmpresa() {
 
                             {isLoading ? (
                                 <SmallSpinner />
-                            ) : data.data && data.data.length ? (
+                            ) : data?.data && data?.data?.length ? (
                                 <>
                                     <table className="w-full mt-5">
                                         <thead className="bg-[#05121f]/60">
@@ -292,7 +292,7 @@ export default function MiEmpresa() {
 
                             {isLoadingSucursales ? (
                                 <SmallSpinner />
-                            ) : dataSucursales.data && dataSucursales.data.length ? (
+                            ) : dataSucursales?.data && dataSucursales?.data?.length ? (
                                 <>
                                     <table className="w-full mt-5">
                                         <thead className="bg-[#05121f]/60">
@@ -382,7 +382,7 @@ export default function MiEmpresa() {
 
                             {isLoadingPuntosEmision ? (
                                 <SmallSpinner />
-                            ) : dataPuntosEmision.data && dataPuntosEmision.data.length ? (
+                            ) : dataPuntosEmision?.data && dataPuntosEmision?.data?.length ? (
                                 <>
                                     <table className="w-full mt-5">
                                         <thead className="bg-[#05121f]/60">

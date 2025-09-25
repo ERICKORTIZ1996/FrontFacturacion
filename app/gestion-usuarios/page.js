@@ -24,7 +24,7 @@ export default function Admins() {
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/sucursales`)
             return data
         } catch (error) {
-            console.log(error);
+            return null
         }
     }
 
@@ -33,7 +33,7 @@ export default function Admins() {
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/puntos-emision`)
             return data
         } catch (error) {
-            console.log(error);
+            return null
         }
     }
 

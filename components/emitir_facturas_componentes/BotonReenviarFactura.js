@@ -1,6 +1,7 @@
 "use client"
 
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function BotonReenviarFactura({ nombreArchivo, claveAcceso }) {
 
@@ -13,6 +14,7 @@ export default function BotonReenviarFactura({ nombreArchivo, claveAcceso }) {
         })
 
         console.log(dataFirma);
+        toast.success(dataFirma.data.message)
 
         // VALIDAR 
         const { data: dataValidar } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/validar`, {
@@ -20,14 +22,16 @@ export default function BotonReenviarFactura({ nombreArchivo, claveAcceso }) {
         })
 
         console.log(dataValidar);
-
-        return
+        toast.success(dataValidar.data.estado)
 
         // VERIFICAR
-        // const { data: dataVerificar } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/verificarFactura`, {
-        //     "nombreArchivo": nombreArchivo,
-        //    "claveAccesoComprobante": claveAcceso
-        // })
+        const { data: dataVerificar } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/verificarFactura`, {
+            "nombreArchivo": nombreArchivo,
+            "claveAccesoComprobante": claveAcceso
+        })
+
+        console.log(dataVerificar);
+        toast.success(dataVerificar.data.estado)
 
         // AUTORIZAR
         // const xmlBody = `
