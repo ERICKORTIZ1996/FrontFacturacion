@@ -1,4 +1,4 @@
-'use cliente'
+'use client'
 
 import { useState } from "react"
 import { Dialog, DialogPanel, DialogTitle, Button } from '@headlessui/react'
@@ -12,6 +12,7 @@ export default function MoldalPrimerReporteATS() {
 
     const changeModalPrimerReporteATS = useMainStore((state) => state.changeModalPrimerReporteATS)
     const modalPrimerReporteATS = useMainStore((state) => state.modalPrimerReporteATS)
+    const dataUser = useMainStore((state) => state.dataUser)
 
     const [fechaConsulta, setFechaConsulta] = useState('');
     const [consulta, setConsulta] = useState(false);
@@ -29,18 +30,129 @@ export default function MoldalPrimerReporteATS() {
 
     const fetchData = async () => {
         try {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/api/reportes/ats?mes=${fechaConsulta.split("-")[1]}&anio=${fechaConsulta.split("-")[0]}`)
+            // Validar que tengamos token antes de hacer la petición
+            if (!dataUser?.tokenAcceso) {
+                console.warn('No hay token de acceso disponible')
+                setConsulta(false)
+                toast.error('No estás autenticado')
+                return null
+            }
+
+            // Validar que tengamos fecha
+            if (!fechaConsulta) {
+                console.warn('No hay fecha seleccionada')
+                setConsulta(false)
+                return null
+            }
+
+            // Debug: mostrar información del token (sin mostrar el token completo por seguridad)
+            const tokenPreview = dataUser.tokenAcceso ? `${dataUser.tokenAcceso.substring(0, 20)}...` : 'no-token'
+            console.log('Intentando obtener reporte ATS con token:', tokenPreview)
+
+            // Corregir la URL: la ruta correcta es /facturas/api/reportes/ats
+            const mes = fechaConsulta.split("-")[1]
+            const anio = fechaConsulta.split("-")[0]
+            
+            // Validar que mes y anio sean válidos
+            if (!mes || !anio) {
+                console.error('Fecha inválida:', fechaConsulta)
+                setConsulta(false)
+                toast.error('La fecha seleccionada no es válida')
+                return null
+            }
+
+            const url = `${process.env.NEXT_PUBLIC_URL_BACK}/facturas/api/reportes/ats?mes=${mes}&anio=${anio}`
+            console.log('URL de consulta:', url)
+            console.log('Parámetros:', { mes, anio })
+
+            const { data } = await axios.get(
+                url,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${dataUser.tokenAcceso}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            )
+            
+            console.log('Reporte ATS obtenido exitosamente:', data)
             setConsulta(false)
-            return data
+            
+            // El backend puede devolver data.data o data directamente dependiendo de ResponseHelper
+            return data?.data || data
         } catch (error) {
-            throw new Error(error)
+            console.error('Error al obtener reporte ATS:', error)
+            
+            // Log detallado del error
+            if (error?.response) {
+                console.error('Status:', error.response.status)
+                console.error('Status Text:', error.response.statusText)
+                console.error('Response Data:', error.response.data)
+                console.error('Headers enviados:', error.config?.headers)
+                
+                // Si es 500, error del servidor
+                if (error?.response?.status === 500) {
+                    const mensajeBackend = error?.response?.data?.message || error?.response?.data?.mensaje || 'Error interno del servidor'
+                    console.error(`❌ 500 Internal Server Error al obtener reporte ATS: ${mensajeBackend}`)
+                    console.warn('Posibles causas:')
+                    console.warn('1. Error en el procesamiento del reporte en el backend')
+                    console.warn('2. Problema con la base de datos')
+                    console.warn('3. Datos faltantes o inválidos para el período solicitado')
+                    console.warn('4. Error en la generación del XML o procesamiento de facturas')
+                    console.warn('Verifica en el backend:')
+                    console.warn('- Logs del servidor para ver el error específico')
+                    console.warn('- Que existan facturas para el mes/año solicitado')
+                    console.warn('- Que la configuración de la empresa esté correcta')
+                }
+                
+                // Si es 403, permisos insuficientes
+                if (error?.response?.status === 403) {
+                    console.error(`❌ 403 Forbidden: No tienes permisos para ver este reporte`)
+                }
+                
+                // Si es 401, el token está expirado o es inválido
+                if (error?.response?.status === 401) {
+                    console.error('❌ 401 Unauthorized: Token inválido o expirado. Es necesario cerrar sesión y volver a iniciar sesión.')
+                }
+            } else if (error?.request) {
+                console.error('No se recibió respuesta del servidor:', error.request)
+            } else {
+                console.error('Error configurando la petición:', error.message)
+            }
+            
+            setConsulta(false)
+            
+            // Extraer mensaje de error más detallado
+            let mensajeError = 'Error al obtener el reporte ATS'
+            
+            if (error?.response?.status === 500) {
+                mensajeError = error?.response?.data?.message || error?.response?.data?.mensaje || 'Error interno del servidor al generar el reporte. Por favor, contacta al administrador o intenta con otra fecha.'
+                // Limpiar emojis del mensaje
+                mensajeError = mensajeError.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim()
+                toast.error(mensajeError, { autoClose: 6000 })
+            } else if (error?.response?.status === 403) {
+                mensajeError = 'No tienes permisos para ver este reporte'
+                toast.error(mensajeError)
+            } else if (error?.response?.status === 401) {
+                mensajeError = 'Tu sesión ha expirado. Por favor, cierra sesión e inicia sesión nuevamente.'
+                toast.error(mensajeError)
+            } else if (error?.response?.data) {
+                mensajeError = error.response.data.mensaje || error.response.data.message || mensajeError
+                mensajeError = mensajeError.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim()
+                toast.error(mensajeError)
+            } else {
+                toast.error(mensajeError)
+            }
+            
+            // Retornar null en lugar de lanzar error para que React Query lo maneje
+            return null
         }
     }
 
     const { data, isLoading } = useQuery({
-        queryKey: ['primer_reporte_ats'],  // Identificador unico para cada Query
+        queryKey: ['primer_reporte_ats', fechaConsulta],  // Identificador unico para cada Query, incluye fecha para invalidar cache
         queryFn: fetchData, // Funcion a consultar
-        enabled: consulta, // Solo ejecuta cuando esta ventana esté activa
+        enabled: consulta && !!dataUser?.tokenAcceso && !!fechaConsulta, // Solo ejecuta cuando hay consulta activa, token y fecha
         refetchOnWindowFocus: false, // No volver a hacer fetch al cambiar de pestaña
     })
 
@@ -51,7 +163,7 @@ export default function MoldalPrimerReporteATS() {
                 <div className="fixed inset-0 flex w-screen items-center justify-center p-4 bg-gray-800/50">
 
                     {/* shadow shadow-[#245e95] */}
-                    <DialogPanel className="w-[100%] md:w-[50%] h-[90%] space-y-4 px-8 py-6 rounded-3xl bg-gradient-to-b from-[#153350]/90 to-[#1f3850]/90 backdrop-blur-sm shadow shadow-[#166fc2]">
+                    <DialogPanel className="w-[95%] md:w-[50%] max-w-xl md:max-w-none h-[90vh] md:h-[90%] space-y-4 px-4 md:px-8 py-4 md:py-6 rounded-3xl bg-gradient-to-b from-[#153350]/90 to-[#1f3850]/90 backdrop-blur-sm shadow shadow-[#166fc2]">
 
                         <div className='flex h-full flex-col justify-between'>
                             <form

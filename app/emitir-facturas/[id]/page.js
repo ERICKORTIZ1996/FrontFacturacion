@@ -3,6 +3,8 @@ import Link from "next/link";
 import MainLayout from "@/components/layouts/MainLayout";
 import ComprobarAcceso from "@/components/others/ComprobarAcceso";
 import BotonImprimirFactura from "@/components/emitir_facturas_componentes/BotonImprimirFactura";
+import BotonEnviarFactura from "@/components/emitir_facturas_componentes/BotonEnviarFactura";
+import VerLogsFactura from "@/components/emitir_facturas_componentes/VerLogsFactura";
 import { formatearFecha, getStatusBill } from "@/helpers";
 import { redirect } from "next/navigation";
 
@@ -323,17 +325,26 @@ export default async function Factura({ params }) {
                             <span className="block">Descuento: $ {Number(factura.data.totalDescuento).toFixed(2)}</span>
                             <span className="block">{factura.data.impuestos[0].codigo} {factura.data.impuestos[0].codigoPorcentaje}: $ {factura.data.impuestos[0].valor.toFixed(2)}</span>
 
-                            <div className="flex gap-3 items-center mt-5">
+                            <div className="flex flex-col gap-3 mt-5">
 
                                 <p className='font-semibold text-gray-800 bg-gray-100 rounded-xl px-3 py-1 w-fit'>
                                     Total a Pagar: $ {Number(factura.data.importeTotal).toFixed(2)}
                                 </p>
 
-                                {factura.data.estado.toLowerCase() === 'firmada' && (
-                                    <BotonImprimirFactura
-                                        nombreArchivo={factura.nombreArchivo}
-                                    />
-                                )}
+                                <div className="flex gap-3 items-center flex-wrap">
+                                    {factura.data.estado.toLowerCase() === 'firmada' && (
+                                        <>
+                                            <BotonImprimirFactura
+                                                nombreArchivo={factura.nombreArchivo}
+                                            />
+                                            <BotonEnviarFactura
+                                                nombreArchivo={factura.nombreArchivo}
+                                                tipoArchivo="pdf"
+                                            />
+                                        </>
+                                    )}
+                                    <VerLogsFactura nombreArchivo={factura.nombreArchivo} />
+                                </div>
 
                             </div>
 

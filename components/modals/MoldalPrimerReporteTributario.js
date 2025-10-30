@@ -1,4 +1,4 @@
-'use cliente'
+'use client'
 
 import { useState } from "react"
 import { Dialog, DialogPanel, DialogTitle, Button } from '@headlessui/react'
@@ -12,6 +12,7 @@ export default function MoldalPrimerReporteTributario() {
 
     const changeModalPrimerReporteTributario = useMainStore((state) => state.changeModalPrimerReporteTributario)
     const modalPrimerReporteTributario = useMainStore((state) => state.modalPrimerReporteTributario)
+    const dataUser = useMainStore((state) => state.dataUser)
 
     const [fechaConsulta, setFechaConsulta] = useState('');
     const [consulta, setConsulta] = useState(false);
@@ -29,18 +30,47 @@ export default function MoldalPrimerReporteTributario() {
 
     const fetchData = async () => {
         try {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/api/reportes/tributario?mes=${fechaConsulta.split("-")[1]}&anio=${fechaConsulta.split("-")[0]}&formato=csv`)
+            // Validar que tengamos token antes de hacer la petición
+            if (!dataUser?.tokenAcceso) {
+                console.warn('No hay token de acceso disponible')
+                setConsulta(false)
+                toast.error('No estás autenticado')
+                return null
+            }
+
+            // Validar que tengamos fecha
+            if (!fechaConsulta) {
+                setConsulta(false)
+                return null
+            }
+
+            // Corregir la URL: la ruta correcta es /facturas/api/reportes/tributario
+            const mes = fechaConsulta.split("-")[1]
+            const anio = fechaConsulta.split("-")[0]
+            const { data } = await axios.get(
+                `${process.env.NEXT_PUBLIC_URL_BACK}/facturas/api/reportes/tributario?mes=${mes}&anio=${anio}&formato=csv`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${dataUser.tokenAcceso}`
+                    }
+                }
+            )
             setConsulta(false)
             return data
         } catch (error) {
-            throw new Error(error)
+            console.error('Error al obtener reporte tributario:', error)
+            setConsulta(false)
+            const mensajeError = error?.response?.data?.mensaje || error?.response?.data?.message || 'Error al obtener el reporte tributario'
+            toast.error(mensajeError)
+            // Retornar null en lugar de lanzar error para que React Query lo maneje
+            return null
         }
     }
 
     const { data, isLoading } = useQuery({
-        queryKey: ['primer_reporte_tributario'],  // Identificador unico para cada Query
+        queryKey: ['primer_reporte_tributario', fechaConsulta],  // Identificador unico para cada Query, incluye fecha para invalidar cache
         queryFn: fetchData, // Funcion a consultar
-        enabled: consulta, // Solo ejecuta cuando esta ventana esté activa
+        enabled: consulta && !!dataUser?.tokenAcceso && !!fechaConsulta, // Solo ejecuta cuando hay consulta activa, token y fecha
         refetchOnWindowFocus: false, // No volver a hacer fetch al cambiar de pestaña
     })
 
@@ -67,7 +97,7 @@ export default function MoldalPrimerReporteTributario() {
                 <div className="fixed inset-0 flex w-screen items-center justify-center p-4 bg-gray-800/50">
 
                     {/* shadow shadow-[#245e95] */}
-                    <DialogPanel className="w-[100%] md:w-[50%] h-[90%] space-y-4 px-8 py-6 rounded-3xl bg-gradient-to-b from-[#153350]/90 to-[#1f3850]/90 backdrop-blur-sm shadow shadow-[#166fc2]">
+                    <DialogPanel className="w-[95%] md:w-[50%] max-w-xl md:max-w-none h-[90vh] md:h-[90%] space-y-4 px-4 md:px-8 py-4 md:py-6 rounded-3xl bg-gradient-to-b from-[#153350]/90 to-[#1f3850]/90 backdrop-blur-sm shadow shadow-[#166fc2]">
 
                         <div className='flex h-full flex-col justify-between'>
                             <form

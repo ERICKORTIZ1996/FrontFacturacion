@@ -7,14 +7,74 @@ import { useMainStore } from "@/store/mainStore"
 import { useDropzone } from 'react-dropzone'
 import { toast } from 'react-toastify';
 import axios from "axios"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import SmallSpinner from "@/components/layouts/SmallSpinner"
 
 export default function MisDatos() {
 
     const [archivo, setArchivo] = useState(null);
+    const [empresaSeleccionada, setEmpresaSeleccionada] = useState('')
 
     const dataUser = useMainStore((state) => state.dataUser)
 
     const passwordFirmRef = useRef(null)
+    const selectEmpresaRef = useRef(null)
+
+    // Obtener empresas para seleccionar
+    const consultarEmpresas = async () => {
+        try {
+            if (!dataUser?.tokenAcceso) {
+                console.warn('No hay token de acceso disponible')
+                return null
+            }
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/empresas`, {
+                headers: {
+                    'Authorization': `Bearer ${dataUser.tokenAcceso}`
+                }
+            })
+            return data
+        } catch (error) {
+            console.error('Error al consultar empresas:', error)
+            return null
+        }
+    }
+
+    const { data: empresasData } = useQuery({
+        queryKey: ['empresas_mis_datos'],
+        queryFn: consultarEmpresas,
+        enabled: !!dataUser?.tokenAcceso, // Solo ejecutar si hay token
+        refetchOnWindowFocus: false,
+    })
+
+    const queryClient = useQueryClient()
+
+    // Consultar firmas de la empresa seleccionada
+    const consultarFirmas = async () => {
+        try {
+            if (!dataUser?.tokenAcceso || !empresaSeleccionada) {
+                return null
+            }
+            const { data } = await axios.get(
+                `${process.env.NEXT_PUBLIC_URL_BACK}/firmas/empresa/${empresaSeleccionada}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${dataUser.tokenAcceso}`
+                    }
+                }
+            )
+            return data
+        } catch (error) {
+            console.error('Error al consultar firmas:', error)
+            return { data: [], total: 0 }
+        }
+    }
+
+    const { data: firmasData, isLoading: isLoadingFirmas } = useQuery({
+        queryKey: ['firmas_empresa', empresaSeleccionada],
+        queryFn: consultarFirmas,
+        enabled: !!dataUser?.tokenAcceso && !!empresaSeleccionada,
+        refetchOnWindowFocus: false,
+    })
 
 
     const guardarDatos = async () => {
@@ -37,27 +97,133 @@ export default function MisDatos() {
 
     const subirFirmaDigital = async (formData) => {
 
+        const idEmpresaSeleccionado = formData.get('empresa-firma') || empresaSeleccionada
+
+        if (!idEmpresaSeleccionado) {
+            toast.error('Debes seleccionar una empresa')
+            return
+        }
+
+        if (!archivo) {
+            toast.error('Debes seleccionar un archivo de firma')
+            return
+        }
+
         try {
+            if (!dataUser?.tokenAcceso) {
+                toast.error('Debes estar autenticado para subir firmas')
+                return
+            }
+
+            const formDataToSend = new FormData()
+            formDataToSend.append('password', formData.get('password-firma'))
+            formDataToSend.append('idEmpresa', idEmpresaSeleccionado)
+            formDataToSend.append('archivoFirma', archivo)
+
             const { data } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/firmas`,
-                {
-                    password: formData.get('password-firma'),
-                    idEmpresa: '5852cc6d-7139-4a9e-a300-159f28bdd4e6',
-                    archivoFirma: archivo,
-                },
+                formDataToSend,
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${dataUser.tokenAcceso}`
                     },
                 },
             );
 
             setArchivo(null)
-            passwordFirmRef.current.value = ""
+            if (passwordFirmRef.current) passwordFirmRef.current.value = ""
             toast.success(data.mensaje);
+            
+            // Refrescar la lista de firmas después de subir una nueva
+            queryClient.invalidateQueries({ queryKey: ['firmas_empresa', idEmpresaSeleccionado] })
 
         } catch (e) {
-            toast.error(e.response.data.mensaje);
+            toast.error(e?.response?.data?.mensaje || 'Error al subir la firma');
         }
+    }
+
+    // Mutación para cambiar estado de firma (activar/desactivar)
+    const cambiarEstadoFirmaMutation = useMutation({
+        mutationFn: async ({ firmaId, empresaId, activar }) => {
+            if (!dataUser?.tokenAcceso) {
+                throw new Error('No estás autenticado')
+            }
+
+            const { data } = await axios.put(
+                `${process.env.NEXT_PUBLIC_URL_BACK}/firmas/${firmaId}/estado`,
+                { uuidEmpresa: empresaId },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${dataUser.tokenAcceso}`
+                    }
+                }
+            )
+            return data
+        },
+        onSuccess: (data) => {
+            toast.success(data.mensaje || 'Estado de firma actualizado')
+            queryClient.invalidateQueries({ queryKey: ['firmas_empresa', empresaSeleccionada] })
+        },
+        onError: (error) => {
+            const mensajeError = error?.response?.data?.mensaje || error?.response?.data?.message || error.message || 'Error al cambiar el estado de la firma'
+            toast.error(mensajeError)
+        }
+    })
+
+    // Mutación para eliminar firma
+    const eliminarFirmaMutation = useMutation({
+        mutationFn: async ({ firmaId, empresaId }) => {
+            if (!dataUser?.tokenAcceso) {
+                throw new Error('No estás autenticado')
+            }
+
+            const { data } = await axios.delete(
+                `${process.env.NEXT_PUBLIC_URL_BACK}/firmas/${firmaId}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${dataUser.tokenAcceso}`
+                    },
+                    data: { uuidEmpresa: empresaId }
+                }
+            )
+            return data
+        },
+        onSuccess: (data) => {
+            toast.success(data.mensaje || 'Firma eliminada correctamente')
+            queryClient.invalidateQueries({ queryKey: ['firmas_empresa', empresaSeleccionada] })
+        },
+        onError: (error) => {
+            const mensajeError = error?.response?.data?.mensaje || error?.response?.data?.message || error.message || 'Error al eliminar la firma'
+            toast.error(mensajeError)
+        }
+    })
+
+    const handleActivarFirma = (firma) => {
+        if (!empresaSeleccionada) {
+            toast.error('Debes seleccionar una empresa')
+            return
+        }
+        cambiarEstadoFirmaMutation.mutate({
+            firmaId: firma.id,
+            empresaId: empresaSeleccionada,
+            activar: !firma.activa
+        })
+    }
+
+    const handleEliminarFirma = (firma) => {
+        if (!empresaSeleccionada) {
+            toast.error('Debes seleccionar una empresa')
+            return
+        }
+        
+        if (!confirm(`¿Estás seguro de eliminar la firma "${firma.nombreArchivo}"?`)) {
+            return
+        }
+        
+        eliminarFirmaMutation.mutate({
+            firmaId: firma.id,
+            empresaId: empresaSeleccionada
+        })
     }
 
     const onDropRejected = () => {
@@ -95,7 +261,7 @@ export default function MisDatos() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
-                    <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5 flex flex-col justify-between">
+                    <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-4 md:px-8 py-4 md:py-6 mt-5 flex flex-col justify-between">
 
                         <div>
                             <h2 className='my-5 text-xl flex gap-2 items-center'>
@@ -163,7 +329,7 @@ export default function MisDatos() {
 
                     </div>
 
-                    <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5 flex flex-col justify-between">
+                    <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-4 md:px-8 py-4 md:py-6 mt-5 flex flex-col justify-between">
 
                         <div>
                             <h2 className='my-5 text-xl flex gap-2 items-center'>
@@ -270,16 +436,33 @@ export default function MisDatos() {
                                 )}
                             </div>
 
-                            <div className='flex gap-5 relative'>
+                            <div className='flex flex-col gap-5 relative'>
+                                <div className='flex-1 flex flex-col'>
+                                    <label htmlFor="empresa-firma" className='mb-1'>Seleccionar Empresa</label>
+                                    <select
+                                        id='empresa-firma'
+                                        name='empresa-firma'
+                                        ref={selectEmpresaRef}
+                                        value={empresaSeleccionada}
+                                        onChange={(e) => setEmpresaSeleccionada(e.target.value)}
+                                        className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-full'
+                                    >
+                                        <option value="">Seleccione una empresa</option>
+                                        {empresasData?.data?.map(empresa => (
+                                            <option key={empresa.id} value={empresa.id}>
+                                                {empresa.razonSocial} - {empresa.ruc}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                                 <div className='flex-1 flex flex-col'>
                                     <label htmlFor="password-firma" className='mb-1'>Contraseña de firma digital</label>
                                     <input
                                         id='password-firma'
-                                        type="text"
+                                        type="password"
                                         ref={passwordFirmRef}
                                         name='password-firma'
                                         className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 w-full'
-                                        // ref={inputRazonSocial}
                                         placeholder='********'
                                     />
                                 </div>
@@ -299,7 +482,104 @@ export default function MisDatos() {
                     </form>
                 </div>
 
+                {/* Sección para administrar firmas */}
+                {empresaSeleccionada && (
+                    <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
+                        <div className="flex justify-between items-center mb-5">
+                            <h2 className="text-xl font-semibold flex gap-2 items-center">
+                                <span className='bg-gray-200 rounded-full p-1 text-gray-800'>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                    </svg>
+                                </span>
+                                Firmas Digitales de la Empresa
+                            </h2>
+                            <p className="text-gray-400 text-sm">
+                                {empresasData?.data?.find(e => e.id === empresaSeleccionada)?.razonSocial || 'Empresa seleccionada'}
+                            </p>
+                        </div>
 
+                        {isLoadingFirmas ? (
+                            <SmallSpinner />
+                        ) : firmasData?.data?.length > 0 ? (
+                            <div className="space-y-3">
+                                {firmasData.data.map((firma) => (
+                                    <div
+                                        key={firma.id}
+                                        className={`bg-[#2e4760] rounded-xl px-4 py-3 border ${
+                                            firma.activa
+                                                ? 'border-green-500 bg-green-500/10'
+                                                : 'border-gray-600'
+                                        }`}
+                                    >
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <p className="font-semibold text-gray-200">
+                                                        {firma.nombreArchivo}
+                                                    </p>
+                                                    {firma.activa && (
+                                                        <span className="bg-green-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                                                            ACTIVA
+                                                        </span>
+                                                    )}
+                                                    {!firma.activa && (
+                                                        <span className="bg-gray-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                                                            INACTIVA
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="text-gray-400 text-sm">
+                                                    Cargada: {new Date(firma.fechaCreacion).toLocaleDateString('es-ES', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit'
+                                                    })}
+                                                </p>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => handleActivarFirma(firma)}
+                                                    disabled={cambiarEstadoFirmaMutation.isPending}
+                                                    className={`px-3 py-1 rounded-lg text-sm font-semibold transition-colors ${
+                                                        firma.activa
+                                                            ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
+                                                            : 'bg-green-600 hover:bg-green-700 text-white'
+                                                    } disabled:opacity-50`}
+                                                >
+                                                    {firma.activa ? 'Desactivar' : 'Activar'}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleEliminarFirma(firma)}
+                                                    disabled={eliminarFirmaMutation.isPending}
+                                                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
+                                                >
+                                                    Eliminar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-center text-gray-400 py-5">
+                                {empresaSeleccionada
+                                    ? 'No hay firmas digitales registradas para esta empresa. Sube una firma usando el formulario de arriba.'
+                                    : 'Selecciona una empresa para ver sus firmas digitales.'}
+                            </p>
+                        )}
+                    </div>
+                )}
+
+                {!empresaSeleccionada && empresasData?.data?.length > 0 && (
+                    <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
+                        <p className="text-center text-gray-400 py-5">
+                            Selecciona una empresa en el formulario de arriba para ver y administrar sus firmas digitales.
+                        </p>
+                    </div>
+                )}
 
             </MainLayout >
         </ComprobarAcceso>

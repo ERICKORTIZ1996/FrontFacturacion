@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from "react"
 import MainLayout from "@/components/layouts/MainLayout"
 import BotonAgregarProducto from "@/components/productos_components/BotonAgregarProducto"
 import ModalCrearProducto from "@/components/modals/ModalCrearProducto"
@@ -5,6 +8,9 @@ import ComprobarAcceso from "@/components/others/ComprobarAcceso"
 import DataProductos from "@/components/productos_components/DataProductos"
 
 export default function Productos() {
+    
+    const [busqueda, setBusqueda] = useState('')
+    
     return (
         <ComprobarAcceso>
             <MainLayout>
@@ -32,7 +38,8 @@ export default function Productos() {
                             type="text"
                             placeholder="Buscar por código"
                             className="w-full outline-none bg-[#2e4760] rounded-xl pl-9 py-1 pr-3 focus:border-blue-500 shadow-lg"
-                            name="email"
+                            value={busqueda}
+                            onChange={(e) => setBusqueda(e.target.value)}
                         />
                     </div>
 
@@ -41,7 +48,7 @@ export default function Productos() {
 
                 <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
 
-                    <DataProductos />
+                    <DataProductos busqueda={busqueda} />
 
                 </div>
 

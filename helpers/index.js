@@ -64,5 +64,37 @@ export const getStatusBill = (status) => {
 }
 
 export const quitarEmojing = (texto) => {
-    return texto.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim()
+    // Validar que texto exista y sea un string
+    if (!texto || typeof texto !== 'string') {
+        return ''
+    }
+    return texto.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim()
+}
+
+/**
+ * Normaliza un valor numérico que puede tener coma o punto como separador decimal
+ * Convierte comas a puntos para uso estándar de JavaScript
+ * @param {string|number} valor - El valor a normalizar
+ * @returns {number} - El número normalizado, o NaN si no es un número válido
+ */
+export const normalizarNumero = (valor) => {
+    if (valor === null || valor === undefined || valor === '') {
+        return NaN
+    }
+    
+    // Si ya es un número, retornarlo directamente
+    if (typeof valor === 'number') {
+        return valor
+    }
+    
+    // Convertir a string y normalizar
+    const valorString = String(valor).trim()
+    
+    // Reemplazar coma por punto para aceptar ambos formatos
+    const valorNormalizado = valorString.replace(',', '.')
+    
+    // Convertir a número
+    const numero = parseFloat(valorNormalizado)
+    
+    return isNaN(numero) ? NaN : numero
 }

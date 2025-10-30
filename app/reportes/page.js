@@ -34,7 +34,7 @@ export default function Reportes() {
                 <div className="mt-5 flex items-center justify-between bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3">
 
                     <nav className="w-full rounded-xl">
-                        <ul className="flex gap-3 justify-between text-gray-800 font-semibold uppercase">
+                        <ul className="flex flex-wrap gap-2 md:gap-3 justify-between text-gray-800 font-semibold uppercase text-xs md:text-base">
                             <li className="flex-1">
                                 <button
                                     type="button"
@@ -92,7 +92,7 @@ export default function Reportes() {
 
                     <div>
 
-                        <div className="mt-5 flex items-center gap-2 bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3 mb-5">
+                        <div className="mt-5 flex flex-col md:flex-row items-start md:items-center gap-2 bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3 mb-5">
                             <h2
                                 className="bg-[#077eeb]/60 px-3 py-1 rounded-xl w-fit text-lg flex gap-1 font-semibold"
                             >
@@ -113,7 +113,7 @@ export default function Reportes() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
-                            <div className="fondoATS flex flex-col justify-between rounded-3xl px-8 py-5">
+                            <div className="fondoATS flex flex-col justify-between rounded-3xl px-4 md:px-8 py-4 md:py-5">
 
                                 <div>
                                     <h2 className="font-bold text-lg mb-3">Tasa de Conversión de Presupuestos</h2>
@@ -159,7 +159,7 @@ export default function Reportes() {
 
                             </div>
 
-                            <div className="fondoATS flex flex-col justify-between rounded-3xl px-8 py-5">
+                            <div className="fondoATS flex flex-col justify-between rounded-3xl px-4 md:px-8 py-4 md:py-5">
 
                                 <div>
                                     <h2 className="font-bold text-lg mb-3">Segmentación de Clientes</h2>
@@ -192,7 +192,7 @@ export default function Reportes() {
 
                     <div>
 
-                        <div className="mt-5 flex items-center gap-2 bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3 mb-5">
+                        <div className="mt-5 flex flex-col md:flex-row items-start md:items-center gap-2 bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3 mb-5">
                             <h2
                                 className="bg-[#077eeb]/60 px-3 py-1 rounded-xl w-fit text-lg flex gap-1 font-semibold"
                             >
@@ -213,7 +213,7 @@ export default function Reportes() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
-                            <div className="fondoTributario flex flex-col justify-between rounded-3xl px-8 py-5">
+                            <div className="fondoTributario flex flex-col justify-between rounded-3xl px-4 md:px-8 py-4 md:py-5">
 
                                 <div>
                                     <h2 className="font-bold text-lg mb-3">Reporte de Ventas por IVA {"("}Impuesto al Valor Agregado{")"}</h2>
@@ -272,7 +272,7 @@ export default function Reportes() {
 
                     <div>
 
-                        <div className="mt-5 flex items-center gap-2 bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3 mb-5">
+                        <div className="mt-5 flex flex-col md:flex-row items-start md:items-center gap-2 bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3 mb-5">
                             <h2
                                 className="bg-[#077eeb]/60 px-3 py-1 rounded-xl w-fit text-lg flex gap-1 font-semibold"
                             >
@@ -306,7 +306,7 @@ export default function Reportes() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
-                            <div className="fondoOtros flex flex-col justify-between rounded-3xl px-8 py-5">
+                            <div className="fondoOtros flex flex-col justify-between rounded-3xl px-4 md:px-8 py-4 md:py-5">
 
                                 <div>
                                     <h2 className="font-bold text-lg mb-3">En construcción</h2>

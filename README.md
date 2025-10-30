@@ -1,6 +1,57 @@
-# Documentación de la API de Facturación
+# Sistema de Facturación Electrónica - Frontend
 
-Este proyecto implementa una API para la gestión de facturas electrónicas, incluyendo la creación, firmado, validación y verificación de documentos XML, así como la generación de PDFs y la consulta de datos de clientes.
+Este proyecto implementa el frontend para la gestión de facturas electrónicas, incluyendo la creación, firmado, validación y verificación de documentos XML, así como la generación de PDFs y la consulta de datos de clientes.
+
+## 🚀 Configuración Inicial
+
+### 1. Instalación de Dependencias
+
+```bash
+npm install
+```
+
+### 2. Variables de Entorno
+
+El proyecto requiere un archivo `.env.local` con las siguientes variables:
+
+**Crear el archivo `.env.local` en la raíz del proyecto:**
+
+```env
+# URL del Backend (API)
+# Ejemplo para desarrollo local: http://localhost:8000
+# Ejemplo para producción: https://api.tudominio.com
+NEXT_PUBLIC_URL_BACK=http://localhost:8000
+
+# Clave de encriptación para datos de usuario en localStorage
+# ⚠️ IMPORTANTE: Genera una clave segura y única para producción
+NEXT_PUBLIC_KEY_CRYPTO=clave-secreta-sistema-facturacion-2024-cambiar-en-produccion
+```
+
+**⚠️ IMPORTANTE:**
+- El archivo `.env.local` NO se debe subir al repositorio (ya está en `.gitignore`)
+- En Next.js, las variables que empiezan con `NEXT_PUBLIC_` son accesibles desde el cliente
+- Reinicia el servidor de desarrollo después de crear o modificar el archivo `.env.local`
+
+### 3. Ejecutar el Proyecto
+
+```bash
+# Modo desarrollo
+npm run dev
+
+# Construir para producción
+npm run build
+
+# Ejecutar producción
+npm start
+```
+
+El proyecto estará disponible en `http://localhost:3000`
+
+---
+
+## 📚 Documentación de la API
+
+Este proyecto consume la siguiente API para la gestión de facturas electrónicas:
 
 ## Endpoints
 

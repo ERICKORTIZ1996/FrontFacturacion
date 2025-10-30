@@ -17,7 +17,7 @@ export default function Inicio() {
                 <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5">
                     <div className="min-w-0">
 
-                        <div className="relative bg-gradient-to-b from-[#3b46bf]/50 to-[#3f6caf]/50 rounded-3xl mr-5 my-5 shadow-lg flex items-center justify-between px-8 py-6">
+                        <div className="relative bg-gradient-to-b from-[#3b46bf]/50 to-[#3f6caf]/50 rounded-3xl md:mr-5 my-5 shadow-lg flex flex-col md:flex-row items-center justify-between px-4 md:px-8 py-4 md:py-6">
 
                             <div className="flex flex-col gap-1">
 
@@ -43,20 +43,21 @@ export default function Inicio() {
                                     </Link>
                                 </div>
 
-                                <h2 className="text-2xl font-semibold text-gray-100 mt-2">Sistema de Facturación</h2>
+                                <h2 className="text-xl md:text-2xl font-semibold text-gray-100 mt-2">Sistema de Facturación</h2>
 
-                                <p>Gestiona y administra tu negocio. Accede a los puntos mas importantes y visualiza las estadisticas para un mayor control.</p>
+                                <p className="text-sm md:text-base">Gestiona y administra tu negocio. Accede a los puntos mas importantes y visualiza las estadisticas para un mayor control.</p>
 
 
                             </div>
 
-                            <div className="relative w-2xl">
+                            <div className="relative w-full md:w-2xl mt-4 md:mt-0">
                                 <Image
                                     src={'/images/banner_principal.png'}
                                     width={500}
                                     height={500}
                                     alt="imagen-bienvenida"
-                                    className="absolute -bottom-40 -right-24 w-full"
+                                    className="absolute md:-bottom-40 md:-right-24 w-full h-auto"
+                                    style={{ width: "auto", height: "auto" }}
                                     priority
                                 />
                             </div>
@@ -65,7 +66,7 @@ export default function Inicio() {
                         <h2 className="font-semibold text-gray-100 text-lg mb-5">Últimas Facturas</h2>
 
                         <div className="overflow-x-auto whitespace-nowrap barra p-2 mb-5">
-                            <div className="inline-block px-4 py-2 mr-2 w-52 h-48 rounded-3xl fondo_card">
+                            <div className="inline-block px-4 py-2 mr-2 w-40 md:w-52 h-40 md:h-48 rounded-3xl fondo_card">
                                 <div className="relative w-full h-full flex flex-col justify-end items-center pb-5">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-24 absolute -top-5 text-[#96ccff]">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -75,7 +76,7 @@ export default function Inicio() {
                                 </div>
                             </div>
 
-                            <div className="inline-block px-4 py-2 mr-2 w-52 h-48 rounded-3xl fondo_card2">
+                            <div className="inline-block px-4 py-2 mr-2 w-40 md:w-52 h-40 md:h-48 rounded-3xl fondo_card2">
                                 <div className="relative w-full h-full flex flex-col justify-end items-center pb-5">
 
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-24 absolute -top-8 text-[#96ffb7]">
@@ -87,7 +88,7 @@ export default function Inicio() {
                                 </div>
                             </div>
 
-                            <div className="inline-block px-4 py-2 mr-2 w-52 h-48 rounded-3xl fondo_card3">
+                            <div className="inline-block px-4 py-2 mr-2 w-40 md:w-52 h-40 md:h-48 rounded-3xl fondo_card3">
                                 <div className="relative w-full h-full flex flex-col justify-end items-center pb-5">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-24 absolute -top-5 text-[#ffad96]">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />

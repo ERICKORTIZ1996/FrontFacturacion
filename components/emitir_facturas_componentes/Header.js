@@ -1,18 +1,51 @@
 'use client'
 
 import { useMainStore } from "@/store/mainStore"
+import { useQuery } from "@tanstack/react-query"
+import axios from "axios"
 
 export default function Header() {
 
     const changeModalNotificacionesGlobales = useMainStore((state) => state.changeModalNotificacionesGlobales)
     const dataUser = useMainStore((state) => state.dataUser)
 
+    // Consultar facturas pendientes para determinar si hay notificaciones sin leer
+    const consultarFacturasPendientes = async () => {
+        try {
+            if (!dataUser?.tokenAcceso) {
+                return { data: [] }
+            }
+
+            // Consultar facturas con estado PENDIENTE o que necesiten atención
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas/estado/PENDIENTE`, {
+                headers: {
+                    'Authorization': `Bearer ${dataUser.tokenAcceso}`
+                }
+            });
+            return data
+        } catch (error) {
+            console.error('Error al consultar facturas pendientes:', error);
+            return { data: [] }
+        }
+    }
+
+    const { data: facturasPendientes } = useQuery({
+        queryKey: ['facturas_pendientes_header'],
+        queryFn: consultarFacturasPendientes,
+        enabled: !!dataUser?.tokenAcceso,
+        refetchOnWindowFocus: true, // Refrescar cuando se vuelve a la pestaña
+        refetchInterval: 30000, // Refrescar cada 30 segundos
+    })
+
+    // Determinar si hay notificaciones sin leer (facturas pendientes)
+    const tieneNotificacionesSinLeer = facturasPendientes?.data?.length > 0
+
     return (
-        <div className="flex justify-between items-start">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-4 md:gap-0">
 
             <div>
-                <p className="text-xl">Bienvenido, <span className="font-semibold text-gray-200">{dataUser.nombre}</span></p>
-                <p>Aquí esta el resumen de tu negocio</p>
+                <p className="text-lg md:text-xl">Bienvenido, <span className="font-semibold text-gray-200">{dataUser.nombre}</span></p>
+                <p className="text-sm md:text-base">Aquí esta el resumen de tu negocio</p>
             </div>
 
             <div className="relative flex justify-end">
@@ -27,7 +60,10 @@ export default function Header() {
 
                 </button>
 
-                <span className="absolute top-0 right-0 w-3 h-3 bg-[#d24148] rounded-full"></span>
+                {/* Solo mostrar el punto rojo si hay notificaciones sin leer */}
+                {tieneNotificacionesSinLeer && (
+                    <span className="absolute top-0 right-0 w-3 h-3 bg-[#d24148] rounded-full"></span>
+                )}
             </div>
         </div>
     )

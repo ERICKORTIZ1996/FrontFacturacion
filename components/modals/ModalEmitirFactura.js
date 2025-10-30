@@ -316,7 +316,7 @@ export default function ModalEmitirFactura() {
     const consultarCliente = async () => {
 
         try {
-
+            // Primero intentar buscar en la base de datos local
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/clientes/buscar/${inputIdentificacion.current.value}`)
 
             const nombresYApellidos = data.data.nombres.split(" ");
@@ -330,8 +330,29 @@ export default function ModalEmitirFactura() {
             return data
 
         } catch (e) {
-            console.log(e);
-            toast.error(e.response.data.message.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim())
+            // Si no existe en BD y es RUC, consultar al SRI
+            if (tipoIdentificacion === 'RUC' && inputIdentificacion.current.value.length === 13) {
+                try {
+                    const { data: dataRUC } = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACK}/ruc`, {
+                        ruc: inputIdentificacion.current.value
+                    })
+
+                    if (dataRUC.success && dataRUC.datos) {
+                        const datosRUC = dataRUC.datos
+                        setTimeout(() => {
+                            inputNombresCliente.current.value = datosRUC.razonSocial || datosRUC.nombreComercial || ''
+                            inputApellidosCliente.current.value = ''
+                            inputDireccionCliente.current.value = datosRUC.direccion || ''
+                        }, 200)
+                        toast.success('Datos obtenidos del SRI')
+                        return { data: dataRUC.datos }
+                    }
+                } catch (errorRUC) {
+                    console.log(errorRUC)
+                }
+            }
+            
+            toast.error(e?.response?.data?.message?.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')?.trim() || 'Cliente no encontrado')
         }
     }
 
@@ -397,7 +418,7 @@ export default function ModalEmitirFactura() {
                 <div className="fixed inset-0 flex w-screen items-center justify-center p-4 bg-gray-800/40  modal-background">
 
                     {/* shadow shadow-[#245e95] */}
-                    <DialogPanel className="w-[100%] md:w-[75%] h-[95%] space-y-4 px-8 py-6 rounded-3xl bg-gradient-to-b from-[#153350]/90 to-[#1f3850]/90 backdrop-blur-sm shadow shadow-[#166fc2]">
+                    <DialogPanel className="w-[95%] md:w-[75%] max-w-4xl md:max-w-none h-[95vh] md:h-[95%] space-y-4 px-4 md:px-8 py-4 md:py-6 rounded-3xl bg-gradient-to-b from-[#153350]/90 to-[#1f3850]/90 backdrop-blur-sm shadow shadow-[#166fc2] overflow-y-auto">
 
                         <div className='flex h-full flex-col justify-between'>
                             <form

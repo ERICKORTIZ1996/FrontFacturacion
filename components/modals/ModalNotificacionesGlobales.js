@@ -12,13 +12,31 @@ export default function ModalNotificacionesGlobales() {
 
     const modalNotificacionesGlobales = useMainStore((state) => state.modalNotificacionesGlobales)
     const changeModalNotificacionesGlobales = useMainStore((state) => state.changeModalNotificacionesGlobales)
+    const dataUser = useMainStore((state) => state.dataUser)
 
     const consultarFacturasPendientes = async () => {
         try {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas`);
+            // Validar que tengamos token antes de hacer la petición
+            if (!dataUser?.tokenAcceso) {
+                console.warn('No hay token de acceso disponible')
+                return { data: [] }
+            }
+
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/facturas`, {
+                headers: {
+                    'Authorization': `Bearer ${dataUser.tokenAcceso}`
+                }
+            });
             return data
         } catch (error) {
-            console.log(error);
+            console.error('Error al consultar facturas pendientes:', error);
+            // Si es 403, puede ser que el token esté expirado o no tenga permisos
+            if (error?.response?.status === 403) {
+                console.warn('Acceso denegado (403). El usuario puede no tener permisos o el token estar expirado.')
+            }
+            // Retornar un objeto con estructura válida en lugar de undefined
+            // Esto previene el error de React Query sobre datos undefined
+            return { data: [] }
         }
     }
 
@@ -26,7 +44,7 @@ export default function ModalNotificacionesGlobales() {
         queryKey: ['facturas_pendientes_modal'], // Identificador unico para cada Query
         queryFn: consultarFacturasPendientes, // Funcion a consultar
         refetchOnWindowFocus: false, // No volver a hacer fetch al cambiar de pestaña
-        enabled: modalNotificacionesGlobales
+        enabled: modalNotificacionesGlobales && !!dataUser?.tokenAcceso // Solo ejecutar si el modal está abierto y hay token
     })
 
     return (
@@ -34,7 +52,7 @@ export default function ModalNotificacionesGlobales() {
             <Dialog open={modalNotificacionesGlobales} onClose={() => { changeModalNotificacionesGlobales() }} className="relative z-50">
                 <div className="fixed inset-0 flex w-screen items-start justify-end p-4 bg-transparent">
 
-                    <DialogPanel className="w-[22rem] h-96  space-y-4 p-3 rounded-3xl shadow shadow-[#245e95] bg-gradient-to-b from-[#153350] to-[#1f3850] mr-20">
+                    <DialogPanel className="w-[90%] md:w-[22rem] h-96 space-y-4 p-3 rounded-3xl shadow shadow-[#245e95] bg-gradient-to-b from-[#153350] to-[#1f3850] md:mr-20">
 
                         <div
                             className='flex justify-between items-center border-b border-b-[#486b8f] p-1'

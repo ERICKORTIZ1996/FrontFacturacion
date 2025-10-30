@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from "react"
 import MainLayout from "@/components/layouts/MainLayout"
 import BotonAgregarFactura from "@/components/emitir_facturas_componentes/BotonAgregarFactura"
 import ModalEmitirFactura from "@/components/modals/ModalEmitirFactura"
@@ -6,6 +9,8 @@ import Link from "next/link"
 import DataFactura from "@/components/emitir_facturas_componentes/DataFactura"
 
 export default function EmitirFacturas() {
+
+    const [busqueda, setBusqueda] = useState('')
 
     return (
         <ComprobarAcceso>
@@ -83,7 +88,8 @@ export default function EmitirFacturas() {
                                 type="text"
                                 placeholder="Buscar por número de factura"
                                 className="w-full outline-none bg-[#2e4760] rounded-xl pl-9 py-1 pr-3 focus:border-blue-500 shadow-lg"
-                                name="email"
+                                value={busqueda}
+                                onChange={(e) => setBusqueda(e.target.value)}
                             />
                         </div>
 
@@ -94,7 +100,7 @@ export default function EmitirFacturas() {
 
                 <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
 
-                    <DataFactura />
+                    <DataFactura busqueda={busqueda} />
 
                 </div>
 

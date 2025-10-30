@@ -72,7 +72,7 @@ export default function ModalCrearSucursal() {
                 <div className="fixed inset-0 flex w-screen items-center justify-center p-4 bg-gray-800/40 modal-background">
 
                     {/* shadow shadow-[#245e95] */}
-                    <DialogPanel className="w-[100%] md:w-[35%] h-[85%] space-y-4 px-8 py-6 rounded-3xl bg-gradient-to-b from-[#153350]/90 to-[#1f3850]/90 backdrop-blur-sm shadow shadow-[#166fc2]">
+                    <DialogPanel className="w-[95%] md:w-[35%] max-w-md md:max-w-none h-[90vh] md:h-[85%] space-y-4 px-4 md:px-8 py-4 md:py-6 rounded-3xl bg-gradient-to-b from-[#153350]/90 to-[#1f3850]/90 backdrop-blur-sm shadow shadow-[#166fc2]">
 
                         <div className='flex h-full flex-col justify-between'>
                             <form
@@ -81,11 +81,11 @@ export default function ModalCrearSucursal() {
                                 id='form-crear-sucursal'
                             >
 
-                                <DialogTitle className="font-semibold text-xl text-center w-full uppercase">
+                                <DialogTitle className="font-semibold text-lg md:text-xl text-center w-full uppercase">
                                     Crear Sucursal
                                 </DialogTitle>
 
-                                <h2 className='my-5 text-xl flex gap-2 items-center'>
+                                <h2 className='my-3 md:my-5 text-lg md:text-xl flex gap-2 items-center'>
 
                                     <span className='bg-gray-200 rounded-full p-1 text-gray-800'>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 bg-gray-200 text-gray-800">
@@ -99,12 +99,12 @@ export default function ModalCrearSucursal() {
                                 <div className='flex flex-col gap-5'>
 
                                     <div className='flex flex-col'>
-                                        <label htmlFor="ruc-empresa" className='mb-1'>Ruc</label>
+                                        <label htmlFor="ruc-empresa" className='mb-1 text-sm md:text-base'>Ruc</label>
                                         <input
                                             id='ruc-empresa'
                                             type="text"
                                             name='ruc-empresa'
-                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 text-sm md:text-base'
                                             placeholder='Ej: 1754854585001'
                                             minLength={13}
                                             maxLength={13}
@@ -112,12 +112,12 @@ export default function ModalCrearSucursal() {
                                     </div>
 
                                     <div className='flex flex-col'>
-                                        <label htmlFor="estab" className='mb-1'>Establecimiento</label>
+                                        <label htmlFor="estab" className='mb-1 text-sm md:text-base'>Establecimiento</label>
                                         <input
                                             id='estab'
                                             type="text"
                                             name='estab'
-                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 text-sm md:text-base'
                                             placeholder='001'
                                             minLength={3}
                                             maxLength={3}
@@ -125,23 +125,23 @@ export default function ModalCrearSucursal() {
                                     </div>
 
                                     <div className='flex flex-col'>
-                                        <label htmlFor="nombre-sucursal" className='mb-1'>Nombre</label>
+                                        <label htmlFor="nombre-sucursal" className='mb-1 text-sm md:text-base'>Nombre</label>
                                         <input
                                             id='nombre-sucursal'
                                             type="text"
                                             name='nombre-sucursal'
-                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 text-sm md:text-base'
                                             placeholder='Ej: Sucursal Sur'
                                         />
                                     </div>
 
                                     <div className='flex flex-col'>
-                                        <label htmlFor="direccion-sucursal" className='mb-1'>Dirección</label>
+                                        <label htmlFor="direccion-sucursal" className='mb-1 text-sm md:text-base'>Dirección</label>
                                         <input
                                             id='direccion-sucursal'
                                             type="text"
                                             name='direccion-sucursal'
-                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300'
+                                            className='outline-none bg-[#2e4760] rounded-lg px-3 py-1 border border-[#2e4760] focus:border-gray-300 text-sm md:text-base'
                                             placeholder='Ej: Av.Rio Amazonas y Naciones Unidas'
                                         />
                                     </div>
@@ -149,25 +149,25 @@ export default function ModalCrearSucursal() {
                                 </div>
                             </form>
 
-                            <form className='border-t border-t-[#486b8f] flex gap-3 items-center justify-end pt-5'>
+                            <form className='border-t border-t-[#486b8f] flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-end pt-3 md:pt-5'>
                                 <Button
-                                    className="font-semibold text-gray-100 cursor-pointer rounded-xl transition-colors px-4 py-1 border border-gray-100 flex gap-2 items-center hover:bg-[#d24148] hover:text-gray-200 hover:border-[#d24148]"
+                                    className="font-semibold text-sm md:text-base text-gray-100 cursor-pointer rounded-xl transition-colors px-3 md:px-4 py-2 md:py-1 border border-gray-100 flex gap-2 items-center justify-center hover:bg-[#d24148] hover:text-gray-200 hover:border-[#d24148]"
                                     onClick={() => {
                                         changeModalCrearSucursal()
                                     }}
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4 md:size-5">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                                     </svg>
                                     Cancelar
                                 </Button>
 
                                 <Button
-                                    className={`bg-gray-100 font-semibold cursor-pointer rounded-xl px-4 py-1 border border-gray-100 text-gray-800 flex items-center`}
+                                    className={`bg-gray-100 font-semibold text-sm md:text-base cursor-pointer rounded-xl px-3 md:px-4 py-2 md:py-1 border border-gray-100 text-gray-800 flex items-center justify-center`}
                                     type='submit'
                                     form='form-crear-sucursal'
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4 md:size-5">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                     </svg>
                                     Crear Sucursal

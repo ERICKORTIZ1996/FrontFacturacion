@@ -38,7 +38,7 @@ export default async function page() {
         <ComprobarAcceso>
             <MainLayout>
 
-                <div className="relative bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
+                <div className="relative bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-4 md:px-8 py-4 md:py-6 mt-5">
 
                     <div className="flex flex-col gap-1">
 
@@ -74,6 +74,7 @@ export default async function page() {
                         height={450}
                         alt="imagen-balances"
                         className="absolute -bottom-16 right-10"
+                        style={{ width: "auto", height: "auto" }}
                         priority
                     />
 
@@ -84,8 +85,8 @@ export default async function page() {
 
                     <div className="">
 
-                        <div className="grid grid-cols-2 mt-5 gap-5">
-                            <div className="shadow-lg border-gray-400 rounded-3xl px-8 py-6 banner-productos-vendidos">
+                        <div className="grid grid-cols-1 md:grid-cols-2 mt-5 gap-3 md:gap-5">
+                            <div className="shadow-lg border-gray-400 rounded-3xl px-4 md:px-8 py-4 md:py-6 banner-productos-vendidos">
 
                                 <h2 className="font-semibold text-gray-100 text-lg mb-5">Productos más Vendidos</h2>
 
@@ -128,7 +129,7 @@ export default async function page() {
                             <div>
                                 <h2 className="font-semibold text-gray-100 text-lg mb-5">Facturas</h2>
 
-                                <div className="shadow-lg border-gray-400 rounded-3xl px-8 py-6 bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50">
+                                <div className="shadow-lg border-gray-400 rounded-3xl px-4 md:px-8 py-4 md:py-6 bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50">
 
                                     <div className="flex justify-center">
 

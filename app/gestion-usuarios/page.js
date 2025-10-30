@@ -13,41 +13,75 @@ import SmallSpinner from "@/components/layouts/SmallSpinner"
 import Paginacion from "@/components/emitir_facturas_componentes/Paginacion"
 import TablaUsuarios from "@/components/tables/TablaUsuarios"
 import TablaAdmins from "@/components/tables/TablaAdmins"
+import { useMainStore } from "@/store/mainStore"
 
 export default function Admins() {
 
     const [ventanaUsuarios, setVentanaUsuarios] = useState(true)
     const [ventanaAdmins, setVentanaAdmins] = useState(false)
+    const dataUser = useMainStore((state) => state.dataUser)
 
     const consultarUsuarios = async () => {
         try {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/sucursales`)
-            return data
+            // Validar que tengamos token antes de hacer la petición
+            if (!dataUser?.tokenAcceso) {
+                console.warn('No hay token de acceso disponible para consultar usuarios')
+                return { data: [] }
+            }
+
+            const url = `${process.env.NEXT_PUBLIC_URL_BACK}/usuarios`
+            const { data } = await axios.get(url, {
+                headers: {
+                    'Authorization': `Bearer ${dataUser.tokenAcceso}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            
+            // Retornar estructura consistente: { data: [] } si no hay datos
+            return data?.data ? data : { data: data || [] }
         } catch (error) {
-            return null
+            console.error('Error al consultar usuarios:', error)
+            // Retornar estructura válida en lugar de null para evitar errores
+            return { data: [] }
         }
     }
 
     const consultarAdmins = async () => {
         try {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/puntos-emision`)
-            return data
+            // Validar que tengamos token antes de hacer la petición
+            if (!dataUser?.tokenAcceso) {
+                console.warn('No hay token de acceso disponible para consultar administradores')
+                return { data: [] }
+            }
+
+            const url = `${process.env.NEXT_PUBLIC_URL_BACK}/usuarios?rol=super admin`
+            const { data } = await axios.get(url, {
+                headers: {
+                    'Authorization': `Bearer ${dataUser.tokenAcceso}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            
+            // Retornar estructura consistente: { data: [] } si no hay datos
+            return data?.data ? data : { data: data || [] }
         } catch (error) {
-            return null
+            console.error('Error al consultar administradores:', error)
+            // Retornar estructura válida en lugar de null para evitar errores
+            return { data: [] }
         }
     }
 
     const { data: dataUsuarios, isLoading: isLoadingUsuarios } = useQuery({
-        queryKey: ['crear_usuario'], // Identificador unico para cada Query
+        queryKey: ['usuarios'], // Identificador unico para cada Query
         queryFn: consultarUsuarios, // Funcion a consultar
-        enabled: ventanaUsuarios, // Solo ejecuta cuando esta ventana esté activa
+        enabled: ventanaUsuarios && !!dataUser?.tokenAcceso, // Solo ejecuta cuando esta ventana esté activa y haya token
         refetchOnWindowFocus: false, // No volver a hacer fetch al cambiar de pestaña
     })
 
     const { data: dataAdmins, isLoading: isLoadingAdmins } = useQuery({
-        queryKey: ['crear_administrador'], // Identificador unico para cada Query
+        queryKey: ['administradores'], // Identificador unico para cada Query
         queryFn: consultarAdmins, // Funcion a consultar 
-        enabled: ventanaAdmins, // Solo ejecuta cuando esta ventana esté activa
+        enabled: ventanaAdmins && !!dataUser?.tokenAcceso, // Solo ejecuta cuando esta ventana esté activa y haya token
         refetchOnWindowFocus: false, // No volver a hacer fetch al cambiar de pestaña
     })
 
@@ -128,31 +162,53 @@ export default function Admins() {
                         </div>
 
 
-                        <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
+                        <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-4 md:px-8 py-4 md:py-6 mt-5">
 
                             {isLoadingUsuarios ? (
                                 <SmallSpinner />
-                            ) : dataUsuarios.data && dataUsuarios.data.length ? (
+                            ) : dataUsuarios?.data && dataUsuarios.data.length > 0 ? (
                                 <>
-                                    <table className="w-full mt-5">
-                                        <thead className="bg-[#05121f]/60">
-                                            <tr className="border-b-2 border-[#061727]">
-                                                <th className="text-start font-semibold p-2">Nombre</th>
-                                                <th className="text-start font-semibold p-2">Email</th>
-                                                <th className="text-start font-semibold p-2">Rol</th>
-                                                <th className="text-start font-semibold p-2">Detalle</th>
-                                            </tr>
-                                        </thead>
+                                    {/* Tabla desktop */}
+                                    <div className="hidden md:block w-full mt-5 overflow-x-auto">
+                                        <table className="w-full">
+                                            <thead className="bg-[#05121f]/60">
+                                                <tr className="border-b-2 border-[#061727]">
+                                                    <th className="text-start font-semibold p-2">Nombre</th>
+                                                    <th className="text-start font-semibold p-2">Email</th>
+                                                    <th className="text-start font-semibold p-2">Rol</th>
+                                                    <th className="text-start font-semibold p-2">Detalle</th>
+                                                </tr>
+                                            </thead>
 
-                                        <tbody>
-                                            {dataUsuarios.data.map(usuario => (
-                                                <TablaUsuarios
-                                                    key={usuario.id}
-                                                    usuario={usuario}
-                                                />
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                            <tbody>
+                                                {dataUsuarios.data.map(usuario => (
+                                                    <TablaUsuarios
+                                                        key={usuario.id}
+                                                        usuario={usuario}
+                                                    />
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* Cards móviles */}
+                                    <div className="md:hidden mt-5 space-y-3">
+                                        {dataUsuarios.data.map(usuario => (
+                                            <div key={usuario.id} className="bg-[#05121f]/60 rounded-lg p-4 border border-[#061727]">
+                                                <div className="flex flex-col gap-2">
+                                                    <div>
+                                                        <p className="font-semibold text-gray-200">{usuario?.nombre || 'N/A'}</p>
+                                                        <p className="text-sm text-gray-400">{usuario?.email || 'N/A'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-green-950 text-xs bg-green-200 rounded-full px-2 py-1">
+                                                            {usuario?.rol || 'usuario'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
 
                                     <Paginacion />
                                 </>
@@ -169,7 +225,7 @@ export default function Admins() {
 
                     <div>
 
-                        <div className="mt-5 flex items-center justify-end gap-2 bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3 mb-5">
+                        <div className="mt-5 flex flex-col md:flex-row items-stretch md:items-center justify-end gap-2 bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3 mb-5">
 
                             <div className="relative">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 absolute top-[7px] left-2">
@@ -188,31 +244,53 @@ export default function Admins() {
                         </div>
 
 
-                        <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
+                        <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-4 md:px-8 py-4 md:py-6 mt-5">
 
                             {isLoadingAdmins ? (
                                 <SmallSpinner />
-                            ) : dataAdmins.data && dataAdmins.data.length ? (
+                            ) : dataAdmins?.data && dataAdmins.data.length > 0 ? (
                                 <>
-                                    <table className="w-full mt-5">
-                                        <thead className="bg-[#05121f]/60">
-                                            <tr className="border-b-2 border-[#061727]">
-                                                <th className="text-start font-semibold p-2">Nombre</th>
-                                                <th className="text-start font-semibold p-2">Email</th>
-                                                <th className="text-start font-semibold p-2">Rol</th>
-                                                <th className="text-start font-semibold p-2">Detalle</th>
-                                            </tr>
-                                        </thead>
+                                    {/* Tabla desktop */}
+                                    <div className="hidden md:block w-full mt-5 overflow-x-auto">
+                                        <table className="w-full">
+                                            <thead className="bg-[#05121f]/60">
+                                                <tr className="border-b-2 border-[#061727]">
+                                                    <th className="text-start font-semibold p-2">Nombre</th>
+                                                    <th className="text-start font-semibold p-2">Email</th>
+                                                    <th className="text-start font-semibold p-2">Rol</th>
+                                                    <th className="text-start font-semibold p-2">Detalle</th>
+                                                </tr>
+                                            </thead>
 
-                                        <tbody>
-                                            {dataAdmins.data.map(admin => (
-                                                <TablaAdmins
-                                                    key={admin.id}
-                                                    admin={admin}
-                                                />
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                            <tbody>
+                                                {dataAdmins.data.map(admin => (
+                                                    <TablaAdmins
+                                                        key={admin.id}
+                                                        admin={admin}
+                                                    />
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* Cards móviles */}
+                                    <div className="md:hidden mt-5 space-y-3">
+                                        {dataAdmins.data.map(admin => (
+                                            <div key={admin.id} className="bg-[#05121f]/60 rounded-lg p-4 border border-[#061727]">
+                                                <div className="flex flex-col gap-2">
+                                                    <div>
+                                                        <p className="font-semibold text-gray-200">{admin?.nombre || 'N/A'}</p>
+                                                        <p className="text-sm text-gray-400">{admin?.email || 'N/A'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-green-950 text-xs bg-green-200 rounded-full px-2 py-1">
+                                                            {admin?.rol || 'super admin'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
 
                                     <Paginacion />
                                 </>

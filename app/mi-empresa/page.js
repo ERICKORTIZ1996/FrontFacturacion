@@ -27,29 +27,56 @@ export default function MiEmpresa() {
     const [ventanaPuntoEmision, setVentanaPuntoEmision] = useState(false)
 
 
+    const dataUser = useMainStore((state) => state.dataUser)
+
     const consultarEmpresas = async () => {
         try {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/empresas`)
+            if (!dataUser?.tokenAcceso) {
+                console.warn('No hay token de acceso disponible')
+                return null
+            }
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/empresas`, {
+                headers: {
+                    'Authorization': `Bearer ${dataUser.tokenAcceso}`
+                }
+            })
             return data
         } catch (error) {
+            console.error('Error al consultar empresas:', error)
             return null
         }
     }
 
     const consultarSucursales = async () => {
         try {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/sucursales`)
+            if (!dataUser?.tokenAcceso) {
+                return null
+            }
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/sucursales`, {
+                headers: {
+                    'Authorization': `Bearer ${dataUser.tokenAcceso}`
+                }
+            })
             return data
         } catch (error) {
+            console.error('Error al consultar sucursales:', error)
             return null
         }
     }
 
     const consultarPuntosEmision = async () => {
         try {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/puntos-emision`)
+            if (!dataUser?.tokenAcceso) {
+                return null
+            }
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/puntos-emision`, {
+                headers: {
+                    'Authorization': `Bearer ${dataUser.tokenAcceso}`
+                }
+            })
             return data
         } catch (error) {
+            console.error('Error al consultar puntos de emisión:', error)
             return null
         }
     }
@@ -57,21 +84,21 @@ export default function MiEmpresa() {
     const { data, isLoading } = useQuery({
         queryKey: ['empresas'], // Identificador unico para cada Query
         queryFn: consultarEmpresas, // Funcion a consultar
-        enabled: ventanaEmpresa, // Solo ejecuta cuando esta ventana esté activa
+        enabled: ventanaEmpresa && !!dataUser?.tokenAcceso, // Solo ejecuta cuando esta ventana esté activa y hay token
         refetchOnWindowFocus: false, // No volver a hacer fetch al cambiar de pestaña
     })
 
     const { data: dataSucursales, isLoading: isLoadingSucursales } = useQuery({
         queryKey: ['sucursales'], // Identificador unico para cada Query
         queryFn: consultarSucursales, // Funcion a consultar 
-        enabled: ventanaSucursal, // Solo ejecuta cuando esta ventana esté activa
+        enabled: ventanaSucursal && !!dataUser?.tokenAcceso, // Solo ejecuta cuando esta ventana esté activa y hay token
         refetchOnWindowFocus: false, // No volver a hacer fetch al cambiar de pestaña
     })
 
     const { data: dataPuntosEmision, isLoading: isLoadingPuntosEmision } = useQuery({
         queryKey: ['puntos_emision'], // Identificador unico para cada Query
         queryFn: consultarPuntosEmision, // Funcion a consultar
-        enabled: ventanaPuntoEmision, // Solo ejecuta cuando esta ventana esté activa
+        enabled: ventanaPuntoEmision && !!dataUser?.tokenAcceso, // Solo ejecuta cuando esta ventana esté activa y hay token
         refetchOnWindowFocus: false, // No volver a hacer fetch al cambiar de pestaña
     })
 
@@ -150,11 +177,11 @@ export default function MiEmpresa() {
 
                 {ventanaEmpresa && (
                     <>
-                        <div className="mt-5 flex items-center justify-between bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3">
+                        <div className="mt-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3">
 
-                            <div className="flex gap-2 items-center">
+                            <div className="flex gap-2 items-center flex-wrap">
                                 <h2
-                                    className="bg-[#077eeb]/60 px-3 py-1 rounded-xl w-fit text-lg flex gap-1 font-semibold"
+                                    className="bg-[#077eeb]/60 px-3 py-1 rounded-xl w-fit text-base md:text-lg flex gap-1 font-semibold"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
@@ -200,32 +227,53 @@ export default function MiEmpresa() {
 
                         </div>
 
-                        <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
+                        <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-4 md:px-8 py-4 md:py-6 mt-5">
 
                             {isLoading ? (
                                 <SmallSpinner />
                             ) : data?.data && data?.data?.length ? (
                                 <>
-                                    <table className="w-full mt-5">
-                                        <thead className="bg-[#05121f]/60">
-                                            <tr className="border-b-2 border-[#061727]">
-                                                <th className="text-start font-semibold p-2">Ruc</th>
-                                                <th className="text-start font-semibold p-2">Razon Social</th>
-                                                <th className="text-start font-semibold p-2">Matriz</th>
-                                                <th className="text-start font-semibold p-2">Sucursales</th>
-                                                <th className="text-start font-semibold p-2">Detalle</th>
-                                            </tr>
-                                        </thead>
+                                    {/* Tabla desktop */}
+                                    <div className="hidden md:block w-full mt-5 overflow-x-auto">
+                                        <table className="w-full">
+                                            <thead className="bg-[#05121f]/60">
+                                                <tr className="border-b-2 border-[#061727]">
+                                                    <th className="text-start font-semibold p-2">Ruc</th>
+                                                    <th className="text-start font-semibold p-2">Razon Social</th>
+                                                    <th className="text-start font-semibold p-2">Matriz</th>
+                                                    <th className="text-start font-semibold p-2">Sucursales</th>
+                                                    <th className="text-start font-semibold p-2">Detalle</th>
+                                                </tr>
+                                            </thead>
 
-                                        <tbody>
-                                            {data.data.map(empresa => (
-                                                <TablaEmpresas
-                                                    key={empresa.id}
-                                                    empresa={empresa}
-                                                />
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                            <tbody>
+                                                {data.data.map(empresa => (
+                                                    <TablaEmpresas
+                                                        key={empresa.id}
+                                                        empresa={empresa}
+                                                    />
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* Cards móviles */}
+                                    <div className="md:hidden mt-5 space-y-3">
+                                        {data.data.map(empresa => (
+                                            <div key={empresa.id} className="bg-[#05121f]/60 rounded-lg p-4 border border-[#061727]">
+                                                <div className="flex flex-col gap-2">
+                                                    <div>
+                                                        <p className="font-semibold text-gray-200">{empresa.razonSocial || 'N/A'}</p>
+                                                        <p className="text-sm text-gray-400">RUC: {empresa.ruc || 'N/A'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs text-gray-400">Matriz</p>
+                                                        <p className="text-sm">{empresa.matriz || 'N/A'}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
 
                                     <Paginacion />
                                 </>
@@ -239,11 +287,11 @@ export default function MiEmpresa() {
 
                 {ventanaSucursal && (
                     <>
-                        <div className="mt-5 flex items-center justify-between bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3">
+                        <div className="mt-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3">
 
-                            <div className="flex gap-2 items-center">
+                            <div className="flex gap-2 items-center flex-wrap">
                                 <h2
-                                    className="bg-[#077eeb]/60 px-3 py-1 rounded-xl w-fit text-lg flex gap-1 font-semibold"
+                                    className="bg-[#077eeb]/60 px-3 py-1 rounded-xl w-fit text-base md:text-lg flex gap-1 font-semibold"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205 3 1m1.5.5-1.5-.5M6.75 7.364V3h-3v18m3-13.636 10.5-3.819" />
@@ -288,34 +336,55 @@ export default function MiEmpresa() {
 
                         </div>
 
-                        <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
+                        <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-4 md:px-8 py-4 md:py-6 mt-5">
 
                             {isLoadingSucursales ? (
                                 <SmallSpinner />
                             ) : dataSucursales?.data && dataSucursales?.data?.length ? (
                                 <>
-                                    <table className="w-full mt-5">
-                                        <thead className="bg-[#05121f]/60">
-                                            <tr className="border-b-2 border-[#061727]">
-                                                <th className="text-start font-semibold p-2">Ruc</th>
-                                                <th className="text-start font-semibold p-2">Establecimiento</th>
-                                                <th className="text-start font-semibold p-2">Nombre</th>
-                                                <th className="text-start font-semibold p-2">Dirección</th>
-                                                <th className="text-start font-semibold p-2">Detalle</th>
-                                            </tr>
-                                        </thead>
+                                    {/* Tabla desktop */}
+                                    <div className="hidden md:block w-full mt-5 overflow-x-auto">
+                                        <table className="w-full">
+                                            <thead className="bg-[#05121f]/60">
+                                                <tr className="border-b-2 border-[#061727]">
+                                                    <th className="text-start font-semibold p-2">Ruc</th>
+                                                    <th className="text-start font-semibold p-2">Establecimiento</th>
+                                                    <th className="text-start font-semibold p-2">Nombre</th>
+                                                    <th className="text-start font-semibold p-2">Dirección</th>
+                                                    <th className="text-start font-semibold p-2">Detalle</th>
+                                                </tr>
+                                            </thead>
 
-                                        <tbody>
-                                            {dataSucursales.data.map(sucursal => (
-                                                <TablaSucursales
-                                                    key={sucursal.id}
-                                                    sucursal={sucursal}
-                                                />
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                            <tbody>
+                                                {dataSucursales.data.map(sucursal => (
+                                                    <TablaSucursales
+                                                        key={sucursal.id}
+                                                        sucursal={sucursal}
+                                                    />
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-                                    < Paginacion />
+                                    {/* Cards móviles */}
+                                    <div className="md:hidden mt-5 space-y-3">
+                                        {dataSucursales.data.map(sucursal => (
+                                            <div key={sucursal.id} className="bg-[#05121f]/60 rounded-lg p-4 border border-[#061727]">
+                                                <div className="flex flex-col gap-2">
+                                                    <div>
+                                                        <p className="font-semibold text-gray-200">{sucursal.nombre || 'N/A'}</p>
+                                                        <p className="text-sm text-gray-400">Establecimiento: {sucursal.establecimiento || 'N/A'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs text-gray-400">Dirección</p>
+                                                        <p className="text-sm">{sucursal.direccion || 'N/A'}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <Paginacion />
                                 </>
                             ) : (
                                 <p className="text-center uppercase">Sin datos</p>
@@ -327,11 +396,11 @@ export default function MiEmpresa() {
 
                 {ventanaPuntoEmision && (
                     <>
-                        <div className="mt-5 flex items-center justify-between bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3">
+                        <div className="mt-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-gradient-to-t from-[#102940]/50 to-[#182a3b]/50 rounded-2xl p-3">
 
-                            <div className="flex gap-2 items-center">
+                            <div className="flex gap-2 items-center flex-wrap">
                                 <h2
-                                    className="bg-[#077eeb]/60 px-3 py-1 rounded-xl w-fit text-lg flex gap-1 font-semibold"
+                                    className="bg-[#077eeb]/60 px-3 py-1 rounded-xl w-fit text-base md:text-lg flex gap-1 font-semibold"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -377,34 +446,51 @@ export default function MiEmpresa() {
 
                         </div>
 
-                        <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-8 py-6 mt-5">
+                        <div className="bg-gradient-to-b from-[#153350]/50 to-[#1f3850]/50 shadow-lg border-gray-400 rounded-3xl px-4 md:px-8 py-4 md:py-6 mt-5">
 
 
                             {isLoadingPuntosEmision ? (
                                 <SmallSpinner />
                             ) : dataPuntosEmision?.data && dataPuntosEmision?.data?.length ? (
                                 <>
-                                    <table className="w-full mt-5">
-                                        <thead className="bg-[#05121f]/60">
-                                            <tr className="border-b-2 border-[#061727]">
-                                                <th className="text-start font-semibold p-2">Ruc</th>
-                                                <th className="text-start font-semibold p-2">Establecimiento</th>
-                                                <th className="text-start font-semibold p-2">Punto de Emisión</th>
-                                                <th className="text-start font-semibold p-2">Detalle</th>
-                                            </tr>
-                                        </thead>
+                                    {/* Tabla desktop */}
+                                    <div className="hidden md:block w-full mt-5 overflow-x-auto">
+                                        <table className="w-full">
+                                            <thead className="bg-[#05121f]/60">
+                                                <tr className="border-b-2 border-[#061727]">
+                                                    <th className="text-start font-semibold p-2">Ruc</th>
+                                                    <th className="text-start font-semibold p-2">Establecimiento</th>
+                                                    <th className="text-start font-semibold p-2">Punto de Emisión</th>
+                                                    <th className="text-start font-semibold p-2">Detalle</th>
+                                                </tr>
+                                            </thead>
 
-                                        <tbody>
-                                            {dataPuntosEmision.data.map(puntoEmision => (
-                                                <TablaPuntoEmision
-                                                    key={puntoEmision.id}
-                                                    puntoEmision={puntoEmision}
-                                                />
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                            <tbody>
+                                                {dataPuntosEmision.data.map(puntoEmision => (
+                                                    <TablaPuntoEmision
+                                                        key={puntoEmision.id}
+                                                        puntoEmision={puntoEmision}
+                                                    />
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-                                    < Paginacion />
+                                    {/* Cards móviles */}
+                                    <div className="md:hidden mt-5 space-y-3">
+                                        {dataPuntosEmision.data.map(puntoEmision => (
+                                            <div key={puntoEmision.id} className="bg-[#05121f]/60 rounded-lg p-4 border border-[#061727]">
+                                                <div className="flex flex-col gap-2">
+                                                    <div>
+                                                        <p className="font-semibold text-gray-200">Establecimiento: {puntoEmision.establecimiento || 'N/A'}</p>
+                                                        <p className="text-sm text-gray-400">Punto Emisión: {puntoEmision.puntoEmision || 'N/A'}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <Paginacion />
                                 </>
                             ) : (
                                 <p className="text-center uppercase">Sin datos</p>

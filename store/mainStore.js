@@ -15,6 +15,9 @@ export const useMainStore = create((set, get) => ({
     modalCrearAdministrador: false,
     modalPrimerReporteATS: false,
     modalPrimerReporteTributario: false,
+    modalCrearPeriodo: false,
+    modalCrearCuenta: false,
+    modalCrearAsiento: false,
     productos: [],
     formulariosFactura: [],
     editar: false,
@@ -42,15 +45,32 @@ export const useMainStore = create((set, get) => ({
     changeModalCrearAdministrador: () => set((state) => ({ modalCrearAdministrador: !state.modalCrearAdministrador })),
     changeModalPrimerReporteATS: () => set((state) => ({ modalPrimerReporteATS: !state.modalPrimerReporteATS })),
     changeModalPrimerReporteTributario: () => set((state) => ({ modalPrimerReporteTributario: !state.modalPrimerReporteTributario })),
+    changeModalCrearPeriodo: () => set((state) => ({ modalCrearPeriodo: !state.modalCrearPeriodo })),
+    changeModalCrearCuenta: () => set((state) => ({ modalCrearCuenta: !state.modalCrearCuenta })),
+    changeModalCrearAsiento: () => set((state) => ({ modalCrearAsiento: !state.modalCrearAsiento })),
     crearFormProducto: (producto) => set((state) => ({
         productos: [...state.productos, producto],
         formulariosFactura: [...state.formulariosFactura, generarId()]
     })),
     decryptData: (data) => {
         try {
-            const bytes = CryptoJS.AES.decrypt(data, process.env.NEXT_PUBLIC_KEY_CRYPTO);
-            return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+            // Obtener clave de encriptación o usar una por defecto (debe coincidir con app/page.js)
+            const encryptionKey = process.env.NEXT_PUBLIC_KEY_CRYPTO || 'clave-secreta-sistema-facturacion-2024-cambiar-en-produccion'
+            
+            if (!encryptionKey || !data) {
+                return null;
+            }
+            
+            const bytes = CryptoJS.AES.decrypt(data, encryptionKey);
+            const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+            
+            if (!decrypted) {
+                return null;
+            }
+            
+            return JSON.parse(decrypted);
         } catch (e) {
+            console.error('Error al desencriptar datos:', e);
             return null;
         }
     },
