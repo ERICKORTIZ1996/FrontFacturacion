@@ -14,6 +14,7 @@ import Paginacion from "@/components/emitir_facturas_componentes/Paginacion"
 import axios from "axios"
 import { useMainStore } from "@/store/mainStore"
 import SmallSpinner from "@/components/layouts/SmallSpinner"
+import { useRouter } from "next/navigation"
 
 export default function MiEmpresa() {
 
@@ -21,6 +22,7 @@ export default function MiEmpresa() {
     const changeModalCrearSucursal = useMainStore((state) => state.changeModalCrearSucursal)
     const changeModalCrearPuntoEmision = useMainStore((state) => state.changeModalCrearPuntoEmision)
 
+    const router = useRouter()
 
     const [ventanaEmpresa, setVentanaEmpresa] = useState(true)
     const [ventanaSucursal, setVentanaSucursal] = useState(false)
@@ -43,6 +45,19 @@ export default function MiEmpresa() {
             return data
         } catch (error) {
             console.error('Error al consultar empresas:', error)
+            
+            // Si el error es 401, el token expiró - redirigir al login
+            if (error?.response?.status === 401) {
+                console.warn('Token expirado. Redirigiendo al login...')
+                const cerrarSesion = useMainStore.getState().cerrarSesion
+                cerrarSesion()
+                setTimeout(() => {
+                    router.push('/')
+                }, 1000)
+            } else if (error?.response?.status === 403) {
+                console.warn('Acceso denegado (403). El usuario puede no tener permisos.')
+            }
+            
             return null
         }
     }
@@ -50,16 +65,100 @@ export default function MiEmpresa() {
     const consultarSucursales = async () => {
         try {
             if (!dataUser?.tokenAcceso) {
+                console.warn('❌ No hay token de acceso disponible en dataUser')
+                console.warn('dataUser completo:', dataUser)
                 return null
             }
+            
+            // Debug detallado del token
+            const token = dataUser.tokenAcceso.trim() // Eliminar espacios
+            const tokenPreview = token ? `${token.substring(0, 30)}...` : 'no-token'
+            const tokenLength = token?.length || 0
+            
+            console.log('🔍 Debug - Consultar Sucursales:', {
+                tieneToken: !!token,
+                tokenLength: tokenLength,
+                tokenPreview: tokenPreview,
+                url: `${process.env.NEXT_PUBLIC_URL_BACK}/sucursales`,
+                headerFormat: `Bearer ${token.substring(0, 20)}...`
+            })
+            
+            // Verificar que el token no esté vacío o tenga solo espacios
+            if (!token || tokenLength === 0) {
+                console.error('❌ El token está vacío o solo contiene espacios')
+                return null
+            }
+            
+            // Construir el header exacto que se enviará
+            const authHeader = `Bearer ${token}`
+            console.log('📤 Headers que se enviarán:', {
+                Authorization: authHeader.substring(0, 40) + '...',
+                'Content-Type': 'application/json'
+            })
+            
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/sucursales`, {
                 headers: {
-                    'Authorization': `Bearer ${dataUser.tokenAcceso}`
+                    'Authorization': authHeader,
+                    'Content-Type': 'application/json'
                 }
             })
+            
+            console.log('✅ Sucursales obtenidas exitosamente')
             return data
         } catch (error) {
-            console.error('Error al consultar sucursales:', error)
+            console.error('❌ Error al consultar sucursales:', error)
+            
+            // Debug completo del error
+            if (error?.response) {
+                const headersEnviados = error.config?.headers
+                console.error('📋 Detalles completos del error:', {
+                    status: error.response.status,
+                    statusText: error.response.statusText,
+                    mensaje: error.response.data?.mensaje || error.response.data?.message || 'Sin mensaje',
+                    datos: error.response.data,
+                    url: error.config?.url,
+                    metodo: error.config?.method?.toUpperCase(),
+                    headerAuthorizationEnviado: headersEnviados?.Authorization ? 
+                        `${headersEnviados.Authorization.substring(0, 40)}...` : 'NO ENVIADO',
+                    todosLosHeaders: Object.keys(headersEnviados || {})
+                })
+                
+                // Verificar si el header se envió correctamente
+                if (headersEnviados?.Authorization) {
+                    const authSent = headersEnviados.Authorization
+                    const tieneBearer = authSent.startsWith('Bearer ')
+                    const tokenEnviado = authSent.replace('Bearer ', '')
+                    console.log('🔍 Análisis del header Authorization:', {
+                        tieneBearer: tieneBearer,
+                        longitudToken: tokenEnviado.length,
+                        formatoCorrecto: tieneBearer && tokenEnviado.length > 0
+                    })
+                } else {
+                    console.error('❌ El header Authorization NO se envió en la petición')
+                }
+            }
+            
+            // Si el error es 401, el token expiró o es inválido - redirigir al login
+            if (error?.response?.status === 401) {
+                console.warn('❌ Token expirado o inválido (401)')
+                console.warn('💡 Posibles causas:')
+                console.warn('   1. El token expiró (verifica duración en backend)')
+                console.warn('   2. El token no es válido (formato incorrecto)')
+                console.warn('   3. El backend rechaza el token (verifica middleware de auth)')
+                console.warn('   4. El formato del header Authorization no es el esperado')
+                console.warn('')
+                console.warn('Redirigiendo al login en 2 segundos...')
+                
+                const cerrarSesion = useMainStore.getState().cerrarSesion
+                cerrarSesion()
+                setTimeout(() => {
+                    router.push('/')
+                }, 2000)
+            } else if (error?.response?.status === 403) {
+                console.warn('⚠️ Acceso denegado (403). El usuario puede no tener permisos para esta acción.')
+                console.warn('Mensaje del servidor:', error.response?.data?.mensaje || error.response?.data?.message)
+            }
+            
             return null
         }
     }
@@ -67,6 +166,7 @@ export default function MiEmpresa() {
     const consultarPuntosEmision = async () => {
         try {
             if (!dataUser?.tokenAcceso) {
+                console.warn('No hay token de acceso disponible')
                 return null
             }
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACK}/puntos-emision`, {
@@ -77,6 +177,19 @@ export default function MiEmpresa() {
             return data
         } catch (error) {
             console.error('Error al consultar puntos de emisión:', error)
+            
+            // Si el error es 401, el token expiró - redirigir al login
+            if (error?.response?.status === 401) {
+                console.warn('Token expirado. Redirigiendo al login...')
+                const cerrarSesion = useMainStore.getState().cerrarSesion
+                cerrarSesion()
+                setTimeout(() => {
+                    router.push('/')
+                }, 1000)
+            } else if (error?.response?.status === 403) {
+                console.warn('Acceso denegado (403). Verifica tus permisos.')
+            }
+            
             return null
         }
     }

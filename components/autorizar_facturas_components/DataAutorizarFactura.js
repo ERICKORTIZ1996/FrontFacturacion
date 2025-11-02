@@ -8,14 +8,21 @@ import SmallSpinner from "../layouts/SmallSpinner"
 import Paginacion from "../emitir_facturas_componentes/Paginacion"
 import axios from "axios"
 import { getStatusBill, formatearFechaFactura } from "@/helpers"
+import { useMainStore } from "@/store/mainStore"
 
 export default function DataAutorizarFactura() {
 
     const [filtroEstado, setfiltroEstado] = useState(null)
+    const dataUser = useMainStore((state) => state.dataUser)
 
     const consultarFacturas = async (estado = null) => {
 
         try {
+            // Validar que tengamos token antes de hacer la petición
+            if (!dataUser?.tokenAcceso) {
+                console.warn('No hay token de acceso disponible')
+                return { data: [] }
+            }
 
             let url;
             const baseUrl = `${process.env.NEXT_PUBLIC_URL_BACK}/facturas`; // URL para consultar todas las facturas
@@ -35,19 +42,32 @@ export default function DataAutorizarFactura() {
                     break;
             }
 
-            // Realiza la petición a la API usando la URL construida
-            const { data } = await axios.get(url);
+            // Realiza la petición a la API usando la URL construida con autenticación
+            const { data } = await axios.get(url, {
+                headers: {
+                    'Authorization': `Bearer ${dataUser.tokenAcceso}`
+                }
+            });
             return data;
 
         } catch (error) {
-            console.error(error);
-            throw error; // Re-lanza el error para que useQuery lo maneje
+            console.error('Error al consultar facturas:', error);
+            
+            // Si el error es 403 o 401, puede ser que el token esté expirado
+            if (error?.response?.status === 403 || error?.response?.status === 401) {
+                console.warn('Token expirado o acceso denegado. Verifica tu sesión.')
+                return { data: [] }
+            }
+            
+            // Retornar estructura válida para evitar errores en React Query
+            return { data: [] }
         }
     };
 
     const { data, isLoading } = useQuery({
         queryKey: ['emitir_facturas', filtroEstado], // Identificador unico para cada Query
         queryFn: () => consultarFacturas(filtroEstado), // Funcion a consultar
+        enabled: !!dataUser?.tokenAcceso, // Solo ejecutar si hay token
         refetchOnWindowFocus: false, // No volver a hacer fetch al cambiar de pestaña
     })
 

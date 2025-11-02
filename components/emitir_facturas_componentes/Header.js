@@ -13,6 +13,7 @@ export default function Header() {
     const consultarFacturasPendientes = async () => {
         try {
             if (!dataUser?.tokenAcceso) {
+                console.warn('No hay token de acceso disponible')
                 return { data: [] }
             }
 
@@ -25,6 +26,15 @@ export default function Header() {
             return data
         } catch (error) {
             console.error('Error al consultar facturas pendientes:', error);
+            
+            // Si el error es 403 o 401, puede ser que el token esté expirado
+            if (error?.response?.status === 403) {
+                console.warn('Acceso denegado (403). El usuario puede no tener permisos o el token estar expirado.')
+            } else if (error?.response?.status === 401) {
+                console.warn('Token expirado o inválido (401). Verifica tu sesión.')
+            }
+            
+            // Retornar estructura válida para evitar errores
             return { data: [] }
         }
     }

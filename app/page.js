@@ -72,8 +72,22 @@ export default function Home() {
         }
       })
 
+      // Verificar que el token viene del backend
+      const tokenRecibido = data.data.tokens.tokenAcceso
+      if (!tokenRecibido) {
+        toast.error('Error: El servidor no devolvió un token válido')
+        setIsLoading(false)
+        return
+      }
+
+      console.log('✅ Login exitoso - Token recibido:', {
+        tokenLength: tokenRecibido.length,
+        tokenPreview: `${tokenRecibido.substring(0, 30)}...`,
+        tieneTokenRenovacion: !!data.data.tokens.tokenRenovacion
+      })
+
       setDataUser({
-        tokenAcceso: data.data.tokens.tokenAcceso,
+        tokenAcceso: tokenRecibido,
         tokenRenovacion: data.data.tokens.tokenRenovacion,
         email: data.data.usuario.email,
         id: data.data.usuario.id,
@@ -82,13 +96,20 @@ export default function Home() {
       })
 
       localStorage.setItem('dataUser', encryptData({
-        tokenAcceso: data.data.tokens.tokenAcceso,
+        tokenAcceso: tokenRecibido,
         tokenRenovacion: data.data.tokens.tokenRenovacion,
         email: data.data.usuario.email,
         id: data.data.usuario.id,
         nombre: data.data.usuario.nombre,
         rol: data.data.usuario.rol
       }))
+
+      // Verificar que se guardó correctamente
+      const tokenGuardado = useMainStore.getState().dataUser.tokenAcceso
+      console.log('💾 Token guardado en store:', {
+        tieneToken: !!tokenGuardado,
+        tokenLength: tokenGuardado?.length || 0
+      })
 
       router.push('/inicio')
 

@@ -35,6 +35,14 @@ export default function MisDatos() {
             return data
         } catch (error) {
             console.error('Error al consultar empresas:', error)
+            
+            // Si el error es 403 o 401, puede ser que el token esté expirado
+            if (error?.response?.status === 403) {
+                console.warn('Acceso denegado (403). El usuario puede no tener permisos o el token estar expirado.')
+            } else if (error?.response?.status === 401) {
+                console.warn('Token expirado o inválido (401). Verifica tu sesión.')
+            }
+            
             return null
         }
     }

@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { generarId } from '@/helpers'
-import CryptoJS from "crypto-js";
+import CryptoJS from "crypto-js"
+import axios from "axios"
 
 export const useMainStore = create((set, get) => ({
 
@@ -76,6 +77,53 @@ export const useMainStore = create((set, get) => ({
     },
     cerrarSesion: () => {
         localStorage.removeItem('dataUser');
+        set({ dataUser: {} });
+    },
+
+    // Renovar token de acceso usando token de renovación
+    renovarToken: async () => {
+        try {
+            const currentUser = get().dataUser;
+            
+            if (!currentUser?.tokenRenovacion) {
+                console.warn('No hay token de renovación disponible')
+                return false;
+            }
+
+            // Intentar renovar el token (ajusta la URL según tu backend)
+            const { data } = await axios.post(
+                `${process.env.NEXT_PUBLIC_URL_BACK}/auth/refresh`,
+                { tokenRenovacion: currentUser.tokenRenovacion },
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            // Actualizar tokens si la renovación fue exitosa
+            if (data?.data?.tokens?.tokenAcceso && data?.data?.tokens?.tokenRenovacion) {
+                const nuevosDatos = {
+                    ...currentUser,
+                    tokenAcceso: data.data.tokens.tokenAcceso,
+                    tokenRenovacion: data.data.tokens.tokenRenovacion
+                };
+
+                set({ dataUser: nuevosDatos });
+
+                // Guardar en localStorage
+                const encryptionKey = process.env.NEXT_PUBLIC_KEY_CRYPTO || 'clave-secreta-sistema-facturacion-2024-cambiar-en-produccion'
+                const encrypted = CryptoJS.AES.encrypt(JSON.stringify(nuevosDatos), encryptionKey).toString();
+                localStorage.setItem('dataUser', encrypted);
+
+                return true;
+            }
+
+            return false;
+        } catch (error) {
+            console.error('Error al renovar token:', error);
+            return false;
+        }
     },
 
     /* ------- local storage ------- */
